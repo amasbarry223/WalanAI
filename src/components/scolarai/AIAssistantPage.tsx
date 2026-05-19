@@ -281,7 +281,7 @@ export default function AIAssistantPage() {
   const hasMessages = messages.length > 0
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50/50">
+    <div className="flex flex-col h-full bg-gray-50/50">
       {/* ── Header ────────────────────────────────────────────────────── */}
       <header className="bg-white border-b px-6 py-4 shrink-0">
         <div className="flex items-center justify-between">

@@ -150,7 +150,7 @@ export default function PricingPage() {
 
   return (
     <motion.div
-      className="min-h-screen bg-gradient-to-b from-gray-50 to-white"
+      className="bg-gradient-to-b from-gray-50 to-white"
       variants={containerVariants}
       initial="hidden"
       animate="visible"

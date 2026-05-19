@@ -43,7 +43,7 @@ export default function AppLayout() {
   // Prevent hydration mismatch by not rendering until client-side mounted
   if (!mounted) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="flex h-full items-center justify-center bg-gray-50">
         <div className="flex flex-col items-center gap-3">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
           <p className="text-sm text-gray-500">Chargement...</p>
@@ -111,9 +111,9 @@ export default function AppLayout() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50/50">
+    <div className="flex h-full bg-gray-50/50">
       <Sidebar />
-      <main className="flex-1 overflow-auto">{renderPage()}</main>
+      <main className="flex-1 h-full overflow-y-auto">{renderPage()}</main>
     </div>
   )
 }

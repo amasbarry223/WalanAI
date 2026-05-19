@@ -1071,8 +1071,8 @@ export default function ExamTrackerPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <ScrollArea className="h-screen">
+    <div className="h-full bg-gray-50/50">
+      <ScrollArea className="h-full">
         <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
           {/* Header */}
           <motion.div

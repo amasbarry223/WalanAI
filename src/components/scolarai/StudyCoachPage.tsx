@@ -496,7 +496,7 @@ export default function StudyCoachPage() {
   const visibleInsights = aiInsights.filter((i) => !dismissedInsights.has(i.id))
 
   return (
-    <ScrollArea className="h-screen">
+    <ScrollArea className="h-full">
       <motion.div
         className="p-4 md:p-6 max-w-[1400px] mx-auto pb-12"
         variants={containerVariants}
