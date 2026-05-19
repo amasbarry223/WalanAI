@@ -255,11 +255,10 @@ export default function LeaderboardPage() {
         </div>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: Main Content */}
-        <div className="lg:col-span-2 space-y-6">
-
-          {/* ─── Top 3 Podium ─── */}
+      {/* Row 1: Podium + Sidebar */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        {/* Podium */}
+        <div className="lg:col-span-2">
           <motion.div variants={itemVariants}>
             <Card className="overflow-hidden border-0 shadow-md">
               <CardContent className="p-0">
@@ -383,135 +382,10 @@ export default function LeaderboardPage() {
               </CardContent>
             </Card>
           </motion.div>
-
-          {/* ─── Full Rankings Table ─── */}
-          <motion.div variants={itemVariants}>
-            <Card className="hover:shadow-md transition-shadow overflow-hidden">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Trophy className="h-5 w-5 text-emerald-500" />
-                    Classement complet
-                  </CardTitle>
-                  <span className="text-xs text-gray-400">{filteredStudents.length} participants</span>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                <ScrollArea className="max-h-[560px]">
-                  <div className="w-full">
-                    {/* Table Header */}
-                    <div className="flex items-center px-4 sm:px-6 py-2.5 border-b bg-gray-50/80">
-                      <span className="w-10 text-[11px] font-semibold text-gray-400 uppercase tracking-wider text-center shrink-0">#</span>
-                      <span className="w-10 shrink-0" />
-                      <span className="flex-1 min-w-0 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Étudiant</span>
-                      <span className="w-20 text-[11px] font-semibold text-gray-400 uppercase tracking-wider text-center shrink-0">Matière</span>
-                      <span className="w-14 text-[11px] font-semibold text-gray-400 uppercase tracking-wider text-center shrink-0">Série</span>
-                      <span className="w-8 text-[11px] font-semibold text-gray-400 uppercase tracking-wider text-center shrink-0" />
-                      <span className="w-20 text-[11px] font-semibold text-gray-400 uppercase tracking-wider text-right shrink-0">Score</span>
-                    </div>
-
-                    {/* Ranking Rows */}
-                    {rest.map((student, index) => {
-                      const rank = index + 4
-                      const isCurrentUser = student.id === CURRENT_USER_ID
-                      return (
-                        <motion.div
-                          key={student.id}
-                          custom={index}
-                          variants={listVariants}
-                          initial="hidden"
-                          animate="visible"
-                          className={`flex items-center px-4 sm:px-6 py-3 transition-colors ${
-                            isCurrentUser
-                              ? 'bg-emerald-50 border-y border-emerald-200'
-                              : 'hover:bg-gray-50/80 border-b border-gray-50 last:border-0'
-                          }`}
-                        >
-                          {/* Rank */}
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold shrink-0 ${
-                            isCurrentUser
-                              ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-200'
-                              : rank <= 5
-                                ? 'bg-emerald-100 text-emerald-700'
-                                : 'bg-gray-100 text-gray-500'
-                          }`}>
-                            {rank}
-                          </div>
-
-                          {/* Avatar */}
-                          <Avatar className="h-10 w-10 shrink-0 ml-0">
-                            <AvatarFallback className={`text-xs font-bold ${
-                              isCurrentUser ? 'bg-emerald-200 text-emerald-700' : 'bg-gray-100 text-gray-600'
-                            }`}>
-                              {getInitials(student.name)}
-                            </AvatarFallback>
-                          </Avatar>
-
-                          {/* Name */}
-                          <div className="flex-1 min-w-0 mx-3">
-                            <div className="flex items-center gap-2">
-                              <p className={`text-sm font-semibold truncate whitespace-nowrap ${
-                                isCurrentUser ? 'text-emerald-800' : 'text-gray-900'
-                              }`}>
-                                {student.name}
-                              </p>
-                              {isCurrentUser && (
-                                <Badge className="bg-emerald-500 text-white text-[9px] px-2 py-0 h-4 shrink-0 rounded-full">Vous</Badge>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Subject */}
-                          <div className="w-20 shrink-0 flex justify-center">
-                            <Badge variant="secondary" className={`text-[10px] px-2 py-0 whitespace-nowrap ${subjectColors[student.subject] || 'bg-gray-100 text-gray-600'}`}>
-                              {student.subject}
-                            </Badge>
-                          </div>
-
-                          {/* Streak */}
-                          <div className="w-14 shrink-0 flex items-center gap-1 justify-center">
-                            <Flame className="h-3.5 w-3.5 text-orange-500 shrink-0" />
-                            <span className="text-xs font-semibold text-gray-700 whitespace-nowrap">{student.streak}j</span>
-                          </div>
-
-                          {/* Trend */}
-                          <div className="w-8 shrink-0 flex justify-center">
-                            {student.trend === 'up' && (
-                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-50">
-                                <ChevronUp className="h-4 w-4 text-emerald-500" />
-                              </div>
-                            )}
-                            {student.trend === 'down' && (
-                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-red-50">
-                                <ChevronDown className="h-4 w-4 text-red-400" />
-                              </div>
-                            )}
-                            {student.trend === 'same' && (
-                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100">
-                                <Minus className="h-3.5 w-3.5 text-gray-400" />
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Score */}
-                          <div className="w-20 shrink-0 text-right">
-                            <p className={`text-sm font-bold tabular-nums whitespace-nowrap ${isCurrentUser ? 'text-emerald-700' : 'text-gray-900'}`}>
-                              {formatScore(student.score)}
-                            </p>
-                          </div>
-                        </motion.div>
-                      )
-                    })}
-                  </div>
-                </ScrollArea>
-              </CardContent>
-            </Card>
-          </motion.div>
         </div>
 
-        {/* Right: Sidebar */}
+        {/* Sidebar */}
         <div className="space-y-6">
-
           {/* ─── Your Rank Card ─── */}
           <motion.div variants={itemVariants}>
             <Card className="border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-md overflow-hidden relative">
@@ -646,85 +520,208 @@ export default function LeaderboardPage() {
               </CardContent>
             </Card>
           </motion.div>
+        </div>
+      </div>
 
-          {/* ─── Achievements Section ─── */}
-          <motion.div variants={itemVariants}>
-            <Card className="hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Medal className="h-5 w-5 text-emerald-500" />
-                  Accomplissements récents
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <ScrollArea className="max-h-[280px]">
-                  <div className="px-4 sm:px-6 pb-4 space-y-0">
-                    {recentAchievements.map((ach, i) => (
-                      <motion.div
-                        key={i}
-                        className="flex items-center gap-3 py-3 border-b border-gray-50 last:border-0"
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.08, duration: 0.3 }}
-                      >
-                        <div className={`p-2 rounded-lg bg-gray-50 shrink-0 ${ach.color}`}>
-                          {ach.icon}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">{ach.badge}</p>
-                          <p className="text-xs text-gray-500 truncate">{ach.student}</p>
-                        </div>
-                        <span className="text-[10px] text-gray-400 shrink-0">{ach.time}</span>
-                      </motion.div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </CardContent>
-            </Card>
-          </motion.div>
+      {/* Row 2: Full Rankings Table — FULL WIDTH */}
+      <motion.div variants={itemVariants}>
+        <Card className="hover:shadow-md transition-shadow overflow-hidden">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Trophy className="h-5 w-5 text-emerald-500" />
+                Classement complet
+              </CardTitle>
+              <span className="text-xs text-gray-400">{filteredStudents.length} participants</span>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            {/* Table Header */}
+            <div className="flex items-center px-5 sm:px-8 py-3 border-b bg-gray-50/80">
+              <span className="w-12 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center shrink-0">#</span>
+              <span className="w-11 shrink-0" />
+              <span className="flex-1 min-w-0 text-xs font-semibold text-gray-400 uppercase tracking-wider">Étudiant</span>
+              <span className="w-28 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center shrink-0">Matière</span>
+              <span className="w-20 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center shrink-0">Série</span>
+              <span className="w-10 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center shrink-0">Trend</span>
+              <span className="w-24 text-xs font-semibold text-gray-400 uppercase tracking-wider text-right shrink-0">Score</span>
+            </div>
 
-          {/* ─── Quick Stats ─── */}
-          <motion.div variants={itemVariants}>
-            <Card className="hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Zap className="h-5 w-5 text-emerald-500" />
-                  Statistiques
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Participants actifs</span>
-                    <span className="text-sm font-bold text-gray-900">{filteredStudents.length}</span>
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Score moyen</span>
-                    <span className="text-sm font-bold text-emerald-600">
-                      {formatScore(Math.round(filteredStudents.reduce((a, s) => a + s.score, 0) / filteredStudents.length))}
-                    </span>
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Plus longue série</span>
-                    <div className="flex items-center gap-1">
-                      <Flame className="h-3.5 w-3.5 text-orange-500" />
-                      <span className="text-sm font-bold text-gray-900">{Math.max(...filteredStudents.map(s => s.streak))}j</span>
+            {/* Ranking Rows — no scroll, all visible */}
+            <div className="w-full">
+              {rest.map((student, index) => {
+                const rank = index + 4
+                const isCurrentUser = student.id === CURRENT_USER_ID
+                return (
+                  <motion.div
+                    key={student.id}
+                    custom={index}
+                    variants={listVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className={`flex items-center px-5 sm:px-8 py-3.5 transition-colors ${
+                      isCurrentUser
+                        ? 'bg-emerald-50 border-y-2 border-emerald-200'
+                        : 'hover:bg-gray-50/80 border-b border-gray-100 last:border-0'
+                    }`}
+                  >
+                    {/* Rank */}
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-sm font-bold shrink-0 ${
+                      isCurrentUser
+                        ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-200'
+                        : rank <= 5
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      {rank}
                     </div>
-                  </div>
-                  <Separator />
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Score le plus élevé</span>
-                    <span className="text-sm font-bold text-amber-600">
-                      {formatScore(Math.max(...filteredStudents.map(s => s.score)))}
-                    </span>
+
+                    {/* Avatar */}
+                    <Avatar className="h-11 w-11 shrink-0">
+                      <AvatarFallback className={`text-xs font-bold ${
+                        isCurrentUser ? 'bg-emerald-200 text-emerald-700' : 'bg-gray-100 text-gray-600'
+                      }`}>
+                        {getInitials(student.name)}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    {/* Name */}
+                    <div className="flex-1 min-w-0 mx-4">
+                      <div className="flex items-center gap-2">
+                        <p className={`text-sm font-semibold truncate whitespace-nowrap ${
+                          isCurrentUser ? 'text-emerald-800' : 'text-gray-900'
+                        }`}>
+                          {student.name}
+                        </p>
+                        {isCurrentUser && (
+                          <Badge className="bg-emerald-500 text-white text-[10px] px-2.5 py-0.5 h-5 shrink-0 rounded-full">Vous</Badge>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Subject */}
+                    <div className="w-28 shrink-0 flex justify-center">
+                      <Badge variant="secondary" className={`text-[11px] px-3 py-0.5 whitespace-nowrap ${subjectColors[student.subject] || 'bg-gray-100 text-gray-600'}`}>
+                        {student.subject}
+                      </Badge>
+                    </div>
+
+                    {/* Streak */}
+                    <div className="w-20 shrink-0 flex items-center gap-1.5 justify-center">
+                      <Flame className="h-4 w-4 text-orange-500 shrink-0" />
+                      <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">{student.streak}j</span>
+                    </div>
+
+                    {/* Trend */}
+                    <div className="w-10 shrink-0 flex justify-center">
+                      {student.trend === 'up' && (
+                        <div className="flex items-center justify-center w-7 h-7 rounded-full bg-emerald-50">
+                          <ChevronUp className="h-4 w-4 text-emerald-500" />
+                        </div>
+                      )}
+                      {student.trend === 'down' && (
+                        <div className="flex items-center justify-center w-7 h-7 rounded-full bg-red-50">
+                          <ChevronDown className="h-4 w-4 text-red-400" />
+                        </div>
+                      )}
+                      {student.trend === 'same' && (
+                        <div className="flex items-center justify-center w-7 h-7 rounded-full bg-gray-100">
+                          <Minus className="h-4 w-4 text-gray-400" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Score */}
+                    <div className="w-24 shrink-0 text-right">
+                      <p className={`text-sm font-bold tabular-nums whitespace-nowrap ${isCurrentUser ? 'text-emerald-700' : 'text-gray-900'}`}>
+                        {formatScore(student.score)}
+                      </p>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Row 3: Bottom Cards — Achievements + Stats */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        {/* ─── Achievements Section ─── */}
+        <motion.div variants={itemVariants}>
+          <Card className="hover:shadow-md transition-shadow h-full">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Medal className="h-5 w-5 text-emerald-500" />
+                Accomplissements récents
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="px-5 sm:px-6 pb-4 space-y-0">
+                {recentAchievements.map((ach, i) => (
+                  <motion.div
+                    key={i}
+                    className="flex items-center gap-3 py-3 border-b border-gray-50 last:border-0"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.08, duration: 0.3 }}
+                  >
+                    <div className={`p-2 rounded-lg bg-gray-50 shrink-0 ${ach.color}`}>
+                      {ach.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{ach.badge}</p>
+                      <p className="text-xs text-gray-500 truncate">{ach.student}</p>
+                    </div>
+                    <span className="text-[10px] text-gray-400 shrink-0">{ach.time}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* ─── Quick Stats ─── */}
+        <motion.div variants={itemVariants}>
+          <Card className="hover:shadow-md transition-shadow h-full">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Zap className="h-5 w-5 text-emerald-500" />
+                Statistiques
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Participants actifs</span>
+                  <span className="text-sm font-bold text-gray-900">{filteredStudents.length}</span>
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Score moyen</span>
+                  <span className="text-sm font-bold text-emerald-600">
+                    {formatScore(Math.round(filteredStudents.reduce((a, s) => a + s.score, 0) / filteredStudents.length))}
+                  </span>
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Plus longue série</span>
+                  <div className="flex items-center gap-1">
+                    <Flame className="h-3.5 w-3.5 text-orange-500" />
+                    <span className="text-sm font-bold text-gray-900">{Math.max(...filteredStudents.map(s => s.streak))}j</span>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Score le plus élevé</span>
+                  <span className="text-sm font-bold text-amber-600">
+                    {formatScore(Math.max(...filteredStudents.map(s => s.score)))}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     </motion.div>
   )
