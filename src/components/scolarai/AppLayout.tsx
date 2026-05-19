@@ -1,6 +1,7 @@
 'use client'
 
 import { useAppStore } from '@/lib/store'
+import { useState, useSyncExternalStore } from 'react'
 import Sidebar from './Sidebar'
 import LoginPage from './LoginPage'
 import RegisterPage from './RegisterPage'
@@ -25,8 +26,31 @@ import StudyCoachPage from './StudyCoachPage'
 import ExamTrackerPage from './ExamTrackerPage'
 import FlashcardDeckPage from './FlashcardDeckPage'
 
+const emptySubscribe = () => () => {}
+
+function useHydrated() {
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  )
+}
+
 export default function AppLayout() {
   const { currentPage, isAuthenticated } = useAppStore()
+  const mounted = useHydrated()
+
+  // Prevent hydration mismatch by not rendering until client-side mounted
+  if (!mounted) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
+          <p className="text-sm text-gray-500">Chargement...</p>
+        </div>
+      </div>
+    )
+  }
 
   // Auth pages (no sidebar)
   if (!isAuthenticated || currentPage === 'login') {
