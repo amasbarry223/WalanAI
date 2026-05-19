@@ -386,7 +386,7 @@ export default function LeaderboardPage() {
 
           {/* ─── Full Rankings Table ─── */}
           <motion.div variants={itemVariants}>
-            <Card className="hover:shadow-md transition-shadow">
+            <Card className="hover:shadow-md transition-shadow overflow-hidden">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2 text-base">
@@ -397,17 +397,20 @@ export default function LeaderboardPage() {
                 </div>
               </CardHeader>
               <CardContent className="p-0">
-                {/* Table Header */}
-                <div className="grid grid-cols-[2.5rem_2.5rem_1fr_4rem_2.5rem_5rem] sm:grid-cols-[2.5rem_2.5rem_1fr_5rem_2.5rem_6rem] items-center gap-1 px-3 sm:px-5 py-2 border-b bg-gray-50/80 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
-                  <span className="text-center">#</span>
-                  <span />
-                  <span>Étudiant</span>
-                  <span className="text-center">Série</span>
-                  <span className="text-center">Trend</span>
-                  <span className="text-right">Score</span>
-                </div>
-                <ScrollArea className="max-h-[480px]">
-                  <div className="px-2 sm:px-3 pb-2">
+                <ScrollArea className="max-h-[560px]">
+                  <div className="w-full">
+                    {/* Table Header */}
+                    <div className="flex items-center px-4 sm:px-6 py-2.5 border-b bg-gray-50/80">
+                      <span className="w-10 text-[11px] font-semibold text-gray-400 uppercase tracking-wider text-center shrink-0">#</span>
+                      <span className="w-10 shrink-0" />
+                      <span className="flex-1 min-w-0 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Étudiant</span>
+                      <span className="w-20 text-[11px] font-semibold text-gray-400 uppercase tracking-wider text-center shrink-0">Matière</span>
+                      <span className="w-14 text-[11px] font-semibold text-gray-400 uppercase tracking-wider text-center shrink-0">Série</span>
+                      <span className="w-8 text-[11px] font-semibold text-gray-400 uppercase tracking-wider text-center shrink-0" />
+                      <span className="w-20 text-[11px] font-semibold text-gray-400 uppercase tracking-wider text-right shrink-0">Score</span>
+                    </div>
+
+                    {/* Ranking Rows */}
                     {rest.map((student, index) => {
                       const rank = index + 4
                       const isCurrentUser = student.id === CURRENT_USER_ID
@@ -418,16 +421,16 @@ export default function LeaderboardPage() {
                           variants={listVariants}
                           initial="hidden"
                           animate="visible"
-                          className={`grid grid-cols-[2.5rem_2.5rem_1fr_4rem_2.5rem_5rem] sm:grid-cols-[2.5rem_2.5rem_1fr_5rem_2.5rem_6rem] items-center gap-1 py-2.5 px-2 sm:px-3 rounded-lg transition-colors ${
+                          className={`flex items-center px-4 sm:px-6 py-3 transition-colors ${
                             isCurrentUser
-                              ? 'bg-emerald-50 border border-emerald-200 my-1'
-                              : 'hover:bg-gray-50'
+                              ? 'bg-emerald-50 border-y border-emerald-200'
+                              : 'hover:bg-gray-50/80 border-b border-gray-50 last:border-0'
                           }`}
                         >
                           {/* Rank */}
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold shrink-0 ${
                             isCurrentUser
-                              ? 'bg-emerald-500 text-white'
+                              ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-200'
                               : rank <= 5
                                 ? 'bg-emerald-100 text-emerald-700'
                                 : 'bg-gray-100 text-gray-500'
@@ -436,57 +439,63 @@ export default function LeaderboardPage() {
                           </div>
 
                           {/* Avatar */}
-                          <Avatar className="h-9 w-9 shrink-0">
-                            <AvatarFallback className={`text-xs font-semibold ${
+                          <Avatar className="h-10 w-10 shrink-0 ml-0">
+                            <AvatarFallback className={`text-xs font-bold ${
                               isCurrentUser ? 'bg-emerald-200 text-emerald-700' : 'bg-gray-100 text-gray-600'
                             }`}>
                               {getInitials(student.name)}
                             </AvatarFallback>
                           </Avatar>
 
-                          {/* Name & Subject */}
-                          <div className="min-w-0 flex items-center gap-1.5">
-                            <p className={`text-sm font-medium truncate ${
-                              isCurrentUser ? 'text-emerald-800' : 'text-gray-900'
-                            }`}>
-                              {student.name}
-                            </p>
-                            {isCurrentUser && (
-                              <Badge className="bg-emerald-500 text-white text-[9px] px-1.5 py-0 h-4 shrink-0">Vous</Badge>
-                            )}
-                            <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 shrink-0 hidden sm:inline-flex ${subjectColors[student.subject] || 'bg-gray-100 text-gray-600'}`}>
+                          {/* Name */}
+                          <div className="flex-1 min-w-0 mx-3">
+                            <div className="flex items-center gap-2">
+                              <p className={`text-sm font-semibold truncate whitespace-nowrap ${
+                                isCurrentUser ? 'text-emerald-800' : 'text-gray-900'
+                              }`}>
+                                {student.name}
+                              </p>
+                              {isCurrentUser && (
+                                <Badge className="bg-emerald-500 text-white text-[9px] px-2 py-0 h-4 shrink-0 rounded-full">Vous</Badge>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Subject */}
+                          <div className="w-20 shrink-0 flex justify-center">
+                            <Badge variant="secondary" className={`text-[10px] px-2 py-0 whitespace-nowrap ${subjectColors[student.subject] || 'bg-gray-100 text-gray-600'}`}>
                               {student.subject}
                             </Badge>
                           </div>
 
                           {/* Streak */}
-                          <div className="flex items-center gap-0.5 justify-center shrink-0">
-                            <Flame className="h-3 w-3 text-orange-500 shrink-0" />
-                            <span className="text-[11px] font-semibold text-gray-700">{student.streak}j</span>
+                          <div className="w-14 shrink-0 flex items-center gap-1 justify-center">
+                            <Flame className="h-3.5 w-3.5 text-orange-500 shrink-0" />
+                            <span className="text-xs font-semibold text-gray-700 whitespace-nowrap">{student.streak}j</span>
                           </div>
 
                           {/* Trend */}
-                          <div className="flex justify-center shrink-0">
+                          <div className="w-8 shrink-0 flex justify-center">
                             {student.trend === 'up' && (
-                              <div className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-50">
-                                <ChevronUp className="h-3.5 w-3.5 text-emerald-500" />
+                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-50">
+                                <ChevronUp className="h-4 w-4 text-emerald-500" />
                               </div>
                             )}
                             {student.trend === 'down' && (
-                              <div className="flex items-center justify-center w-5 h-5 rounded-full bg-red-50">
-                                <ChevronDown className="h-3.5 w-3.5 text-red-400" />
+                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-red-50">
+                                <ChevronDown className="h-4 w-4 text-red-400" />
                               </div>
                             )}
                             {student.trend === 'same' && (
-                              <div className="flex items-center justify-center w-5 h-5 rounded-full bg-gray-100">
-                                <Minus className="h-3 w-3 text-gray-400" />
+                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100">
+                                <Minus className="h-3.5 w-3.5 text-gray-400" />
                               </div>
                             )}
                           </div>
 
                           {/* Score */}
-                          <div className="text-right shrink-0">
-                            <p className={`text-sm font-bold tabular-nums ${isCurrentUser ? 'text-emerald-700' : 'text-gray-900'}`}>
+                          <div className="w-20 shrink-0 text-right">
+                            <p className={`text-sm font-bold tabular-nums whitespace-nowrap ${isCurrentUser ? 'text-emerald-700' : 'text-gray-900'}`}>
                               {formatScore(student.score)}
                             </p>
                           </div>
