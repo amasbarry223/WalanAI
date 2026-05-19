@@ -398,13 +398,13 @@ export default function LeaderboardPage() {
               </CardHeader>
               <CardContent className="p-0">
                 {/* Table Header */}
-                <div className="flex items-center gap-3 px-4 sm:px-6 py-2 border-b bg-gray-50/80 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
-                  <span className="w-8 text-center">#</span>
-                  <span className="w-9" />
-                  <span className="flex-1">Étudiant</span>
-                  <span className="hidden sm:block w-16 text-center">Série</span>
-                  <span className="w-8 text-center">Trend</span>
-                  <span className="w-16 text-right">Score</span>
+                <div className="grid grid-cols-[2.5rem_2.5rem_1fr_4rem_2.5rem_5rem] sm:grid-cols-[2.5rem_2.5rem_1fr_5rem_2.5rem_6rem] items-center gap-1 px-3 sm:px-5 py-2 border-b bg-gray-50/80 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+                  <span className="text-center">#</span>
+                  <span />
+                  <span>Étudiant</span>
+                  <span className="text-center">Série</span>
+                  <span className="text-center">Trend</span>
+                  <span className="text-right">Score</span>
                 </div>
                 <ScrollArea className="max-h-[480px]">
                   <div className="px-2 sm:px-3 pb-2">
@@ -418,7 +418,7 @@ export default function LeaderboardPage() {
                           variants={listVariants}
                           initial="hidden"
                           animate="visible"
-                          className={`flex items-center gap-3 py-2.5 px-2 sm:px-3 rounded-lg transition-colors ${
+                          className={`grid grid-cols-[2.5rem_2.5rem_1fr_4rem_2.5rem_5rem] sm:grid-cols-[2.5rem_2.5rem_1fr_5rem_2.5rem_6rem] items-center gap-1 py-2.5 px-2 sm:px-3 rounded-lg transition-colors ${
                             isCurrentUser
                               ? 'bg-emerald-50 border border-emerald-200 my-1'
                               : 'hover:bg-gray-50'
@@ -445,30 +445,28 @@ export default function LeaderboardPage() {
                           </Avatar>
 
                           {/* Name & Subject */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-1.5">
-                              <p className={`text-sm font-medium truncate ${
-                                isCurrentUser ? 'text-emerald-800' : 'text-gray-900'
-                              }`}>
-                                {student.name}
-                              </p>
-                              {isCurrentUser && (
-                                <Badge className="bg-emerald-500 text-white text-[9px] px-1.5 py-0 h-4 shrink-0">Vous</Badge>
-                              )}
-                            </div>
-                            <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 mt-0.5 ${subjectColors[student.subject] || 'bg-gray-100 text-gray-600'}`}>
+                          <div className="min-w-0 flex items-center gap-1.5">
+                            <p className={`text-sm font-medium truncate ${
+                              isCurrentUser ? 'text-emerald-800' : 'text-gray-900'
+                            }`}>
+                              {student.name}
+                            </p>
+                            {isCurrentUser && (
+                              <Badge className="bg-emerald-500 text-white text-[9px] px-1.5 py-0 h-4 shrink-0">Vous</Badge>
+                            )}
+                            <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 shrink-0 hidden sm:inline-flex ${subjectColors[student.subject] || 'bg-gray-100 text-gray-600'}`}>
                               {student.subject}
                             </Badge>
                           </div>
 
                           {/* Streak */}
-                          <div className="hidden sm:flex items-center gap-1 shrink-0 w-16 justify-center">
-                            <Flame className="h-3.5 w-3.5 text-orange-500 shrink-0" />
-                            <span className="text-xs font-semibold text-gray-700">{student.streak}j</span>
+                          <div className="flex items-center gap-0.5 justify-center shrink-0">
+                            <Flame className="h-3 w-3 text-orange-500 shrink-0" />
+                            <span className="text-[11px] font-semibold text-gray-700">{student.streak}j</span>
                           </div>
 
                           {/* Trend */}
-                          <div className="shrink-0 w-8 flex justify-center">
+                          <div className="flex justify-center shrink-0">
                             {student.trend === 'up' && (
                               <div className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-50">
                                 <ChevronUp className="h-3.5 w-3.5 text-emerald-500" />
@@ -487,7 +485,7 @@ export default function LeaderboardPage() {
                           </div>
 
                           {/* Score */}
-                          <div className="text-right shrink-0 w-16">
+                          <div className="text-right shrink-0">
                             <p className={`text-sm font-bold tabular-nums ${isCurrentUser ? 'text-emerald-700' : 'text-gray-900'}`}>
                               {formatScore(student.score)}
                             </p>
