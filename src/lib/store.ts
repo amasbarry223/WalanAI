@@ -3,6 +3,7 @@
 import { create } from 'zustand'
 
 export type PageName =
+  | 'landing'
   | 'login'
   | 'register'
   | 'onboarding'
@@ -48,7 +49,7 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set) => ({
-  currentPage: 'login',
+  currentPage: 'landing',
   isAuthenticated: false,
   user: null,
   sidebarCollapsed: false,
@@ -67,7 +68,7 @@ export const useAppStore = create<AppState>((set) => ({
     set({
       isAuthenticated: false,
       user: null,
-      currentPage: 'login',
+      currentPage: 'landing',
     }),
 
   toggleSidebar: () =>

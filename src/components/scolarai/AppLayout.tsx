@@ -3,6 +3,7 @@
 import { useAppStore } from '@/lib/store'
 import { useState, useSyncExternalStore } from 'react'
 import Sidebar from './Sidebar'
+import LandingPage from './LandingPage'
 import LoginPage from './LoginPage'
 import RegisterPage from './RegisterPage'
 import OnboardingPage from './OnboardingPage'
@@ -50,6 +51,11 @@ export default function AppLayout() {
         </div>
       </div>
     )
+  }
+
+  // Landing page (no sidebar, no auth required)
+  if (currentPage === 'landing') {
+    return <LandingPage />
   }
 
   // Auth pages (no sidebar)
