@@ -23,6 +23,10 @@ import {
   Lightbulb,
   CreditCard,
   Zap,
+  Layers,
+  ClipboardCheck,
+  Sparkles,
+  UsersRound,
 } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -55,45 +59,31 @@ const navItems: NavItem[] = [
     icon: <FileText className="h-4 w-4" />,
   },
   {
-    label: 'Assistant IA',
-    page: 'assistant',
-    icon: <Bot className="h-4 w-4" />,
-  },
-  {
     label: 'Carnets de notes',
     page: 'notes',
     icon: <BookOpen className="h-4 w-4" />,
-    section: 'APPRENTISSAGE',
   },
   {
-    label: 'Ressources',
-    page: 'resources',
-    icon: <Lightbulb className="h-4 w-4" />,
+    label: 'Assistant IA',
+    page: 'assistant',
+    icon: <Bot className="h-4 w-4" />,
+    section: 'INTELLIGENCE IA',
+  },
+  {
+    label: 'Coach IA',
+    page: 'study-coach',
+    icon: <Sparkles className="h-4 w-4" />,
   },
   {
     label: 'Révision',
     page: 'revision',
     icon: <Brain className="h-4 w-4" />,
+    section: 'APPRENTISSAGE',
   },
   {
-    label: 'Pomodoro',
-    page: 'pomodoro',
-    icon: <Timer className="h-4 w-4" />,
-  },
-  {
-    label: 'Planificateur',
-    page: 'planner',
-    icon: <Calendar className="h-4 w-4" />,
-  },
-  {
-    label: 'Classement',
-    page: 'leaderboard',
-    icon: <Trophy className="h-4 w-4" />,
-  },
-  {
-    label: 'Ma Progression',
-    page: 'progress',
-    icon: <TrendingUp className="h-4 w-4" />,
+    label: 'Flashcards',
+    page: 'flashcard-deck',
+    icon: <Layers className="h-4 w-4" />,
   },
   {
     label: 'Générateur de Quiz',
@@ -101,9 +91,46 @@ const navItems: NavItem[] = [
     icon: <Zap className="h-4 w-4" />,
   },
   {
+    label: 'Ressources',
+    page: 'resources',
+    icon: <Lightbulb className="h-4 w-4" />,
+  },
+  {
+    label: 'Pomodoro',
+    page: 'pomodoro',
+    icon: <Timer className="h-4 w-4" />,
+    section: 'ORGANISATION',
+  },
+  {
+    label: 'Planificateur',
+    page: 'planner',
+    icon: <Calendar className="h-4 w-4" />,
+  },
+  {
+    label: 'Suivi des Examens',
+    page: 'exam-tracker',
+    icon: <ClipboardCheck className="h-4 w-4" />,
+  },
+  {
+    label: 'Groupes d\u2019Étude',
+    page: 'study-groups',
+    icon: <UsersRound className="h-4 w-4" />,
+  },
+  {
+    label: 'Ma Progression',
+    page: 'progress',
+    icon: <TrendingUp className="h-4 w-4" />,
+    section: 'PERFORMANCE',
+  },
+  {
     label: 'Historique Quiz',
     page: 'quiz-history',
     icon: <History className="h-4 w-4" />,
+  },
+  {
+    label: 'Classement',
+    page: 'leaderboard',
+    icon: <Trophy className="h-4 w-4" />,
   },
   {
     label: 'Tarifs',

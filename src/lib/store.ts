@@ -21,6 +21,10 @@ export type PageName =
   | 'notes'
   | 'pricing'
   | 'resources'
+  | 'exam-tracker'
+  | 'flashcard-deck'
+  | 'study-coach'
+  | 'study-groups'
 
 interface User {
   name: string

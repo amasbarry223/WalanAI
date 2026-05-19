@@ -20,6 +20,10 @@ import NotesPage from './NotesPage'
 import QuizGeneratorPage from './QuizGeneratorPage'
 import ResourcesPage from './ResourcesPage'
 import PricingPage from './PricingPage'
+import StudyGroupsPage from './StudyGroupsPage'
+import StudyCoachPage from './StudyCoachPage'
+import ExamTrackerPage from './ExamTrackerPage'
+import FlashcardDeckPage from './FlashcardDeckPage'
 
 export default function AppLayout() {
   const { currentPage, isAuthenticated } = useAppStore()
@@ -69,6 +73,14 @@ export default function AppLayout() {
         return <ResourcesPage />
       case 'pricing':
         return <PricingPage />
+      case 'study-groups':
+        return <StudyGroupsPage />
+      case 'flashcard-deck':
+        return <FlashcardDeckPage />
+      case 'exam-tracker':
+        return <ExamTrackerPage />
+      case 'study-coach':
+        return <StudyCoachPage />
       default:
         return <DashboardPage />
     }
