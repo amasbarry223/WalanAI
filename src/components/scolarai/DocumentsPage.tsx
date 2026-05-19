@@ -141,16 +141,16 @@ export default function DocumentsPage() {
           <Clock className="h-3.5 w-3.5" />
           Tri : Date
         </Button>
-        <div className="flex border rounded-lg overflow-hidden">
+        <div className="flex border rounded-lg overflow-hidden bg-white">
           <button
             onClick={() => setViewMode('grid')}
-            className={`p-2 ${viewMode === 'grid' ? 'bg-emerald-500 text-white' : 'bg-white text-gray-400 hover:bg-gray-50'}`}
+            className={`p-2 transition-colors ${viewMode === 'grid' ? 'bg-emerald-500 text-white' : 'text-gray-400 hover:bg-gray-50'}`}
           >
             <LayoutGrid className="h-4 w-4" />
           </button>
           <button
             onClick={() => setViewMode('list')}
-            className={`p-2 ${viewMode === 'list' ? 'bg-emerald-500 text-white' : 'bg-white text-gray-400 hover:bg-gray-50'}`}
+            className={`p-2 border-l transition-colors ${viewMode === 'list' ? 'bg-emerald-500 text-white' : 'text-gray-400 hover:bg-gray-50'}`}
           >
             <List className="h-4 w-4" />
           </button>

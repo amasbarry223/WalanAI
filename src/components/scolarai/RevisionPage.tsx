@@ -227,26 +227,26 @@ export default function RevisionPage() {
                 </AnimatePresence>
 
                 {/* Navigation */}
-                <div className="flex items-center justify-between mt-6">
-                  <Button variant="outline" onClick={handlePrev} className="gap-2">
+                <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-3">
+                  <Button variant="outline" onClick={handlePrev} className="gap-2 w-full sm:w-auto">
                     <ChevronLeft className="h-4 w-4" />
                     Précédent
                   </Button>
                   <div className="flex gap-2">
-                    <Button variant="outline" className="gap-2 text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200">
+                    <Button variant="outline" size="sm" className="gap-1.5 text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200">
                       <X className="h-4 w-4" />
-                      Difficile
+                      <span className="hidden sm:inline">Difficile</span>
                     </Button>
-                    <Button variant="outline" className="gap-2 text-amber-500 hover:text-amber-600 hover:bg-amber-50 border-amber-200">
+                    <Button variant="outline" size="sm" className="gap-1.5 text-amber-500 hover:text-amber-600 hover:bg-amber-50 border-amber-200">
                       <RefreshCw className="h-4 w-4" />
-                      À revoir
+                      <span className="hidden sm:inline">À revoir</span>
                     </Button>
-                    <Button className="gap-2 bg-emerald-500 hover:bg-emerald-600 text-white">
+                    <Button size="sm" className="gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white">
                       <Check className="h-4 w-4" />
-                      Su
+                      Maîtrisé
                     </Button>
                   </div>
-                  <Button variant="outline" onClick={handleNext} className="gap-2">
+                  <Button variant="outline" onClick={handleNext} className="gap-2 w-full sm:w-auto">
                     Suivant
                     <ChevronRight className="h-4 w-4" />
                   </Button>

@@ -15,25 +15,33 @@ import {
   BookOpen,
   Flame,
   Award,
-  Calendar,
   BarChart3,
   Zap,
 } from 'lucide-react'
 import {
+  Bar,
+  BarChart,
+  Line,
+  LineChart,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+} from 'recharts'
+import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  type ChartConfig,
 } from '@/components/ui/chart'
-import { Bar, BarChart, Line, LineChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts'
 
 const weeklyData = [
-  { day: 'Lun', minutes: 25, quiz: 3 },
-  { day: 'Mar', minutes: 45, quiz: 5 },
-  { day: 'Mer', minutes: 30, quiz: 2 },
-  { day: 'Jeu', minutes: 60, quiz: 7 },
-  { day: 'Ven', minutes: 40, quiz: 4 },
-  { day: 'Sam', minutes: 15, quiz: 1 },
-  { day: 'Dim', minutes: 50, quiz: 6 },
+  { day: 'Lun', minutes: 25 },
+  { day: 'Mar', minutes: 45 },
+  { day: 'Mer', minutes: 30 },
+  { day: 'Jeu', minutes: 60 },
+  { day: 'Ven', minutes: 40 },
+  { day: 'Sam', minutes: 15 },
+  { day: 'Dim', minutes: 50 },
 ]
 
 const monthlyData = [
@@ -53,9 +61,8 @@ const subjectProgress = [
 
 const chartConfig = {
   minutes: { label: 'Minutes', color: '#10b981' },
-  quiz: { label: 'Quiz', color: '#8b5cf6' },
   score: { label: 'Score', color: '#10b981' },
-}
+} satisfies ChartConfig
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -88,26 +95,26 @@ export default function ProgressPage() {
               <TrendingUp className="h-6 w-6 text-emerald-500" />
               Ma Progression
             </h1>
-            <p className="text-sm text-gray-500">Suivez vos performances et votre évolution</p>
+            <p className="text-sm text-gray-600">Suivez vos performances et votre évolution</p>
           </div>
         </div>
       </motion.div>
 
       {/* Stats overview */}
-      <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+      <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         {[
-          { label: 'Temps total', value: '4h 35min', icon: <Clock className="h-5 w-5" />, color: 'text-blue-500', bg: 'bg-blue-50' },
-          { label: 'Score moyen', value: '72%', icon: <Target className="h-5 w-5" />, color: 'text-emerald-500', bg: 'bg-emerald-50' },
-          { label: 'Fiches maîtrisées', value: '89', icon: <Brain className="h-5 w-5" />, color: 'text-violet-500', bg: 'bg-violet-50' },
-          { label: 'Série actuelle', value: '5 jours', icon: <Flame className="h-5 w-5" />, color: 'text-amber-500', bg: 'bg-amber-50' },
+          { label: 'Temps total', value: '4h 35min', icon: <Clock className="h-5 w-5" />, color: 'text-blue-600', bg: 'bg-blue-50' },
+          { label: 'Score moyen', value: '72%', icon: <Target className="h-5 w-5" />, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { label: 'Fiches maîtrisées', value: '89', icon: <Brain className="h-5 w-5" />, color: 'text-violet-600', bg: 'bg-violet-50' },
+          { label: 'Série actuelle', value: '5 jours', icon: <Flame className="h-5 w-5" />, color: 'text-amber-600', bg: 'bg-amber-50' },
         ].map((stat) => (
           <Card key={stat.label} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
-              <div className={`inline-flex p-2 rounded-lg ${stat.bg} mb-2`}>
+            <CardContent className="p-5">
+              <div className={`inline-flex p-2.5 rounded-xl ${stat.bg} mb-3`}>
                 <span className={stat.color}>{stat.icon}</span>
               </div>
               <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-              <p className="text-xs text-gray-500">{stat.label}</p>
+              <p className="text-sm text-gray-500 mt-0.5">{stat.label}</p>
             </CardContent>
           </Card>
         ))}
@@ -117,20 +124,20 @@ export default function ProgressPage() {
         {/* Weekly Activity Chart */}
         <motion.div variants={itemVariants}>
           <Card className="hover:shadow-md transition-shadow">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-base">
                 <BarChart3 className="h-5 w-5 text-emerald-500" />
                 Activité hebdomadaire
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <ChartContainer config={chartConfig} className="h-[250px] w-full">
-                <BarChart data={weeklyData} accessibilityLayer>
-                  <CartesianGrid vertical={false} stroke="#f0f0f0" />
-                  <XAxis dataKey="day" tickLine={false} axisLine={false} fontSize={12} />
-                  <YAxis tickLine={false} axisLine={false} fontSize={12} />
+            <CardContent className="pt-0">
+              <ChartContainer config={chartConfig} className="h-[260px] w-full">
+                <BarChart data={weeklyData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="day" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="minutes" fill="var(--color-minutes)" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="minutes" fill="var(--color-minutes)" radius={[6, 6, 0, 0]} maxBarSize={40} />
                 </BarChart>
               </ChartContainer>
             </CardContent>
@@ -140,20 +147,27 @@ export default function ProgressPage() {
         {/* Score Evolution */}
         <motion.div variants={itemVariants}>
           <Card className="hover:shadow-md transition-shadow">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-base">
                 <TrendingUp className="h-5 w-5 text-emerald-500" />
                 Évolution du score
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <ChartContainer config={chartConfig} className="h-[250px] w-full">
-                <LineChart data={monthlyData} accessibilityLayer>
-                  <CartesianGrid vertical={false} stroke="#f0f0f0" />
-                  <XAxis dataKey="week" tickLine={false} axisLine={false} fontSize={12} />
-                  <YAxis tickLine={false} axisLine={false} fontSize={12} domain={[0, 100]} />
+            <CardContent className="pt-0">
+              <ChartContainer config={chartConfig} className="h-[260px] w-full">
+                <LineChart data={monthlyData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="week" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} domain={[0, 100]} />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line type="monotone" dataKey="score" stroke="var(--color-score)" strokeWidth={3} dot={{ r: 5, fill: 'var(--color-score)' }} />
+                  <Line
+                    type="monotone"
+                    dataKey="score"
+                    stroke="var(--color-score)"
+                    strokeWidth={3}
+                    dot={{ r: 5, fill: 'var(--color-score)', strokeWidth: 2, stroke: '#fff' }}
+                    activeDot={{ r: 7, strokeWidth: 2, stroke: '#fff' }}
+                  />
                 </LineChart>
               </ChartContainer>
             </CardContent>
@@ -170,14 +184,14 @@ export default function ProgressPage() {
               Progression par matière
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5">
             {subjectProgress.map((item) => (
               <div key={item.subject}>
-                <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-gray-700">{item.subject}</span>
                   <span className="text-sm font-bold text-gray-900">{item.progress}%</span>
                 </div>
-                <div className="relative h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                <div className="relative h-3 bg-gray-100 rounded-full overflow-hidden">
                   <motion.div
                     className={`absolute top-0 left-0 h-full rounded-full ${item.color}`}
                     initial={{ width: 0 }}
@@ -203,22 +217,30 @@ export default function ProgressPage() {
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[
-                { name: 'Premier Quiz', icon: <Zap className="h-6 w-6" />, earned: true, color: 'text-amber-500' },
-                { name: 'Série de 5j', icon: <Flame className="h-6 w-6" />, earned: true, color: 'text-red-500' },
-                { name: '100 Flashcards', icon: <Brain className="h-6 w-6" />, earned: false, color: 'text-gray-300' },
-                { name: 'Score 90%+', icon: <Target className="h-6 w-6" />, earned: false, color: 'text-gray-300' },
+                { name: 'Premier Quiz', icon: <Zap className="h-7 w-7" />, earned: true, color: 'text-amber-500' },
+                { name: 'Série de 5j', icon: <Flame className="h-7 w-7" />, earned: true, color: 'text-red-500' },
+                { name: '100 Flashcards', icon: <Brain className="h-7 w-7" />, earned: false, color: 'text-gray-300' },
+                { name: 'Score 90%+', icon: <Target className="h-7 w-7" />, earned: false, color: 'text-gray-300' },
               ].map((badge) => (
                 <div
                   key={badge.name}
-                  className={`flex flex-col items-center p-4 rounded-xl border-2 ${
-                    badge.earned ? 'border-emerald-200 bg-emerald-50/50' : 'border-gray-100 bg-gray-50/50 opacity-60'
+                  className={`flex flex-col items-center p-5 rounded-xl border-2 transition-colors ${
+                    badge.earned ? 'border-emerald-200 bg-emerald-50/50' : 'border-gray-100 bg-gray-50'
                   }`}
                 >
-                  <span className={badge.earned ? badge.color : 'text-gray-300'}>{badge.icon}</span>
-                  <p className={`text-xs font-medium mt-2 ${badge.earned ? 'text-gray-700' : 'text-gray-400'}`}>
+                  <span className={badge.earned ? badge.color : 'text-gray-200'}>{badge.icon}</span>
+                  <p className={`text-xs font-semibold mt-2.5 ${badge.earned ? 'text-gray-700' : 'text-gray-400'}`}>
                     {badge.name}
                   </p>
-                  {badge.earned && <Badge className="mt-1 bg-emerald-100 text-emerald-600 text-[10px] border-0">Obtenu</Badge>}
+                  {badge.earned ? (
+                    <Badge className="mt-1.5 bg-emerald-100 text-emerald-600 text-[10px] border-0 hover:bg-emerald-100">
+                      Obtenu
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="mt-1.5 text-gray-400 text-[10px] border-gray-200">
+                      Verrouillé
+                    </Badge>
+                  )}
                 </div>
               ))}
             </div>

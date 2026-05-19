@@ -20,6 +20,7 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Tooltip,
   TooltipContent,
@@ -97,12 +98,12 @@ export default function Sidebar() {
     <TooltipProvider delayDuration={0}>
       <aside
         className={cn(
-          'flex flex-col border-r bg-white transition-all duration-300 ease-in-out h-screen sticky top-0',
+          'flex flex-col border-r bg-white transition-all duration-300 ease-in-out h-screen sticky top-0 overflow-hidden',
           sidebarCollapsed ? 'w-[70px]' : 'w-[260px]'
         )}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 px-4 h-16 border-b shrink-0">
+        <div className="flex items-center gap-3 px-4 h-14 border-b shrink-0">
           <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-emerald-500 shrink-0">
             <GraduationCap className="h-5 w-5 text-white" />
           </div>
@@ -113,126 +114,131 @@ export default function Sidebar() {
           )}
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-          {navItems.map((item) => (
-            <div key={item.page}>
-              {item.section && !sidebarCollapsed && (
-                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-3 pt-4 pb-2 first:pt-0">
-                  {item.section}
-                </p>
-              )}
-              {item.section && sidebarCollapsed && (
-                <Separator className="my-3" />
-              )}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => setCurrentPage(item.page)}
-                    className={cn(
-                      'flex items-center gap-3 w-full rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-                      currentPage === item.page
-                        ? 'bg-emerald-50 text-emerald-600'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
-                      sidebarCollapsed && 'justify-center px-2'
-                    )}
-                  >
-                    <span
+        {/* Navigation - scrollable */}
+        <ScrollArea className="flex-1 py-3 px-3">
+          <div className="space-y-0.5">
+            {navItems.map((item) => (
+              <div key={item.page}>
+                {item.section && !sidebarCollapsed && (
+                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-3 pt-3 pb-1.5 first:pt-0">
+                    {item.section}
+                  </p>
+                )}
+                {item.section && sidebarCollapsed && (
+                  <Separator className="my-2" />
+                )}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => setCurrentPage(item.page)}
                       className={cn(
-                        'shrink-0',
+                        'flex items-center gap-3 w-full rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                         currentPage === item.page
-                          ? 'text-emerald-500'
-                          : 'text-gray-400'
+                          ? 'bg-emerald-50 text-emerald-600'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                        sidebarCollapsed && 'justify-center px-2'
                       )}
                     >
-                      {item.icon}
-                    </span>
-                    {!sidebarCollapsed && <span>{item.label}</span>}
-                  </button>
-                </TooltipTrigger>
-                {sidebarCollapsed && (
-                  <TooltipContent side="right" className="font-medium">
-                    {item.label}
-                  </TooltipContent>
-                )}
-              </Tooltip>
-            </div>
-          ))}
-        </nav>
-
-        {/* Pro Upgrade */}
-        <div className="px-3 pb-2 shrink-0">
-          {!sidebarCollapsed ? (
-            <div className="rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 p-3 text-white">
-              <div className="flex items-center gap-2 mb-1">
-                <Crown className="h-4 w-4" />
-                <span className="text-sm font-semibold">Passer à Pro</span>
+                      <span
+                        className={cn(
+                          'shrink-0',
+                          currentPage === item.page
+                            ? 'text-emerald-500'
+                            : 'text-gray-400'
+                        )}
+                      >
+                        {item.icon}
+                      </span>
+                      {!sidebarCollapsed && <span>{item.label}</span>}
+                    </button>
+                  </TooltipTrigger>
+                  {sidebarCollapsed && (
+                    <TooltipContent side="right" className="font-medium">
+                      {item.label}
+                    </TooltipContent>
+                  )}
+                </Tooltip>
               </div>
-              <p className="text-xs text-emerald-100 mb-2">
-                Débloquez toutes les fonctionnalités
-              </p>
-              <Button
-                size="sm"
-                className="w-full bg-white text-emerald-600 hover:bg-emerald-50 h-8 text-xs font-semibold"
-              >
-                Upgrade
-              </Button>
-            </div>
-          ) : (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button className="flex items-center justify-center w-full py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors">
-                  <Crown className="h-4 w-4" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="right">Passer à Pro</TooltipContent>
-            </Tooltip>
-          )}
-        </div>
+            ))}
+          </div>
+        </ScrollArea>
 
-        {/* User Profile */}
-        <div className="border-t px-3 py-3 shrink-0">
-          <div
-            className={cn(
-              'flex items-center gap-3',
-              sidebarCollapsed && 'justify-center'
-            )}
-          >
-            <Avatar className="h-9 w-9 shrink-0">
-              <AvatarFallback className="bg-emerald-100 text-emerald-600 text-xs font-semibold">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            {!sidebarCollapsed && (
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
-                  {user?.name || 'Utilisateur'}
+        {/* Bottom section - fixed */}
+        <div className="shrink-0 border-t bg-white">
+          {/* Pro Upgrade - compact */}
+          <div className="px-3 pt-3 pb-2">
+            {!sidebarCollapsed ? (
+              <div className="rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 p-2.5 text-white">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <Crown className="h-3.5 w-3.5" />
+                  <span className="text-xs font-semibold">Passer à Pro</span>
+                </div>
+                <p className="text-[10px] text-emerald-100 mb-1.5 leading-tight">
+                  Débloquez tout
                 </p>
-                <p className="text-xs text-gray-400 capitalize">
-                  Plan {user?.plan || 'gratuit'}
-                </p>
+                <Button
+                  size="sm"
+                  className="w-full bg-white text-emerald-600 hover:bg-emerald-50 h-7 text-[11px] font-semibold"
+                >
+                  Upgrade
+                </Button>
               </div>
-            )}
-            {!sidebarCollapsed && (
+            ) : (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button
-                    onClick={logout}
-                    className="text-gray-400 hover:text-gray-600 transition-colors"
-                  >
-                    <LogOut className="h-4 w-4" />
+                  <button className="flex items-center justify-center w-full py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors">
+                    <Crown className="h-4 w-4" />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent>Déconnexion</TooltipContent>
+                <TooltipContent side="right">Passer à Pro</TooltipContent>
               </Tooltip>
             )}
+          </div>
+
+          {/* User Profile */}
+          <div className="px-3 pb-3">
+            <div
+              className={cn(
+                'flex items-center gap-3',
+                sidebarCollapsed && 'justify-center'
+              )}
+            >
+              <Avatar className="h-8 w-8 shrink-0">
+                <AvatarFallback className="bg-emerald-500 text-white text-xs font-bold">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              {!sidebarCollapsed && (
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {user?.name || 'Utilisateur'}
+                  </p>
+                  <p className="text-[11px] text-emerald-700 font-semibold capitalize">
+                    Plan {user?.plan || 'gratuit'}
+                  </p>
+                </div>
+              )}
+              {!sidebarCollapsed && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={logout}
+                      className="text-gray-400 hover:text-red-500 transition-colors"
+                    >
+                      <LogOut className="h-4 w-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>Déconnexion</TooltipContent>
+                </Tooltip>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Collapse Toggle */}
         <button
           onClick={toggleSidebar}
-          className="absolute -right-3 top-20 z-10 flex items-center justify-center w-6 h-6 rounded-full border bg-white shadow-sm text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute -right-3 top-16 z-10 flex items-center justify-center w-6 h-6 rounded-full border bg-white shadow-sm text-gray-400 hover:text-gray-600 hover:shadow transition-colors"
         >
           {sidebarCollapsed ? (
             <ChevronRight className="h-3 w-3" />

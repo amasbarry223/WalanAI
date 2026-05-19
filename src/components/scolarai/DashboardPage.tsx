@@ -179,7 +179,7 @@ export default function DashboardPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <Avatar className="h-14 w-14 border-2 border-white/30">
-                      <AvatarFallback className="bg-white/20 text-white text-lg font-bold">
+                      <AvatarFallback className="bg-white text-emerald-600 text-lg font-bold">
                         {initials}
                       </AvatarFallback>
                     </Avatar>

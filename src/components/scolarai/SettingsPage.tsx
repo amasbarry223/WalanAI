@@ -85,7 +85,7 @@ export default function SettingsPage() {
             <div className="flex items-center gap-4 mb-6">
               <div className="relative">
                 <Avatar className="h-20 w-20">
-                  <AvatarFallback className="bg-emerald-100 text-emerald-600 text-2xl font-bold">
+                  <AvatarFallback className="bg-emerald-500 text-white text-2xl font-bold">
                     {initials}
                   </AvatarFallback>
                 </Avatar>

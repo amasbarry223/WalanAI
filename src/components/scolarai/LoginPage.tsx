@@ -36,7 +36,9 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
 
   const handleSubmit = () => {
-    login({ name: 'Barry', email: email || 'barry@email.com', plan: 'gratuit' })
+    const name = email.split('@')[0] || 'Barry'
+    const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1)
+    login({ name: capitalizedName, email: email || 'barry@email.com', plan: 'gratuit' })
   }
 
   return (
