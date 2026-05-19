@@ -1,0 +1,246 @@
+'use client'
+
+import { useAppStore, type PageName } from '@/lib/store'
+import { cn } from '@/lib/utils'
+import {
+  LayoutDashboard,
+  FileText,
+  Bot,
+  Brain,
+  TrendingUp,
+  History,
+  Settings,
+  HelpCircle,
+  Crown,
+  ChevronLeft,
+  ChevronRight,
+  GraduationCap,
+  LogOut,
+} from 'lucide-react'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+
+interface NavItem {
+  label: string
+  page: PageName
+  icon: React.ReactNode
+  section?: string
+}
+
+const navItems: NavItem[] = [
+  {
+    label: 'Tableau de bord',
+    page: 'dashboard',
+    icon: <LayoutDashboard className="h-4 w-4" />,
+    section: 'NAVIGATION',
+  },
+  {
+    label: 'Mes Documents',
+    page: 'documents',
+    icon: <FileText className="h-4 w-4" />,
+  },
+  {
+    label: 'Assistant IA',
+    page: 'assistant',
+    icon: <Bot className="h-4 w-4" />,
+  },
+  {
+    label: 'Révision',
+    page: 'revision',
+    icon: <Brain className="h-4 w-4" />,
+    section: 'APPRENTISSAGE',
+  },
+  {
+    label: 'Ma Progression',
+    page: 'progress',
+    icon: <TrendingUp className="h-4 w-4" />,
+  },
+  {
+    label: 'Historique Quiz',
+    page: 'quiz-history',
+    icon: <History className="h-4 w-4" />,
+  },
+  {
+    label: 'Paramètres',
+    page: 'settings',
+    icon: <Settings className="h-4 w-4" />,
+    section: 'AUTRE',
+  },
+  {
+    label: "Centre d'aide",
+    page: 'help',
+    icon: <HelpCircle className="h-4 w-4" />,
+  },
+]
+
+export default function Sidebar() {
+  const { currentPage, setCurrentPage, user, sidebarCollapsed, toggleSidebar, logout } =
+    useAppStore()
+
+  const initials = user?.name
+    ? user.name
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    : 'U'
+
+  return (
+    <TooltipProvider delayDuration={0}>
+      <aside
+        className={cn(
+          'flex flex-col border-r bg-white transition-all duration-300 ease-in-out h-screen sticky top-0',
+          sidebarCollapsed ? 'w-[70px]' : 'w-[260px]'
+        )}
+      >
+        {/* Logo */}
+        <div className="flex items-center gap-3 px-4 h-16 border-b shrink-0">
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-emerald-500 shrink-0">
+            <GraduationCap className="h-5 w-5 text-white" />
+          </div>
+          {!sidebarCollapsed && (
+            <span className="font-bold text-lg text-gray-900 whitespace-nowrap">
+              ScolarAI
+            </span>
+          )}
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+          {navItems.map((item) => (
+            <div key={item.page}>
+              {item.section && !sidebarCollapsed && (
+                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider px-3 pt-4 pb-2 first:pt-0">
+                  {item.section}
+                </p>
+              )}
+              {item.section && sidebarCollapsed && (
+                <Separator className="my-3" />
+              )}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setCurrentPage(item.page)}
+                    className={cn(
+                      'flex items-center gap-3 w-full rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+                      currentPage === item.page
+                        ? 'bg-emerald-50 text-emerald-600'
+                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900',
+                      sidebarCollapsed && 'justify-center px-2'
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        'shrink-0',
+                        currentPage === item.page
+                          ? 'text-emerald-500'
+                          : 'text-gray-400'
+                      )}
+                    >
+                      {item.icon}
+                    </span>
+                    {!sidebarCollapsed && <span>{item.label}</span>}
+                  </button>
+                </TooltipTrigger>
+                {sidebarCollapsed && (
+                  <TooltipContent side="right" className="font-medium">
+                    {item.label}
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </div>
+          ))}
+        </nav>
+
+        {/* Pro Upgrade */}
+        <div className="px-3 pb-2 shrink-0">
+          {!sidebarCollapsed ? (
+            <div className="rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 p-3 text-white">
+              <div className="flex items-center gap-2 mb-1">
+                <Crown className="h-4 w-4" />
+                <span className="text-sm font-semibold">Passer à Pro</span>
+              </div>
+              <p className="text-xs text-emerald-100 mb-2">
+                Débloquez toutes les fonctionnalités
+              </p>
+              <Button
+                size="sm"
+                className="w-full bg-white text-emerald-600 hover:bg-emerald-50 h-8 text-xs font-semibold"
+              >
+                Upgrade
+              </Button>
+            </div>
+          ) : (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button className="flex items-center justify-center w-full py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors">
+                  <Crown className="h-4 w-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right">Passer à Pro</TooltipContent>
+            </Tooltip>
+          )}
+        </div>
+
+        {/* User Profile */}
+        <div className="border-t px-3 py-3 shrink-0">
+          <div
+            className={cn(
+              'flex items-center gap-3',
+              sidebarCollapsed && 'justify-center'
+            )}
+          >
+            <Avatar className="h-9 w-9 shrink-0">
+              <AvatarFallback className="bg-emerald-100 text-emerald-600 text-xs font-semibold">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            {!sidebarCollapsed && (
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {user?.name || 'Utilisateur'}
+                </p>
+                <p className="text-xs text-gray-400 capitalize">
+                  Plan {user?.plan || 'gratuit'}
+                </p>
+              </div>
+            )}
+            {!sidebarCollapsed && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={logout}
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Déconnexion</TooltipContent>
+              </Tooltip>
+            )}
+          </div>
+        </div>
+
+        {/* Collapse Toggle */}
+        <button
+          onClick={toggleSidebar}
+          className="absolute -right-3 top-20 z-10 flex items-center justify-center w-6 h-6 rounded-full border bg-white shadow-sm text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          {sidebarCollapsed ? (
+            <ChevronRight className="h-3 w-3" />
+          ) : (
+            <ChevronLeft className="h-3 w-3" />
+          )}
+        </button>
+      </aside>
+    </TooltipProvider>
+  )
+}
