@@ -27,6 +27,16 @@ import {
   ChevronRight,
 } from 'lucide-react'
 import { useState, useMemo } from 'react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { ScrollArea } from '@/components/ui/scroll-area'
+
+const mockNotifications = [
+  { id: 1, title: 'Rappel de révision', message: 'Il est temps de réviser vos flashcards sur le Droit Civil', time: 'Il y a 5 min', read: false, icon: '📚' },
+  { id: 2, title: 'Série en cours !', message: 'Vous avez atteint 5 jours consécutifs. Continuez !', time: 'Il y a 1h', read: false, icon: '🔥' },
+  { id: 3, title: 'Nouveau badge', message: 'Vous avez débloqué le badge "Premier Quiz"', time: 'Il y a 3h', read: true, icon: '🏆' },
+  { id: 4, title: 'Examen approche', message: 'Votre examen de Droit Civil est dans 7 jours', time: 'Hier', read: true, icon: '⚠️' },
+  { id: 5, title: 'Rapport hebdomadaire', message: 'Votre rapport de la semaine est prêt', time: 'Il y a 2j', read: true, icon: '📊' },
+]
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -137,8 +147,11 @@ export default function DashboardPage() {
     { label: 'Documents', icon: <FileText className="h-4 w-4" />, page: 'documents' as const, color: 'text-blue-500' },
     { label: 'Assistant IA', icon: <Bot className="h-4 w-4" />, page: 'assistant' as const, color: 'text-violet-500' },
     { label: 'Révision', icon: <Brain className="h-4 w-4" />, page: 'revision' as const, color: 'text-amber-500' },
+    { label: 'Pomodoro', icon: <Clock className="h-4 w-4" />, page: 'pomodoro' as const, color: 'text-red-500' },
+    { label: 'Planificateur', icon: <Calendar className="h-4 w-4" />, page: 'planner' as const, color: 'text-indigo-500' },
+    { label: 'Carnets', icon: <BookOpen className="h-4 w-4" />, page: 'notes' as const, color: 'text-teal-500' },
+    { label: 'Classement', icon: <Flame className="h-4 w-4" />, page: 'leaderboard' as const, color: 'text-orange-500' },
     { label: 'Ma Progression', icon: <TrendingUp className="h-4 w-4" />, page: 'progress' as const, color: 'text-rose-500' },
-    { label: 'Carnets', icon: <BookOpen className="h-4 w-4" />, page: 'documents' as const, color: 'text-teal-500' },
     { label: 'Paramètres', icon: <Settings className="h-4 w-4" />, page: 'settings' as const, color: 'text-gray-500' },
   ]
 
@@ -153,10 +166,45 @@ export default function DashboardPage() {
       <motion.div variants={itemVariants} className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5 text-gray-500" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full" />
-          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="h-5 w-5 text-gray-500" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 p-0" align="end">
+              <div className="flex items-center justify-between px-4 py-3 border-b">
+                <h4 className="font-semibold text-sm">Notifications</h4>
+                <button className="text-xs text-emerald-500 hover:text-emerald-600 font-medium">Tout marquer lu</button>
+              </div>
+              <ScrollArea className="h-[300px]">
+                <div className="divide-y">
+                  {mockNotifications.map((notif) => (
+                    <div
+                      key={notif.id}
+                      className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer ${!notif.read ? 'bg-emerald-50/50' : ''}`}
+                    >
+                      <span className="text-lg shrink-0">{notif.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm ${!notif.read ? 'font-semibold text-gray-900' : 'font-medium text-gray-700'}`}>{notif.title}</p>
+                        <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{notif.message}</p>
+                        <p className="text-[10px] text-gray-400 mt-1">{notif.time}</p>
+                      </div>
+                      {!notif.read && (
+                        <span className="w-2 h-2 bg-emerald-500 rounded-full shrink-0 mt-1.5" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+              <div className="border-t px-4 py-2.5">
+                <button className="text-xs text-emerald-500 hover:text-emerald-600 font-medium w-full text-center">
+                  Voir toutes les notifications
+                </button>
+              </div>
+            </PopoverContent>
+          </Popover>
           <Button variant="ghost" size="icon" onClick={() => setCurrentPage('settings')}>
             <Settings className="h-5 w-5 text-gray-500" />
           </Button>

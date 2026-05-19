@@ -13,6 +13,10 @@ export type PageName =
   | 'quiz-history'
   | 'settings'
   | 'help'
+  | 'pomodoro'
+  | 'planner'
+  | 'leaderboard'
+  | 'notes'
 
 interface User {
   name: string

@@ -16,6 +16,10 @@ import {
   ChevronRight,
   GraduationCap,
   LogOut,
+  BookOpen,
+  Timer,
+  Calendar,
+  Trophy,
 } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -53,10 +57,30 @@ const navItems: NavItem[] = [
     icon: <Bot className="h-4 w-4" />,
   },
   {
+    label: 'Carnets de notes',
+    page: 'notes',
+    icon: <BookOpen className="h-4 w-4" />,
+    section: 'APPRENTISSAGE',
+  },
+  {
     label: 'Révision',
     page: 'revision',
     icon: <Brain className="h-4 w-4" />,
-    section: 'APPRENTISSAGE',
+  },
+  {
+    label: 'Pomodoro',
+    page: 'pomodoro',
+    icon: <Timer className="h-4 w-4" />,
+  },
+  {
+    label: 'Planificateur',
+    page: 'planner',
+    icon: <Calendar className="h-4 w-4" />,
+  },
+  {
+    label: 'Classement',
+    page: 'leaderboard',
+    icon: <Trophy className="h-4 w-4" />,
   },
   {
     label: 'Ma Progression',

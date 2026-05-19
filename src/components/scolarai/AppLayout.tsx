@@ -12,6 +12,10 @@ import ProgressPage from './ProgressPage'
 import QuizHistoryPage from './QuizHistoryPage'
 import SettingsPage from './SettingsPage'
 import HelpCenterPage from './HelpCenterPage'
+import PlannerPage from './PlannerPage'
+import PomodoroPage from './PomodoroPage'
+import LeaderboardPage from './LeaderboardPage'
+import NotesPage from './NotesPage'
 
 export default function AppLayout() {
   const { currentPage, isAuthenticated } = useAppStore()
@@ -43,6 +47,14 @@ export default function AppLayout() {
         return <SettingsPage />
       case 'help':
         return <HelpCenterPage />
+      case 'planner':
+        return <PlannerPage />
+      case 'pomodoro':
+        return <PomodoroPage />
+      case 'leaderboard':
+        return <LeaderboardPage />
+      case 'notes':
+        return <NotesPage />
       default:
         return <DashboardPage />
     }
