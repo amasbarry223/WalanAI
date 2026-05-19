@@ -498,7 +498,7 @@ export default function StudyCoachPage() {
   return (
     <ScrollArea className="h-full">
       <motion.div
-        className="p-4 md:p-6 max-w-[1400px] mx-auto pb-12"
+        className="p-4 md:p-6 lg:p-8 pb-12"
         variants={containerVariants}
         initial="hidden"
         animate="visible"

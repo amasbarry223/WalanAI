@@ -505,7 +505,7 @@ export default function QuizGeneratorPage() {
 
   const renderConfigPhase = () => (
     <motion.div
-      className="p-4 md:p-6 max-w-[1200px] mx-auto"
+      className="p-4 md:p-6 lg:p-8"
       variants={containerVariants}
       initial="hidden"
       animate="visible"
@@ -745,7 +745,7 @@ export default function QuizGeneratorPage() {
     if (!currentQuestion) return null
 
     return (
-      <div className="p-4 md:p-6 max-w-[900px] mx-auto">
+      <div className="p-4 md:p-6 lg:p-8">
         {/* Top Bar */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -953,7 +953,7 @@ export default function QuizGeneratorPage() {
 
   const renderResultsPhase = () => (
     <motion.div
-      className="p-4 md:p-6 max-w-[1000px] mx-auto"
+      className="p-4 md:p-6 lg:p-8"
       variants={containerVariants}
       initial="hidden"
       animate="visible"

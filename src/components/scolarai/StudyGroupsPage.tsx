@@ -652,7 +652,7 @@ export default function StudyGroupsPage() {
 
   return (
     <div className="h-full bg-gradient-to-br from-gray-50 via-white to-emerald-50/30">
-      <div className="max-w-[1400px] mx-auto p-4 md:p-6 lg:p-8">
+      <div className="p-4 md:p-6 lg:p-8">
         {/* ─── Header ────────────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

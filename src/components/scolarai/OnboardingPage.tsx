@@ -797,7 +797,7 @@ export default function OnboardingPage() {
 
   // ── Render ──
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4 py-8 relative overflow-hidden">
+    <div className="h-full flex flex-col items-center justify-center bg-gray-50 px-4 py-8 relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-24 -left-24 w-64 h-64 rounded-full bg-emerald-100/40 blur-3xl" />

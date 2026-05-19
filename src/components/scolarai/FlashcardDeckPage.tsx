@@ -531,7 +531,7 @@ export default function FlashcardDeckPage() {
 
   return (
     <motion.div
-      className="p-4 md:p-6 max-w-[1400px] mx-auto"
+      className="p-4 md:p-6 lg:p-8"
       variants={containerVariants}
       initial="hidden"
       animate="visible"

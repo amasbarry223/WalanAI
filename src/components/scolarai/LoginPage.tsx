@@ -42,7 +42,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4 py-8">
+    <div className="h-full flex flex-col items-center justify-center bg-gray-50 px-4 py-8">
       {/* Logo */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
