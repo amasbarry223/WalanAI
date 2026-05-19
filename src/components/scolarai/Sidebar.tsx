@@ -20,6 +20,9 @@ import {
   Timer,
   Calendar,
   Trophy,
+  Lightbulb,
+  CreditCard,
+  Zap,
 } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -63,6 +66,11 @@ const navItems: NavItem[] = [
     section: 'APPRENTISSAGE',
   },
   {
+    label: 'Ressources',
+    page: 'resources',
+    icon: <Lightbulb className="h-4 w-4" />,
+  },
+  {
     label: 'Révision',
     page: 'revision',
     icon: <Brain className="h-4 w-4" />,
@@ -88,15 +96,25 @@ const navItems: NavItem[] = [
     icon: <TrendingUp className="h-4 w-4" />,
   },
   {
+    label: 'Générateur de Quiz',
+    page: 'quiz-generator',
+    icon: <Zap className="h-4 w-4" />,
+  },
+  {
     label: 'Historique Quiz',
     page: 'quiz-history',
     icon: <History className="h-4 w-4" />,
   },
   {
+    label: 'Tarifs',
+    page: 'pricing',
+    icon: <CreditCard className="h-4 w-4" />,
+    section: 'AUTRE',
+  },
+  {
     label: 'Paramètres',
     page: 'settings',
     icon: <Settings className="h-4 w-4" />,
-    section: 'AUTRE',
   },
   {
     label: "Centre d'aide",
@@ -203,6 +221,7 @@ export default function Sidebar() {
                 <Button
                   size="sm"
                   className="w-full bg-white text-emerald-600 hover:bg-emerald-50 h-7 text-[11px] font-semibold"
+                  onClick={() => setCurrentPage('pricing')}
                 >
                   Upgrade
                 </Button>
@@ -210,7 +229,7 @@ export default function Sidebar() {
             ) : (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button className="flex items-center justify-center w-full py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors">
+                  <button className="flex items-center justify-center w-full py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors" onClick={() => setCurrentPage('pricing')}>
                     <Crown className="h-4 w-4" />
                   </button>
                 </TooltipTrigger>

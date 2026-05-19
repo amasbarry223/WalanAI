@@ -4,6 +4,7 @@ import { useAppStore } from '@/lib/store'
 import Sidebar from './Sidebar'
 import LoginPage from './LoginPage'
 import RegisterPage from './RegisterPage'
+import OnboardingPage from './OnboardingPage'
 import DashboardPage from './DashboardPage'
 import DocumentsPage from './DocumentsPage'
 import AIAssistantPage from './AIAssistantPage'
@@ -16,6 +17,9 @@ import PlannerPage from './PlannerPage'
 import PomodoroPage from './PomodoroPage'
 import LeaderboardPage from './LeaderboardPage'
 import NotesPage from './NotesPage'
+import QuizGeneratorPage from './QuizGeneratorPage'
+import ResourcesPage from './ResourcesPage'
+import PricingPage from './PricingPage'
 
 export default function AppLayout() {
   const { currentPage, isAuthenticated } = useAppStore()
@@ -27,6 +31,10 @@ export default function AppLayout() {
 
   if (currentPage === 'register') {
     return <RegisterPage />
+  }
+
+  if (currentPage === 'onboarding') {
+    return <OnboardingPage />
   }
 
   const renderPage = () => {
@@ -43,6 +51,8 @@ export default function AppLayout() {
         return <ProgressPage />
       case 'quiz-history':
         return <QuizHistoryPage />
+      case 'quiz-generator':
+        return <QuizGeneratorPage />
       case 'settings':
         return <SettingsPage />
       case 'help':
@@ -55,6 +65,10 @@ export default function AppLayout() {
         return <LeaderboardPage />
       case 'notes':
         return <NotesPage />
+      case 'resources':
+        return <ResourcesPage />
+      case 'pricing':
+        return <PricingPage />
       default:
         return <DashboardPage />
     }

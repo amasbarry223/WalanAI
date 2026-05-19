@@ -57,3 +57,29 @@ Stage Summary:
 - Notes with split-view editor and AI integration buttons
 - Notification dropdown on Dashboard
 - All new features accessible from sidebar and dashboard quick actions
+
+---
+Task ID: 3
+Agent: Main Agent
+Task: Add 4 more feature pages (Quiz Generator, Onboarding, Pricing, Resources)
+
+Work Log:
+- Updated Zustand store with 4 new page types: onboarding, quiz-generator, pricing, resources
+- Changed login redirect to onboarding page for new users
+- Created QuizGeneratorPage.tsx - 3-phase interactive quiz (config, playing, results) with subject/difficulty/type selection, timer, question navigation, answer selection with feedback, animated score reveal, detailed question review
+- Created OnboardingPage.tsx - 4-step welcome wizard (welcome, choose subjects, study preferences, celebration) with slide transitions, animated confetti, progress indicator, skip button
+- Created PricingPage.tsx - Monthly/annual billing toggle, Free vs Pro plan comparison cards, feature comparison table, FAQ accordion, money-back guarantee banner, 3 student testimonials
+- Created ResourcesPage.tsx - Category tabs, featured carousel, resource grid with type/subject/difficulty/rating, resource detail modal with table of contents, study tools section, recently viewed
+- Updated AppLayout.tsx - Added imports and route cases for all 4 new pages including OnboardingPage (shown without sidebar)
+- Updated Sidebar.tsx - Added Zap icon for Quiz Generator, CreditCard icon for Pricing page, made Pro upgrade buttons navigate to pricing page
+- Updated DashboardPage.tsx - Made "Passer à Pro" button navigate to pricing page
+- Lint passes clean, dev server compiles successfully
+
+Stage Summary:
+- 4 more feature pages added (18 total pages)
+- Interactive Quiz Generator with 3 phases and real quiz interaction
+- Onboarding wizard with 4 steps and smooth transitions
+- Pricing page with plan comparison and testimonials
+- Resource Library with carousel, grid, and detail modals
+- Pro upgrade buttons now link to pricing page
+- New users now see onboarding flow after login

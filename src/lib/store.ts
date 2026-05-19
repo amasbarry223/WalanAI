@@ -5,18 +5,22 @@ import { create } from 'zustand'
 export type PageName =
   | 'login'
   | 'register'
+  | 'onboarding'
   | 'dashboard'
   | 'documents'
   | 'assistant'
   | 'revision'
   | 'progress'
   | 'quiz-history'
+  | 'quiz-generator'
   | 'settings'
   | 'help'
   | 'pomodoro'
   | 'planner'
   | 'leaderboard'
   | 'notes'
+  | 'pricing'
+  | 'resources'
 
 interface User {
   name: string
@@ -52,7 +56,7 @@ export const useAppStore = create<AppState>((set) => ({
     set({
       isAuthenticated: true,
       user,
-      currentPage: 'dashboard',
+      currentPage: 'onboarding',
     }),
 
   logout: () =>

@@ -208,7 +208,7 @@ export default function DashboardPage() {
           <Button variant="ghost" size="icon" onClick={() => setCurrentPage('settings')}>
             <Settings className="h-5 w-5 text-gray-500" />
           </Button>
-          <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2">
+          <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2" onClick={() => setCurrentPage('pricing')}>
             <Crown className="h-4 w-4" />
             <span className="hidden sm:inline">Passer à Pro</span>
           </Button>
