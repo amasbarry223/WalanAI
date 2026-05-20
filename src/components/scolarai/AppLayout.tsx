@@ -27,6 +27,7 @@ import StudyGroupsPage from './StudyGroupsPage'
 import StudyCoachPage from './StudyCoachPage'
 import ExamTrackerPage from './ExamTrackerPage'
 import FlashcardDeckPage from './FlashcardDeckPage'
+import AdminLayout from './admin/AdminLayout'
 
 const emptySubscribe = () => () => {}
 
@@ -39,7 +40,7 @@ function useHydrated() {
 }
 
 export default function AppLayout() {
-  const { currentPage, isAuthenticated } = useAppStore()
+  const { currentPage, isAuthenticated, isAdminMode } = useAppStore()
   const mounted = useHydrated()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -53,6 +54,11 @@ export default function AppLayout() {
         </div>
       </div>
     )
+  }
+
+  // Admin mode — completely separate layout
+  if (isAdminMode) {
+    return <AdminLayout />
   }
 
   // Landing page (no sidebar, no auth required)

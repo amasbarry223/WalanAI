@@ -70,11 +70,17 @@ export default function LoginPage() {
     // Frontend-only: simulate login with form data
     const nameFromEmail = email.trim().split('@')[0]
     const capitalizedName = nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1)
+    const lowerEmail = email.trim().toLowerCase()
+
+    // Detect admin role based on email
+    const isAdmin = lowerEmail.includes('admin') || lowerEmail === 'admin@scolarai.fr'
+    const isSuperAdmin = lowerEmail === 'admin@scolarai.fr'
 
     login({
-      name: capitalizedName,
-      email: email.trim().toLowerCase(),
-      plan: 'gratuit',
+      name: isAdmin ? 'Admin ScolarAI' : capitalizedName,
+      email: lowerEmail,
+      plan: isAdmin ? 'pro' : 'gratuit',
+      role: isSuperAdmin ? 'super-admin' : isAdmin ? 'admin' : 'etudiant',
     })
 
     setIsLoading(false)

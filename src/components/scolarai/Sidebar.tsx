@@ -27,6 +27,7 @@ import {
   ClipboardCheck,
   Sparkles,
   UsersRound,
+  Shield,
 } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -166,7 +167,7 @@ function SidebarContent({
   collapsed: boolean
   onNavigate?: () => void
 }) {
-  const { currentPage, setCurrentPage, user, logout } = useAppStore()
+  const { currentPage, setCurrentPage, user, logout, enterAdminMode } = useAppStore()
 
   const initials = user?.name
     ? user.name
@@ -277,6 +278,34 @@ function SidebarContent({
             </Tooltip>
           )}
         </div>
+
+        {/* Admin Mode Button */}
+        {user?.role === 'admin' || user?.role === 'super-admin' ? (
+          <div className="px-3 pb-2">
+            {!collapsed ? (
+              <Button
+                variant="outline"
+                className="w-full border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900 gap-2 text-xs h-8"
+                onClick={() => { enterAdminMode(); onNavigate?.() }}
+              >
+                <Shield className="h-3.5 w-3.5" />
+                Mode Admin
+              </Button>
+            ) : (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    className="flex items-center justify-center w-full py-2 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+                    onClick={() => { enterAdminMode(); onNavigate?.() }}
+                  >
+                    <Shield className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right">Mode Admin</TooltipContent>
+              </Tooltip>
+            )}
+          </div>
+        ) : null}
 
         {/* User Profile */}
         <div className="px-3 pb-3">
