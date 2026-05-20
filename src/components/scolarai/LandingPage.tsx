@@ -36,6 +36,9 @@ import {
   Crown,
   Globe,
   Mail,
+  FileText,
+  Layers,
+  ClipboardList,
 } from 'lucide-react'
 
 // ─── Animation Configs ───────────────────────────────────────
@@ -77,8 +80,6 @@ function AnimatedSection({ children, className = '', id }: { children: React.Rea
     </motion.section>
   )
 }
-
-
 
 // ─── Navbar ───────────────────────────────────────────────────
 
@@ -279,7 +280,6 @@ function ProductShowcase() {
   }, [])
 
   useEffect(() => {
-    // Row 1: scrolls left continuously
     if (!row1Ref.current) return
     const el = row1Ref.current
     const totalWidth = el.scrollWidth / 2
@@ -292,7 +292,6 @@ function ProductShowcase() {
   }, [])
 
   useEffect(() => {
-    // Row 2: scrolls left continuously (different speed)
     if (!row2Ref.current) return
     const el = row2Ref.current
     const totalWidth = el.scrollWidth / 2
@@ -304,7 +303,6 @@ function ProductShowcase() {
     })
   }, [])
 
-  // Showcase images for the scrolling rows
   const showcaseRow1 = [
     { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard ScolarAI' },
     { src: '/images/showcase/quiz-1.png', alt: 'Quiz Generator' },
@@ -353,7 +351,7 @@ function ProductShowcase() {
 
   return (
     <section className="relative overflow-x-clip py-12">
-      {/* Browser Mockup - centered on top, absolute positioned on lg */}
+      {/* Browser Mockup */}
       <div
         ref={showcaseRef}
         className="mx-auto mb-6 max-w-5xl px-4 lg:absolute lg:inset-0 lg:z-10 lg:mb-0 lg:flex lg:max-w-none lg:items-center lg:justify-center lg:px-6"
@@ -373,7 +371,7 @@ function ProductShowcase() {
               <div className="w-10" />
             </div>
 
-            {/* Video / Image content */}
+            {/* Dashboard Image */}
             <div className="relative">
               <img
                 src="/images/showcase/dashboard-1.png"
@@ -385,7 +383,7 @@ function ProductShowcase() {
         </div>
       </div>
 
-      {/* Scrolling Showcase Rows - same structure as youthumb.ai */}
+      {/* Scrolling Showcase Rows */}
       <div className="space-y-6">
         {/* Row 1 */}
         <div className="flex gap-6" ref={row1Ref}>
@@ -447,78 +445,212 @@ function ProductShowcase() {
   )
 }
 
-// ─── Features Section ─────────────────────────────────────────
+// ─── Features Section (youthumb.ai style - Inspiration → Result) ──
 
-const features = [
+const featureCards = [
   {
-    icon: <Brain className="h-5 w-5" />,
-    title: 'IA Adaptative',
-    description: "Notre algorithme s'adapte à votre niveau et votre rythme d'apprentissage pour vous proposer du contenu sur mesure.",
-    color: 'bg-emerald-50 text-emerald-600 border-emerald-200/60',
+    inspirationLabel: 'Cours PDF',
+    inspirationIcon: <FileText className="h-8 w-8 text-zinc-400" />,
+    inspirationBg: 'from-zinc-100 to-zinc-50',
+    inspirationContent: (
+      <div className="space-y-2 p-3">
+        <div className="h-2 w-3/4 rounded bg-zinc-300" />
+        <div className="h-2 w-full rounded bg-zinc-200" />
+        <div className="h-2 w-5/6 rounded bg-zinc-200" />
+        <div className="h-2 w-2/3 rounded bg-zinc-200" />
+        <div className="mt-3 h-2 w-full rounded bg-zinc-300" />
+        <div className="h-2 w-4/5 rounded bg-zinc-200" />
+        <div className="h-2 w-3/4 rounded bg-zinc-200" />
+      </div>
+    ),
+    resultLabel: 'Quiz Généré',
+    resultIcon: <ClipboardList className="h-8 w-8 text-emerald-500" />,
+    resultBg: 'from-emerald-50 to-teal-50',
+    resultContent: (
+      <div className="space-y-2 p-3">
+        <div className="flex items-center gap-2">
+          <div className="h-4 w-4 rounded-full border-2 border-emerald-400" />
+          <div className="h-2 w-3/4 rounded bg-emerald-200" />
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-4 w-4 rounded-full border-2 border-emerald-400 bg-emerald-400" />
+          <div className="h-2 w-2/3 rounded bg-emerald-200" />
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-4 w-4 rounded-full border-2 border-emerald-400" />
+          <div className="h-2 w-4/5 rounded bg-emerald-200" />
+        </div>
+        <div className="mt-3 flex items-center gap-2">
+          <div className="h-4 w-4 rounded-full border-2 border-teal-400" />
+          <div className="h-2 w-1/2 rounded bg-teal-200" />
+        </div>
+      </div>
+    ),
   },
   {
-    icon: <Target className="h-5 w-5" />,
-    title: 'Quiz Personnalisés',
-    description: "Générez des quiz en un clic sur n'importe quel sujet, avec des difficultés progressives qui évoluent avec vous.",
-    color: 'bg-violet-50 text-violet-600 border-violet-200/60',
+    inspirationLabel: 'Notes de cours',
+    inspirationIcon: <BookOpen className="h-8 w-8 text-zinc-400" />,
+    inspirationBg: 'from-zinc-100 to-zinc-50',
+    inspirationContent: (
+      <div className="space-y-2 p-3">
+        <div className="h-2 w-2/3 rounded bg-zinc-300" />
+        <div className="h-2 w-full rounded bg-zinc-200" />
+        <div className="h-2 w-5/6 rounded bg-zinc-200" />
+        <div className="mt-3 h-2 w-1/2 rounded bg-zinc-300" />
+        <div className="h-2 w-3/4 rounded bg-zinc-200" />
+        <div className="h-2 w-full rounded bg-zinc-200" />
+      </div>
+    ),
+    resultLabel: 'Flashcards Créées',
+    resultIcon: <Layers className="h-8 w-8 text-emerald-500" />,
+    resultBg: 'from-emerald-50 to-teal-50',
+    resultContent: (
+      <div className="space-y-2 p-3">
+        <div className="rounded-lg bg-white border border-emerald-200 p-2">
+          <div className="h-2 w-3/4 rounded bg-emerald-200" />
+          <div className="mt-1 h-2 w-1/2 rounded bg-emerald-100" />
+        </div>
+        <div className="rounded-lg bg-white border border-emerald-200 p-2">
+          <div className="h-2 w-2/3 rounded bg-emerald-200" />
+          <div className="mt-1 h-2 w-3/5 rounded bg-emerald-100" />
+        </div>
+        <div className="rounded-lg bg-white border border-teal-200 p-2">
+          <div className="h-2 w-4/5 rounded bg-teal-200" />
+          <div className="mt-1 h-2 w-1/3 rounded bg-teal-100" />
+        </div>
+      </div>
+    ),
   },
   {
-    icon: <Clock className="h-5 w-5" />,
-    title: 'Révision Espacée',
-    description: 'Notre système de répétition espacée optimise votre mémorisation à long terme en vous rappelant au bon moment.',
-    color: 'bg-amber-50 text-amber-600 border-amber-200/60',
-  },
-  {
-    icon: <BarChart3 className="h-5 w-5" />,
-    title: 'Suivi en Temps Réel',
-    description: "Visualisez vos progrès avec des tableaux de bord détaillés et des statistiques sur votre évolution.",
-    color: 'bg-rose-50 text-rose-600 border-rose-200/60',
-  },
-  {
-    icon: <Users className="h-5 w-5" />,
-    title: "Groupes d'Étude",
-    description: 'Collaborez avec vos pairs, partagez des ressources et progressez ensemble dans des groupes thématiques.',
-    color: 'bg-cyan-50 text-cyan-600 border-cyan-200/60',
-  },
-  {
-    icon: <MessageCircle className="h-5 w-5" />,
-    title: 'Coach IA',
-    description: 'Un assistant intelligent disponible 24/7 pour répondre à vos questions et vous guider dans vos révisions.',
-    color: 'bg-teal-50 text-teal-600 border-teal-200/60',
+    inspirationLabel: 'Sujet d\'examen',
+    inspirationIcon: <GraduationCap className="h-8 w-8 text-zinc-400" />,
+    inspirationBg: 'from-zinc-100 to-zinc-50',
+    inspirationContent: (
+      <div className="space-y-2 p-3">
+        <div className="h-2 w-1/2 rounded bg-zinc-300" />
+        <div className="h-2 w-full rounded bg-zinc-200" />
+        <div className="h-2 w-3/4 rounded bg-zinc-200" />
+        <div className="mt-3 h-2 w-2/3 rounded bg-zinc-300" />
+        <div className="h-2 w-5/6 rounded bg-zinc-200" />
+      </div>
+    ),
+    resultLabel: 'Plan de Révision',
+    resultIcon: <Target className="h-8 w-8 text-emerald-500" />,
+    resultBg: 'from-emerald-50 to-teal-50',
+    resultContent: (
+      <div className="space-y-2 p-3">
+        <div className="flex items-center gap-2">
+          <div className="h-5 w-5 rounded bg-emerald-400 flex items-center justify-center">
+            <Check className="h-3 w-3 text-white" />
+          </div>
+          <div className="h-2 w-2/3 rounded bg-emerald-200" />
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-5 w-5 rounded bg-emerald-400 flex items-center justify-center">
+            <Check className="h-3 w-3 text-white" />
+          </div>
+          <div className="h-2 w-1/2 rounded bg-emerald-200" />
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-5 w-5 rounded border-2 border-emerald-300" />
+          <div className="h-2 w-3/4 rounded bg-teal-200" />
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-5 w-5 rounded border-2 border-teal-300" />
+          <div className="h-2 w-2/3 rounded bg-teal-200" />
+        </div>
+      </div>
+    ),
   },
 ]
 
-function FeaturesSection() {
-  return (
-    <AnimatedSection id="features" className="py-24 sm:py-32 bg-white">
-      <div className="mx-auto max-w-6xl px-6">
-        <motion.div variants={fadeInUp} className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900 mb-4">
-            Tout ce qu&apos;il faut pour{' '}
-            <span className="text-emerald-500 font-serif italic" style={{ letterSpacing: '-0.04em' }}>
-              réussir
-            </span>
-          </h2>
-          <p className="text-lg text-zinc-600 max-w-2xl mx-auto">
-            Des outils puissants conçus par des pédagogues et des ingénieurs IA pour maximiser votre potentiel académique.
-          </p>
-        </motion.div>
+function FeatureCard({ card }: { card: typeof featureCards[0] }) {
+  const [hovered, setHovered] = useState(false)
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, i) => (
-            <motion.div key={i} variants={fadeInUp}>
-              <div className="group h-full rounded-xl border border-zinc-200 bg-white p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                <div className={`inline-flex items-center justify-center w-10 h-10 rounded-lg border ${feature.color} mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                  {feature.icon}
-                </div>
-                <h3 className="text-base font-semibold text-zinc-900 mb-2">{feature.title}</h3>
-                <p className="text-sm text-zinc-600 leading-relaxed">{feature.description}</p>
-              </div>
-            </motion.div>
-          ))}
+  return (
+    <div
+      className="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <div className="relative">
+        {/* Result image - positioned below, slides up on hover */}
+        <div
+          className="absolute inset-0 z-0 transition-transform duration-500 ease-out"
+          style={{ transform: hovered ? 'translateY(0)' : 'translateY(calc(100% + 40px))' }}
+        >
+          <div className="relative aspect-video overflow-hidden rounded-xl border-2 border-emerald-400 shadow-xl bg-gradient-to-br">
+            <div className={`absolute inset-0 bg-gradient-to-br ${card.resultBg}`} />
+            <div className="relative z-10 flex h-full flex-col items-center justify-center">
+              {card.resultIcon}
+              <span className="mt-2 text-xs font-semibold text-emerald-600">{card.resultLabel}</span>
+              <div className="w-full mt-1">{card.resultContent}</div>
+            </div>
+            {/* "Générée" badge */}
+            <div className="absolute right-2 bottom-2 flex items-center gap-1 rounded-full bg-emerald-500 px-2 py-1 text-xs font-medium text-white md:right-3 md:bottom-3 md:px-3">
+              <Check className="h-3 w-3" />
+              Généré
+            </div>
+          </div>
+        </div>
+
+        {/* Inspiration image - always on top */}
+        <div className="relative z-10 aspect-video overflow-hidden rounded-xl border-2 border-zinc-300 shadow-md bg-gradient-to-br">
+          <div className={`absolute inset-0 bg-gradient-to-br ${card.inspirationBg}`} />
+          <div className="relative z-10 flex h-full flex-col items-center justify-center">
+            {card.inspirationIcon}
+            <span className="mt-2 text-xs font-semibold text-zinc-500">{card.inspirationLabel}</span>
+            <div className="w-full mt-1">{card.inspirationContent}</div>
+          </div>
+          {/* Style label */}
+          <div className="absolute top-2 left-2 rounded-full bg-zinc-900/80 px-2 py-1 text-xs font-medium text-white md:top-3 md:left-3 md:px-3">
+            {card.inspirationLabel}
+          </div>
         </div>
       </div>
-    </AnimatedSection>
+
+      {/* Arrow button between images */}
+      <div className="flex justify-center py-2">
+        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg">
+          <ArrowRight className="h-3 w-3 rotate-90" />
+        </div>
+      </div>
+
+      {/* Space for the result image */}
+      <div className="relative aspect-video" />
+    </div>
+  )
+}
+
+function FeaturesSection() {
+  return (
+    <section id="features" className="px-6 py-24 bg-white">
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-16 text-center">
+          <div className="mx-auto mb-4 inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 px-3 py-1.5 text-xs font-semibold tracking-widest text-white uppercase shadow-lg">
+            <Zap className="h-3.5 w-3.5" />
+            Instantané
+          </div>
+          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">
+            Des quiz performants en quelques secondes
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-xl text-zinc-500">
+            Importez vos cours comme vous le feriez avec un document. Notre IA analyse le contenu et génère des outils de révision personnalisés.
+          </p>
+        </div>
+
+        <div className="grid gap-8 md:grid-cols-3">
+          {featureCards.map((card, i) => (
+            <FeatureCard key={i} card={card} />
+          ))}
+        </div>
+
+        <p className="mt-10 text-center text-lg text-zinc-600">
+          Vos cours. Votre quiz.{' '}
+          <span className="font-semibold text-zinc-900">30 secondes.</span>
+        </p>
+      </div>
+    </section>
   )
 }
 
