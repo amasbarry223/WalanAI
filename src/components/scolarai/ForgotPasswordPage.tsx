@@ -45,27 +45,12 @@ export default function ForgotPasswordPage() {
 
     setIsLoading(true)
 
-    try {
-      const response = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim().toLowerCase() }),
-      })
+    // Simulate network delay for UX
+    await new Promise((r) => setTimeout(r, 1000))
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        setError(data.error || 'Une erreur est survenue.')
-        return
-      }
-
-      // Always show success to prevent email enumeration
-      setEmailSent(true)
-    } catch {
-      setError('Erreur réseau. Veuillez réessayer.')
-    } finally {
-      setIsLoading(false)
-    }
+    // Frontend-only: simulate email sent
+    setEmailSent(true)
+    setIsLoading(false)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

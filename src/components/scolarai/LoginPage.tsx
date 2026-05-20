@@ -64,34 +64,20 @@ export default function LoginPage() {
 
     setIsLoading(true)
 
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: email.trim(),
-          password,
-        }),
-      })
+    // Simulate network delay for UX
+    await new Promise((r) => setTimeout(r, 800))
 
-      const data = await response.json()
+    // Frontend-only: simulate login with form data
+    const nameFromEmail = email.trim().split('@')[0]
+    const capitalizedName = nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1)
 
-      if (!response.ok) {
-        setError(data.error || 'Une erreur est survenue.')
-        return
-      }
+    login({
+      name: capitalizedName,
+      email: email.trim().toLowerCase(),
+      plan: 'gratuit',
+    })
 
-      // Success — log in the user
-      login({
-        name: data.name,
-        email: data.email,
-        plan: data.plan || 'gratuit',
-      })
-    } catch {
-      setError('Erreur réseau. Veuillez réessayer.')
-    } finally {
-      setIsLoading(false)
-    }
+    setIsLoading(false)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

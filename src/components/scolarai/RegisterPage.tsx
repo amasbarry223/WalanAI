@@ -135,35 +135,17 @@ export default function RegisterPage() {
 
     setIsLoading(true)
 
-    try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: name.trim(),
-          email: email.trim(),
-          password,
-        }),
-      })
+    // Simulate network delay for UX
+    await new Promise((r) => setTimeout(r, 1000))
 
-      const data = await response.json()
+    // Frontend-only: simulate registration with form data
+    login({
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      plan: 'gratuit',
+    })
 
-      if (!response.ok) {
-        setError(data.error || 'Une erreur est survenue.')
-        return
-      }
-
-      // Success — log in the user
-      login({
-        name: data.name,
-        email: data.email,
-        plan: data.plan || 'gratuit',
-      })
-    } catch {
-      setError('Erreur réseau. Veuillez réessayer.')
-    } finally {
-      setIsLoading(false)
-    }
+    setIsLoading(false)
   }
 
   return (
