@@ -39,6 +39,14 @@ import {
   FileText,
   Layers,
   ClipboardList,
+  Palette,
+  PenTool,
+  Lightbulb,
+  ListChecks,
+  BrainCircuit,
+  NotebookPen,
+  BookMarked,
+  ScanSearch,
 } from 'lucide-react'
 
 // ─── Animation Configs ───────────────────────────────────────
@@ -806,6 +814,144 @@ function ParallelGenerationSection() {
   )
 }
 
+// ─── All Styles Section (youthumb.ai style marquee) ──────────
+
+const styleCardsRow1 = [
+  { label: 'Quiz QCM', icon: <ClipboardList className="h-6 w-6" />, gradient: 'from-emerald-400 to-teal-500', preview: 'QCM' },
+  { label: 'Flashcards', icon: <Layers className="h-6 w-6" />, gradient: 'from-teal-400 to-cyan-500', preview: 'Flip' },
+  { label: 'Vrai / Faux', icon: <Check className="h-6 w-6" />, gradient: 'from-green-400 to-emerald-500', preview: 'V/F' },
+  { label: 'Résumés', icon: <FileText className="h-6 w-6" />, gradient: 'from-emerald-500 to-green-600', preview: 'Sum' },
+  { label: 'Plans de révision', icon: <Target className="h-6 w-6" />, gradient: 'from-teal-500 to-emerald-600', preview: 'Plan' },
+  { label: 'Questions ouvertes', icon: <PenTool className="h-6 w-6" />, gradient: 'from-cyan-400 to-teal-500', preview: 'Q°' },
+  { label: 'Cartes mentales', icon: <BrainCircuit className="h-6 w-6" />, gradient: 'from-emerald-400 to-green-500', preview: 'Map' },
+  { label: 'Fiches de synthèse', icon: <NotebookPen className="h-6 w-6" />, gradient: 'from-green-500 to-teal-600', preview: 'Note' },
+  { label: 'Quiz QCM', icon: <ClipboardList className="h-6 w-6" />, gradient: 'from-emerald-400 to-teal-500', preview: 'QCM' },
+  { label: 'Flashcards', icon: <Layers className="h-6 w-6" />, gradient: 'from-teal-400 to-cyan-500', preview: 'Flip' },
+  { label: 'Vrai / Faux', icon: <Check className="h-6 w-6" />, gradient: 'from-green-400 to-emerald-500', preview: 'V/F' },
+  { label: 'Résumés', icon: <FileText className="h-6 w-6" />, gradient: 'from-emerald-500 to-green-600', preview: 'Sum' },
+]
+
+const styleCardsRow2 = [
+  { label: 'QRC', icon: <Lightbulb className="h-6 w-6" />, gradient: 'from-teal-400 to-emerald-500', preview: 'QRC' },
+  { label: 'Exercices', icon: <ListChecks className="h-6 w-6" />, gradient: 'from-green-500 to-cyan-500', preview: 'Exo' },
+  { label: 'Mind Map', icon: <BrainCircuit className="h-6 w-6" />, gradient: 'from-emerald-500 to-teal-400', preview: 'Map' },
+  { label: 'Notes structurées', icon: <BookMarked className="h-6 w-6" />, gradient: 'from-cyan-500 to-emerald-500', preview: 'Note' },
+  { label: 'Analyse de texte', icon: <ScanSearch className="h-6 w-6" />, gradient: 'from-teal-500 to-green-500', preview: 'Ana' },
+  { label: 'Quiz chronométré', icon: <Clock className="h-6 w-6" />, gradient: 'from-emerald-400 to-green-500', preview: 'Time' },
+  { label: 'Formulaires', icon: <NotebookPen className="h-6 w-6" />, gradient: 'from-green-400 to-teal-500', preview: 'Form' },
+  { label: 'Bilan de connaissances', icon: <BarChart3 className="h-6 w-6" />, gradient: 'from-teal-600 to-emerald-500', preview: 'Bilan' },
+  { label: 'QRC', icon: <Lightbulb className="h-6 w-6" />, gradient: 'from-teal-400 to-emerald-500', preview: 'QRC' },
+  { label: 'Exercices', icon: <ListChecks className="h-6 w-6" />, gradient: 'from-green-500 to-cyan-500', preview: 'Exo' },
+  { label: 'Mind Map', icon: <BrainCircuit className="h-6 w-6" />, gradient: 'from-emerald-500 to-teal-400', preview: 'Map' },
+  { label: 'Notes structurées', icon: <BookMarked className="h-6 w-6" />, gradient: 'from-cyan-500 to-emerald-500', preview: 'Note' },
+]
+
+function StyleCard({ card }: { card: typeof styleCardsRow1[0] }) {
+  return (
+    <div className="aspect-video w-56 shrink-0 overflow-hidden rounded-xl shadow-lg md:w-72">
+      <div className={`relative h-full w-full bg-gradient-to-br ${card.gradient} flex flex-col items-center justify-center gap-2 p-4`}>
+        {/* Icon circle */}
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm text-white">
+          {card.icon}
+        </div>
+        {/* Label */}
+        <span className="text-sm font-semibold text-white drop-shadow-sm">{card.label}</span>
+        {/* Mini content preview */}
+        <div className="mt-1 flex flex-col gap-1 w-full max-w-[80%]">
+          <div className="h-1.5 w-3/4 rounded-full bg-white/30" />
+          <div className="h-1.5 w-full rounded-full bg-white/20" />
+          <div className="h-1.5 w-2/3 rounded-full bg-white/20" />
+        </div>
+        {/* Preview badge */}
+        <div className="absolute top-2 right-2 rounded-md bg-white/20 px-1.5 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm">
+          {card.preview}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function AllStylesSection() {
+  const row1Ref = useRef<HTMLDivElement>(null)
+  const row2Ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!row1Ref.current) return
+    const el = row1Ref.current
+    const totalWidth = el.scrollWidth / 2
+    gsap.to(el, {
+      x: -totalWidth,
+      duration: 45,
+      ease: 'none',
+      repeat: -1,
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!row2Ref.current) return
+    const el = row2Ref.current
+    const totalWidth = el.scrollWidth / 2
+    gsap.to(el, {
+      x: -totalWidth,
+      duration: 55,
+      ease: 'none',
+      repeat: -1,
+    })
+  }, [])
+
+  return (
+    <section className="overflow-hidden py-12">
+      <div className="mb-8 text-center">
+        <div className="mb-3 inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 px-3 py-1.5 text-xs font-semibold tracking-widest text-white uppercase shadow-lg">
+          <Palette className="h-3.5 w-3.5" />
+          Tous les Styles
+        </div>
+        <p className="text-lg text-zinc-600">Choisis et génère n&apos;importe quel style de contenu éducatif</p>
+      </div>
+
+      <div className="space-y-6">
+        {/* Row 1 */}
+        <div className="flex gap-6" ref={row1Ref}>
+          <div className="flex gap-6">
+            {styleCardsRow1.map((card, i) => (
+              <StyleCard key={`s1-${i}`} card={card} />
+            ))}
+          </div>
+          <div className="flex gap-6">
+            {styleCardsRow1.map((card, i) => (
+              <StyleCard key={`s1d-${i}`} card={card} />
+            ))}
+          </div>
+          <div className="flex gap-6">
+            {styleCardsRow1.map((card, i) => (
+              <StyleCard key={`s1dd-${i}`} card={card} />
+            ))}
+          </div>
+        </div>
+
+        {/* Row 2 */}
+        <div className="flex gap-6" ref={row2Ref}>
+          <div className="flex gap-6">
+            {styleCardsRow2.map((card, i) => (
+              <StyleCard key={`s2-${i}`} card={card} />
+            ))}
+          </div>
+          <div className="flex gap-6">
+            {styleCardsRow2.map((card, i) => (
+              <StyleCard key={`s2d-${i}`} card={card} />
+            ))}
+          </div>
+          <div className="flex gap-6">
+            {styleCardsRow2.map((card, i) => (
+              <StyleCard key={`s2dd-${i}`} card={card} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // ─── How It Works Section ─────────────────────────────────────
 
 const steps = [
@@ -1327,6 +1473,7 @@ export default function LandingPage() {
       <ProductShowcase />
       <FeaturesSection />
       <ParallelGenerationSection />
+      <AllStylesSection />
       <HowItWorksSection />
       <StatsSection />
       <TestimonialsSection />
