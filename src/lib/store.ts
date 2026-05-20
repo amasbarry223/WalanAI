@@ -6,6 +6,7 @@ export type PageName =
   | 'landing'
   | 'login'
   | 'register'
+  | 'forgot-password'
   | 'onboarding'
   | 'dashboard'
   | 'documents'

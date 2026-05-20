@@ -208,7 +208,8 @@ export default function LoginPage() {
               <div className="flex justify-end">
                 <button
                   type="button"
-                  className="text-sm font-medium text-emerald-500 hover:text-emerald-600 transition-colors"
+                  onClick={() => setCurrentPage('forgot-password')}
+                  className="text-sm font-medium text-emerald-500 hover:text-emerald-600 transition-colors cursor-pointer"
                 >
                   Mot de passe oublié ?
                 </button>

@@ -6,6 +6,7 @@ import Sidebar from './Sidebar'
 import LandingPage from './LandingPage'
 import LoginPage from './LoginPage'
 import RegisterPage from './RegisterPage'
+import ForgotPasswordPage from './ForgotPasswordPage'
 import OnboardingPage from './OnboardingPage'
 import DashboardPage from './DashboardPage'
 import DocumentsPage from './DocumentsPage'
@@ -65,6 +66,10 @@ export default function AppLayout() {
 
   if (currentPage === 'register') {
     return <RegisterPage />
+  }
+
+  if (currentPage === 'forgot-password') {
+    return <ForgotPasswordPage />
   }
 
   if (currentPage === 'onboarding') {
