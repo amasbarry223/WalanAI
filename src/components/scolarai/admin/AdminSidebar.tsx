@@ -97,6 +97,11 @@ function AdminSidebarContent({
 }) {
   const { currentAdminPage, setCurrentAdminPage, user, exitAdminMode } = useAppStore()
 
+  const handleExitAdmin = () => {
+    exitAdminMode()
+    window.location.href = '/'
+  }
+
   const initials = user?.name
     ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
     : 'A'
@@ -178,7 +183,7 @@ function AdminSidebarContent({
             <Button
               variant="outline"
               className="w-full border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white gap-2"
-              onClick={exitAdminMode}
+              onClick={handleExitAdmin}
             >
               <ArrowLeftRight className="h-4 w-4" />
               Mode Étudiant
@@ -188,7 +193,7 @@ function AdminSidebarContent({
               <TooltipTrigger asChild>
                 <button
                   className="flex items-center justify-center w-full py-2 rounded-lg border border-slate-600 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
-                  onClick={exitAdminMode}
+                  onClick={handleExitAdmin}
                 >
                   <ArrowLeftRight className="h-4 w-4" />
                 </button>

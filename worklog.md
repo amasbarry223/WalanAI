@@ -25,3 +25,27 @@ Stage Summary:
 - All pages have consistent dark gradient banner headers with emerald accents
 - Dark sidebar (slate-900) distinguishes admin mode from student mode
 - Login with admin@scolarai.fr auto-enters admin mode
+
+---
+Task ID: 2
+Agent: Main Agent
+Task: Enable /admin URL route for direct back-office access
+
+Work Log:
+- Created `/admin` Next.js route at `src/app/admin/page.tsx`
+- Route auto-enters admin mode on mount via `enterAdminMode()`
+- Shows AdminLoginPage if user is not authenticated as admin
+- Shows AdminLayout if user is authenticated as admin
+- Updated AdminSidebar "Mode Étudiant" button to navigate to `/` via `window.location.href`
+- Updated AdminLoginPage "Retour à ScolarAI" link to navigate to `/` via `window.location.href`
+- Added `useEffect` in AppLayout to exit admin mode when on main `/` route
+- Removed AdminLayout/AdminLoginPage imports from AppLayout (now handled by `/admin` route)
+- Removed `admin-login` case from AppLayout routing
+- Verified lint passes with no errors
+- Verified both `/` and `/admin` compile and return HTTP 200
+
+Stage Summary:
+- Admin back-office now accessible directly via `/admin` URL
+- Clean separation: `/` = student app, `/admin` = admin back-office
+- Navigation: `/admin` → login → admin dashboard | admin sidebar → "Mode Étudiant" → `/`
+- Zustand store properly manages admin mode state across routes

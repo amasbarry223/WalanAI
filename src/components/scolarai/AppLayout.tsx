@@ -1,7 +1,7 @@
 'use client'
 
 import { useAppStore } from '@/lib/store'
-import { useState, useSyncExternalStore } from 'react'
+import { useState, useSyncExternalStore, useEffect } from 'react'
 import Sidebar, { MobileSidebar, MobileHeader } from './Sidebar'
 import LandingPage from './LandingPage'
 import LoginPage from './LoginPage'
@@ -27,8 +27,6 @@ import StudyGroupsPage from './StudyGroupsPage'
 import StudyCoachPage from './StudyCoachPage'
 import ExamTrackerPage from './ExamTrackerPage'
 import FlashcardDeckPage from './FlashcardDeckPage'
-import AdminLayout from './admin/AdminLayout'
-import AdminLoginPage from './admin/AdminLoginPage'
 
 const emptySubscribe = () => () => {}
 
@@ -41,9 +39,16 @@ function useHydrated() {
 }
 
 export default function AppLayout() {
-  const { currentPage, isAuthenticated, isAdminMode } = useAppStore()
+  const { currentPage, isAuthenticated, isAdminMode, exitAdminMode } = useAppStore()
   const mounted = useHydrated()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  // When the main page (/) is rendered, exit admin mode if still active
+  useEffect(() => {
+    if (mounted && isAdminMode) {
+      exitAdminMode()
+    }
+  }, [mounted, isAdminMode, exitAdminMode])
 
   // Prevent hydration mismatch by not rendering until client-side mounted
   if (!mounted) {
@@ -55,11 +60,6 @@ export default function AppLayout() {
         </div>
       </div>
     )
-  }
-
-  // Admin mode — completely separate layout
-  if (isAdminMode) {
-    return <AdminLayout />
   }
 
   // Landing page (no sidebar, no auth required)
@@ -78,10 +78,6 @@ export default function AppLayout() {
 
   if (currentPage === 'forgot-password') {
     return <ForgotPasswordPage />
-  }
-
-  if (currentPage === 'admin-login') {
-    return <AdminLoginPage />
   }
 
   if (currentPage === 'onboarding') {

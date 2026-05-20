@@ -233,7 +233,7 @@ export default function AdminLoginPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        onClick={() => setCurrentPage('landing')}
+        onClick={() => { setCurrentPage('landing'); window.location.href = '/' }}
         className="mt-6 flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-300 transition-colors cursor-pointer relative z-10"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
