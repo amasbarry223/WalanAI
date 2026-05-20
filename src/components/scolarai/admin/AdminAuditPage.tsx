@@ -138,14 +138,25 @@ export default function AdminAuditPage() {
     >
       {/* Header */}
       <motion.div variants={itemVariants} className="mb-6">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Shield className="h-6 w-6 text-emerald-500" />
-            Journal d&apos;audit
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Traçabilité de toutes les actions sur la plateforme
-          </p>
+        <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl p-6 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full -translate-y-32 translate-x-32" />
+          <div className="absolute bottom-0 left-20 w-40 h-40 bg-emerald-500/5 rounded-full translate-y-20" />
+          <div className="relative z-10">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                  <Shield className="h-6 w-6 text-emerald-400" />
+                  Journal d&apos;audit
+                </h1>
+                <p className="text-slate-400 text-sm mt-1">
+                  Traçabilité de toutes les actions sur la plateforme
+                </p>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30">47 actions aujourd&apos;hui</Badge>
+              </div>
+            </div>
+          </div>
         </div>
       </motion.div>
 

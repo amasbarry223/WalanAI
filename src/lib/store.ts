@@ -16,6 +16,7 @@ export type AdminPageName =
 export type PageName =
   | 'landing'
   | 'login'
+  | 'admin-login'
   | 'register'
   | 'forgot-password'
   | 'onboarding'

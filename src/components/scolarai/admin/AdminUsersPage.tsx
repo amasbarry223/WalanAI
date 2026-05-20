@@ -176,24 +176,33 @@ export default function AdminUsersPage() {
     >
       {/* Header */}
       <motion.div variants={itemVariants} className="mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <Users className="h-6 w-6 text-emerald-500" />
-              Gestion des Utilisateurs
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">Gérez les comptes, rôles et permissions</p>
+        <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl p-6 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full -translate-y-32 translate-x-32" />
+          <div className="absolute bottom-0 left-20 w-40 h-40 bg-emerald-500/5 rounded-full translate-y-20" />
+          <div className="relative z-10">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                  <Users className="h-6 w-6 text-emerald-400" />
+                  Gestion des Utilisateurs
+                </h1>
+                <p className="text-slate-400 text-sm mt-1">Gérez les comptes, rôles et permissions</p>
+              </div>
+              <div className="flex items-center gap-3 text-sm">
+                <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30">{totalUsers} utilisateurs</Badge>
+              </div>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" className="gap-2">
-              <Download className="h-4 w-4" />
-              <span className="hidden sm:inline">Exporter</span>
-            </Button>
-            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2" onClick={() => setAddOpen(true)}>
-              <UserPlus className="h-4 w-4" />
-              Ajouter
-            </Button>
-          </div>
+        </div>
+        <div className="flex gap-2 mt-4">
+          <Button variant="outline" className="gap-2">
+            <Download className="h-4 w-4" />
+            <span className="hidden sm:inline">Exporter</span>
+          </Button>
+          <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2" onClick={() => setAddOpen(true)}>
+            <UserPlus className="h-4 w-4" />
+            Ajouter
+          </Button>
         </div>
       </motion.div>
 

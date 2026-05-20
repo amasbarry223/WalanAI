@@ -28,6 +28,7 @@ import StudyCoachPage from './StudyCoachPage'
 import ExamTrackerPage from './ExamTrackerPage'
 import FlashcardDeckPage from './FlashcardDeckPage'
 import AdminLayout from './admin/AdminLayout'
+import AdminLoginPage from './admin/AdminLoginPage'
 
 const emptySubscribe = () => () => {}
 
@@ -77,6 +78,10 @@ export default function AppLayout() {
 
   if (currentPage === 'forgot-password') {
     return <ForgotPasswordPage />
+  }
+
+  if (currentPage === 'admin-login') {
+    return <AdminLoginPage />
   }
 
   if (currentPage === 'onboarding') {

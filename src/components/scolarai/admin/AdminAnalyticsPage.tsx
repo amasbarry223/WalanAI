@@ -205,33 +205,39 @@ export default function AdminAnalyticsPage() {
     >
       {/* Header */}
       <motion.div variants={itemVariants} className="mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <BarChart3 className="h-6 w-6 text-emerald-500" />
-              Analytique
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              Dashboards analytiques détaillés de la plateforme
-            </p>
-          </div>
-          <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-            {periods.map((p) => (
-              <Button
-                key={p.key}
-                variant="ghost"
-                size="sm"
-                onClick={() => setActivePeriod(p.key)}
-                className={cn(
-                  'text-xs font-medium px-3 py-1.5 rounded-md transition-all',
-                  activePeriod === p.key
-                    ? 'bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 hover:text-white'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
-                )}
-              >
-                {p.label}
-              </Button>
-            ))}
+        <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl p-6 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full -translate-y-32 translate-x-32" />
+          <div className="absolute bottom-0 left-20 w-40 h-40 bg-emerald-500/5 rounded-full translate-y-20" />
+          <div className="relative z-10">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                  <BarChart3 className="h-6 w-6 text-emerald-400" />
+                  Analytique
+                </h1>
+                <p className="text-slate-400 text-sm mt-1">
+                  Dashboards analytiques détaillés de la plateforme
+                </p>
+              </div>
+              <div className="flex items-center gap-1 bg-white/10 rounded-lg p-1">
+                {periods.map((p) => (
+                  <Button
+                    key={p.key}
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setActivePeriod(p.key)}
+                    className={cn(
+                      'text-xs font-medium px-3 py-1.5 rounded-md transition-all',
+                      activePeriod === p.key
+                        ? 'bg-emerald-500 text-white shadow-sm hover:bg-emerald-600 hover:text-white'
+                        : 'text-slate-300 hover:text-white hover:bg-white/10'
+                    )}
+                  >
+                    {p.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </motion.div>

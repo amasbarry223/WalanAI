@@ -47,6 +47,7 @@ import {
   NotebookPen,
   BookMarked,
   ScanSearch,
+  Shield,
 } from 'lucide-react'
 
 // ─── Animation Configs ───────────────────────────────────────
@@ -153,6 +154,14 @@ function Navbar() {
             Connexion
           </Button>
           <Button
+            variant="ghost"
+            className="hidden sm:flex text-slate-500 hover:text-slate-800 font-medium gap-1.5 text-xs"
+            onClick={() => setCurrentPage('admin-login')}
+          >
+            <Shield className="h-3.5 w-3.5" />
+            Admin
+          </Button>
+          <Button
             className="rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-4"
             onClick={() => setCurrentPage('register')}
           >
@@ -190,6 +199,14 @@ function Navbar() {
             <div className="flex flex-col gap-2 pt-3 border-t border-zinc-100">
               <Button variant="outline" onClick={() => { setCurrentPage('login'); setMobileOpen(false) }}>
                 Connexion
+              </Button>
+              <Button
+                variant="ghost"
+                className="text-slate-500 hover:text-slate-800 gap-1.5 text-xs justify-start"
+                onClick={() => { setCurrentPage('admin-login'); setMobileOpen(false) }}
+              >
+                <Shield className="h-3.5 w-3.5" />
+                Back-Office Admin
               </Button>
               <Button
                 className="bg-emerald-500 hover:bg-emerald-600 text-white"
