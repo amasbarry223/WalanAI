@@ -85,14 +85,14 @@ export default function ProgressPage() {
       animate="visible"
     >
       {/* Header */}
-      <motion.div variants={itemVariants} className="flex items-center justify-between mb-6">
+      <motion.div variants={itemVariants} className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <TrendingUp className="h-6 w-6 text-emerald-500" />
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <TrendingUp className="h-5 w-6 text-emerald-500" />
               Ma Progression
             </h1>
             <p className="text-sm text-gray-600">Suivez vos performances et votre évolution</p>

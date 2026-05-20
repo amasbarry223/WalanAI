@@ -222,7 +222,7 @@ function HeroSection() {
   }, [])
 
   return (
-    <section ref={heroRef} className="px-6 pt-32 pb-20 bg-white">
+    <section ref={heroRef} className="px-4 sm:px-6 pt-24 sm:pt-32 pb-12 sm:pb-20 bg-white">
       <div className="mx-auto max-w-6xl">
         <div className="mx-auto max-w-3xl text-center">
           {/* Badge */}
@@ -241,7 +241,7 @@ function HeroSection() {
           </h1>
 
           {/* Subtitle */}
-          <p className="gsap-hero mx-auto mb-10 max-w-2xl text-xl leading-relaxed text-zinc-600">
+          <p className="gsap-hero mx-auto mb-10 max-w-2xl text-lg md:text-xl leading-relaxed text-zinc-600">
             Générez des quiz, flashcards et plans de révision personnalisés en quelques secondes. Sans manuels supplémentaires. Sans perte de temps. Sans stress.
           </p>
 
@@ -632,17 +632,17 @@ function FeatureCard({ card }: { card: typeof featureCards[0] }) {
 
 function FeaturesSection() {
   return (
-    <section id="features" className="px-6 py-24 bg-white">
+    <section id="features" className="px-4 sm:px-6 py-16 sm:py-24 bg-white">
       <div className="mx-auto max-w-5xl">
         <div className="mb-16 text-center">
           <div className="mx-auto mb-4 inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 px-3 py-1.5 text-xs font-semibold tracking-widest text-white uppercase shadow-lg">
             <Zap className="h-3.5 w-3.5" />
             Instantané
           </div>
-          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-zinc-900">
             Des quiz performants en quelques secondes
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-xl text-zinc-500">
+          <p className="mx-auto mt-4 max-w-2xl text-base md:text-xl text-zinc-500">
             Importez vos cours comme vous le feriez avec un document. Notre IA analyse le contenu et génère des outils de révision personnalisés.
           </p>
         </div>
@@ -705,9 +705,9 @@ function ParallelGenerationSection() {
   ]
 
   return (
-    <section className="px-6 py-24 bg-white">
+    <section className="px-4 sm:px-6 py-16 sm:py-24 bg-white">
       <div className="mx-auto max-w-5xl">
-        <div className="mb-16 text-center">
+        <div className="mb-12 sm:mb-16 text-center">
           <div className="mx-auto mb-4 inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 px-3 py-1.5 text-xs font-semibold tracking-widest text-white uppercase shadow-lg">
             <Zap className="h-3.5 w-3.5" />
             Génération parallèle
@@ -716,7 +716,7 @@ function ParallelGenerationSection() {
             N&apos;attendez plus.{' '}
             <span className="text-emerald-500">Générez en parallèle.</span>
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-xl text-zinc-500">
+          <p className="mx-auto mt-4 max-w-2xl text-base md:text-xl text-zinc-500">
             Les autres outils génèrent les contenus un par un. ScolarAI les lance tous simultanément — 4 ressources en le temps qu&apos;il faut aux autres pour en faire une.
           </p>
         </div>
@@ -804,7 +804,7 @@ function ParallelGenerationSection() {
 
         {/* "5x plus rapide" Badge */}
         <div className="mt-8 flex justify-center">
-          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-3 font-bold text-white shadow-lg shadow-emerald-500/25">
+          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-4 py-2 sm:px-6 sm:py-3 font-bold text-white shadow-lg shadow-emerald-500/25 text-sm sm:text-base">
             <Zap className="h-5 w-5" />
             5x plus rapide
           </div>

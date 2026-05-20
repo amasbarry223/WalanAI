@@ -109,12 +109,12 @@ export default function DocumentsPage() {
       </motion.div>
 
       {/* Filter tabs */}
-      <motion.div variants={itemVariants} className="flex items-center gap-2 mb-4">
+      <motion.div variants={itemVariants} className="flex items-center gap-2 mb-4 overflow-x-auto">
         {filters.map((filter) => (
           <button
             key={filter.key}
             onClick={() => setActiveFilter(filter.key)}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
               activeFilter === filter.key
                 ? 'bg-emerald-500 text-white'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -127,8 +127,8 @@ export default function DocumentsPage() {
       </motion.div>
 
       {/* Search and view controls */}
-      <motion.div variants={itemVariants} className="flex items-center gap-3 mb-6">
-        <div className="relative flex-1">
+      <motion.div variants={itemVariants} className="flex items-center gap-3 mb-6 flex-wrap">
+        <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Rechercher dans les documents..."
@@ -137,7 +137,7 @@ export default function DocumentsPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <Button variant="outline" size="sm" className="gap-2 text-gray-600">
+        <Button variant="outline" size="sm" className="gap-2 text-gray-600 hidden sm:inline-flex">
           <Clock className="h-3.5 w-3.5" />
           Tri : Date
         </Button>
@@ -258,14 +258,14 @@ export default function DocumentsPage() {
                           </Badge>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4 text-xs text-gray-400 shrink-0">
-                        <span className="flex items-center gap-1">
+                      <div className="flex items-center gap-3 sm:gap-4 text-xs text-gray-400 shrink-0">
+                        <span className="flex items-center gap-1 hidden sm:inline">
                           <Brain className="h-3 w-3" />
                           {doc.flashcards} fiches
                         </span>
-                        <span>{doc.date}</span>
+                        <span className="hidden sm:inline">{doc.date}</span>
                         {doc.favorite && <Star className="h-4 w-4 text-amber-400 fill-amber-400" />}
-                        <button className="p-1 rounded hover:bg-gray-100">
+                        <button className="p-1 rounded hover:bg-gray-100 min-h-[44px] min-w-[44px] flex items-center justify-center">
                           <MoreVertical className="h-4 w-4 text-gray-400" />
                         </button>
                       </div>

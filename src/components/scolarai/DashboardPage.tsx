@@ -289,9 +289,9 @@ export default function DashboardPage() {
       animate="visible"
     >
       {/* Header */}
-      <motion.div variants={itemVariants} className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <div className="flex items-center gap-2">
+      <motion.div variants={itemVariants} className="flex items-center justify-between mb-6 gap-2">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Dashboard</h1>
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="ghost" size="icon" className="relative">
@@ -358,7 +358,7 @@ export default function DashboardPage() {
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h2 className="text-xl font-bold">{greeting}, {user?.name?.split(' ')[0] || 'Étudiant'}!</h2>
+                      <h2 className="text-lg sm:text-xl font-bold">{greeting}, {user?.name?.split(' ')[0] || 'Étudiant'}!</h2>
                       <p className="text-emerald-100 text-sm">Prêt à continuer votre apprentissage ?</p>
                     </div>
                   </div>
@@ -380,25 +380,25 @@ export default function DashboardPage() {
                     </Button>
                   </div>
                 </div>
-                <div className="flex gap-6 mt-4">
+                <div className="flex flex-wrap gap-4 sm:gap-6 mt-4">
                   <div className="text-center">
-                    <p className="text-2xl font-bold">{mockDocuments.length}</p>
-                    <p className="text-xs text-emerald-100 uppercase tracking-wide">Documents</p>
+                    <p className="text-xl sm:text-2xl font-bold">{mockDocuments.length}</p>
+                    <p className="text-[10px] sm:text-xs text-emerald-100 uppercase tracking-wide">Documents</p>
                   </div>
-                  <Separator orientation="vertical" className="bg-white/20 h-auto" />
+                  <Separator orientation="vertical" className="bg-white/20 h-auto hidden sm:block" />
                   <div className="text-center">
-                    <p className="text-2xl font-bold">72%</p>
-                    <p className="text-xs text-emerald-100 uppercase tracking-wide">Score</p>
+                    <p className="text-xl sm:text-2xl font-bold">72%</p>
+                    <p className="text-[10px] sm:text-xs text-emerald-100 uppercase tracking-wide">Score</p>
                   </div>
-                  <Separator orientation="vertical" className="bg-white/20 h-auto" />
+                  <Separator orientation="vertical" className="bg-white/20 h-auto hidden sm:block" />
                   <div className="text-center">
-                    <p className="text-2xl font-bold">5j</p>
-                    <p className="text-xs text-emerald-100 uppercase tracking-wide">Série</p>
+                    <p className="text-xl sm:text-2xl font-bold">5j</p>
+                    <p className="text-[10px] sm:text-xs text-emerald-100 uppercase tracking-wide">Série</p>
                   </div>
-                  <Separator orientation="vertical" className="bg-white/20 h-auto" />
+                  <Separator orientation="vertical" className="bg-white/20 h-auto hidden sm:block" />
                   <div className="text-center">
-                    <p className="text-2xl font-bold">{totalSessions}</p>
-                    <p className="text-xs text-emerald-100 uppercase tracking-wide">Sessions</p>
+                    <p className="text-xl sm:text-2xl font-bold">{totalSessions}</p>
+                    <p className="text-[10px] sm:text-xs text-emerald-100 uppercase tracking-wide">Sessions</p>
                   </div>
                 </div>
               </CardContent>
@@ -665,7 +665,7 @@ export default function DashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-4 gap-3 mb-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
                   <div className="bg-emerald-50 rounded-lg p-3 text-center">
                     <Clock className="h-5 w-5 text-emerald-500 mx-auto mb-1" />
                     <p className="text-lg font-bold text-emerald-600">{totalMinutes} min</p>
@@ -699,17 +699,19 @@ export default function DashboardPage() {
             <CardHeader className="pb-3">
               <CardTitle className="text-base">Actions rapides</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-1">
-              {quickActions.map((action) => (
-                <button
-                  key={action.label}
-                  onClick={() => setCurrentPage(action.page)}
-                  className="flex items-center gap-3 w-full rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
-                >
-                  <span className={action.color}>{action.icon}</span>
-                  <span>{action.label}</span>
-                </button>
-              ))}
+            <CardContent>
+              <div className="grid grid-cols-2 gap-1 lg:grid-cols-1">
+                {quickActions.map((action) => (
+                  <button
+                    key={action.label}
+                    onClick={() => setCurrentPage(action.page)}
+                    className="flex items-center gap-3 w-full rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                  >
+                    <span className={action.color}>{action.icon}</span>
+                    <span className="truncate">{action.label}</span>
+                  </button>
+                ))}
+              </div>
             </CardContent>
           </Card>
 

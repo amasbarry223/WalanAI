@@ -291,13 +291,12 @@ export default function PomodoroPage() {
             <Card className="border-0 shadow-lg overflow-hidden">
               <CardContent className="p-6 md:p-8 flex flex-col items-center">
                 <motion.div
-                  className="relative"
+                  className="relative w-full max-w-[280px]"
                   variants={pulseVariants}
                   animate={isRunning ? 'running' : 'paused'}
                 >
                   <svg
-                    width="280"
-                    height="280"
+                    width="100%"
                     viewBox="0 0 280 280"
                     className="transform -rotate-90"
                   >
@@ -337,7 +336,7 @@ export default function PomodoroPage() {
                         transition={{ duration: 0.2 }}
                         className="flex flex-col items-center"
                       >
-                        <span className="text-5xl md:text-6xl font-mono font-bold text-gray-900 tracking-tight">
+                        <span className="text-4xl sm:text-5xl md:text-6xl font-mono font-bold text-gray-900 tracking-tight">
                           {formatTime(timeLeft)}
                         </span>
                         <Badge
@@ -356,12 +355,12 @@ export default function PomodoroPage() {
                 </motion.div>
 
                 {/* Controls */}
-                <div className="flex items-center gap-4 mt-8">
+                <div className="flex items-center gap-3 sm:gap-4 mt-6 sm:mt-8">
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Button
                       variant="outline"
                       size="icon"
-                      className="h-12 w-12 rounded-full border-gray-200 hover:border-emerald-300 hover:bg-emerald-50"
+                      className="h-11 w-11 sm:h-12 sm:w-12 rounded-full border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 min-h-[44px] min-w-[44px]"
                       onClick={handleReset}
                     >
                       <RotateCcw className="h-5 w-5 text-gray-500" />
@@ -369,7 +368,7 @@ export default function PomodoroPage() {
                   </motion.div>
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Button
-                      className="h-16 w-16 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/30"
+                      className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/30 min-h-[44px] min-w-[44px]"
                       onClick={isRunning ? handlePause : handleStart}
                       disabled={timeLeft === 0 && !isRunning}
                     >
@@ -384,7 +383,7 @@ export default function PomodoroPage() {
                     <Button
                       variant="outline"
                       size="icon"
-                      className="h-12 w-12 rounded-full border-gray-200 hover:border-emerald-300 hover:bg-emerald-50"
+                      className="h-11 w-11 sm:h-12 sm:w-12 rounded-full border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 min-h-[44px] min-w-[44px]"
                       onClick={() => {
                         // Skip to end of session
                         setIsRunning(false)

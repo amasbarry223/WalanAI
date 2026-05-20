@@ -2,7 +2,7 @@
 
 import { useAppStore } from '@/lib/store'
 import { useState, useSyncExternalStore } from 'react'
-import Sidebar from './Sidebar'
+import Sidebar, { MobileSidebar, MobileHeader } from './Sidebar'
 import LandingPage from './LandingPage'
 import LoginPage from './LoginPage'
 import RegisterPage from './RegisterPage'
@@ -41,6 +41,7 @@ function useHydrated() {
 export default function AppLayout() {
   const { currentPage, isAuthenticated } = useAppStore()
   const mounted = useHydrated()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   // Prevent hydration mismatch by not rendering until client-side mounted
   if (!mounted) {
@@ -123,8 +124,25 @@ export default function AppLayout() {
 
   return (
     <div className="flex h-full bg-gray-50/50">
+      {/* Desktop Sidebar */}
       <Sidebar />
-      <main className="flex-1 h-full overflow-y-auto">{renderPage()}</main>
+
+      {/* Mobile Sidebar (Sheet Drawer) */}
+      <MobileSidebar
+        open={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+      />
+
+      {/* Main area with mobile header */}
+      <div className="flex-1 flex flex-col min-w-0 h-full">
+        {/* Mobile Header - only shows on small screens */}
+        <MobileHeader onMenuClick={() => setMobileMenuOpen(true)} />
+
+        {/* Page content */}
+        <main className="flex-1 overflow-y-auto">
+          {renderPage()}
+        </main>
+      </div>
     </div>
   )
 }

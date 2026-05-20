@@ -121,13 +121,13 @@ function MessageBubble({ message }: { message: Message }) {
 
       {/* Bubble */}
       <div
-        className={`max-w-[75%] flex flex-col ${isUser ? 'items-end' : 'items-start'}`}
+        className={`max-w-[85%] sm:max-w-[75%] flex flex-col ${isUser ? 'items-end' : 'items-start'}`}
       >
         <span className="text-[11px] font-medium text-gray-400 mb-1 px-1">
           {isUser ? 'Vous' : 'Assistant IA'}
         </span>
         <div
-          className={`px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
+          className={`px-3 sm:px-4 py-2 sm:py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
             isUser
               ? 'bg-emerald-500 text-white rounded-2xl rounded-br-sm'
               : 'bg-white border text-gray-800 rounded-2xl rounded-bl-sm shadow-sm'
@@ -283,7 +283,7 @@ export default function AIAssistantPage() {
   return (
     <div className="flex flex-col h-full bg-gray-50/50">
       {/* ── Header ────────────────────────────────────────────────────── */}
-      <header className="bg-white border-b px-6 py-4 shrink-0">
+      <header className="bg-white border-b px-4 sm:px-6 py-3 sm:py-4 shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500 shadow-sm shadow-emerald-500/25">
@@ -331,7 +331,7 @@ export default function AIAssistantPage() {
       <div className="bg-white border-t shrink-0">
         <form
           onSubmit={handleSubmit}
-          className="max-w-3xl mx-auto px-4 sm:px-6 py-4"
+          className="max-w-3xl mx-auto px-4 sm:px-6 py-3 sm:py-4"
         >
           <div className="flex items-end gap-3">
             {/* Attachment button */}

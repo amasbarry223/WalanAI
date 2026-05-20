@@ -783,7 +783,7 @@ export default function QuizGeneratorPage() {
             <button
               key={q.id}
               onClick={() => goToQuestion(i)}
-              className={`w-8 h-8 rounded-lg text-xs font-semibold transition-all ${
+              className={`w-8 h-8 min-h-[44px] min-w-[44px] rounded-lg text-xs font-semibold transition-all flex items-center justify-center ${
                 i === currentQuestionIndex
                   ? 'bg-emerald-500 text-white shadow-sm'
                   : answers[i] !== null
