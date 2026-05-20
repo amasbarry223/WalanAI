@@ -11,7 +11,6 @@ import AdminSubscriptionsPage from './AdminSubscriptionsPage'
 import AdminAnalyticsPage from './AdminAnalyticsPage'
 import AdminSupportPage from './AdminSupportPage'
 import AdminSettingsPage from './AdminSettingsPage'
-import AdminAuditPage from './AdminAuditPage'
 import { GraduationCap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -42,7 +41,6 @@ const adminPageTitles: Record<AdminPageName, string> = {
   'admin-analytics': 'Analytique',
   'admin-support': 'Support',
   'admin-settings': 'Configuration',
-  'admin-audit': "Journal d'audit",
 }
 
 function MobileAdminHeader({ onMenuClick }: { onMenuClick: () => void }) {
@@ -128,8 +126,6 @@ export default function AdminLayout() {
         return <AdminSupportPage />
       case 'admin-settings':
         return <AdminSettingsPage />
-      case 'admin-audit':
-        return <AdminAuditPage />
       default:
         return <AdminDashboardPage />
     }

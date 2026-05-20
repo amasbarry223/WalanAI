@@ -11,10 +11,8 @@ import {
   BarChart3,
   Headphones,
   Settings,
-  Shield,
   ArrowLeftRight,
   GraduationCap,
-  LogOut,
   ChevronLeft,
   ChevronRight,
   Crown,
@@ -80,11 +78,6 @@ const adminNavItems: AdminNavItem[] = [
     page: 'admin-settings',
     icon: <Settings className="h-4 w-4" />,
     section: 'SYSTÈME',
-  },
-  {
-    label: 'Journal d\'audit',
-    page: 'admin-audit',
-    icon: <Shield className="h-4 w-4" />,
   },
 ]
 

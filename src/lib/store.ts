@@ -11,7 +11,6 @@ export type AdminPageName =
   | 'admin-analytics'
   | 'admin-support'
   | 'admin-settings'
-  | 'admin-audit'
 
 export type PageName =
   | 'landing'
