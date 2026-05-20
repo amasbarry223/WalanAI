@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Calendar,
@@ -15,8 +15,6 @@ import {
   AlertTriangle,
   AlertCircle,
   Sparkles,
-  Trash2,
-  ChevronDown,
   BookOpen,
   Target,
   Timer,
@@ -37,7 +35,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog'
 import {
   Select,
@@ -46,8 +43,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/lib/utils'
+
+// ─── Animation Variants ─────────────────────────────────────────────────────
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.06 },
+  },
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+}
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -1071,208 +1082,188 @@ export default function ExamTrackerPage() {
   ]
 
   return (
-    <div className="h-full bg-gray-50/50">
-      <ScrollArea className="h-full">
-        <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6"
-          >
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-2">
-                <div className="p-2 rounded-xl bg-emerald-50">
-                  <Award className="h-6 w-6 text-emerald-600" />
-                </div>
-                Suivi des Examens
-              </h1>
-              <p className="text-gray-500 mt-1 text-sm">
-                Planifiez vos révisions et suivez votre progression vers les examens
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3">
-              {/* View toggle */}
-              <div className="flex items-center bg-white rounded-lg border border-gray-200 p-0.5">
-                {viewModes.map((mode) => (
-                  <button
-                    key={mode.key}
-                    onClick={() => setViewMode(mode.key)}
-                    className={cn(
-                      'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all',
-                      viewMode === mode.key
-                        ? 'bg-emerald-500 text-white shadow-sm'
-                        : 'text-gray-500 hover:text-gray-700'
-                    )}
-                  >
-                    {mode.icon}
-                    <span className="hidden sm:inline">{mode.label}</span>
-                  </button>
-                ))}
+    <motion.div
+      className="p-4 md:p-6 lg:p-8"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {/* Header */}
+      <motion.div variants={itemVariants} className="flex items-center justify-between mb-6 flex-wrap gap-3">
+        <div className="flex items-center gap-3">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <div className="p-2 rounded-xl bg-emerald-50">
+                <Award className="h-5 w-5 text-emerald-600" />
               </div>
-
-              {/* Add exam button */}
-              <Button
-                onClick={() => setDialogOpen(true)}
-                className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm"
-              >
-                <Plus className="h-4 w-4 mr-1.5" />
-                <span className="hidden sm:inline">Ajouter un examen</span>
-                <span className="sm:hidden">Ajouter</span>
-              </Button>
-            </div>
-          </motion.div>
-
-          {/* Stats Row */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
-            {stats.map((stat, i) => {
-              const Icon = stat.icon
-              return (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.08 }}
-                >
-                  <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className={cn('p-2 rounded-lg', stat.bg)}>
-                          <Icon className={cn('h-5 w-5', stat.color)} />
-                        </div>
-                        <div>
-                          <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                          <p className="text-xs text-gray-500 leading-tight">{stat.label}</p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              )
-            })}
+              Suivi des Examens
+            </h1>
+            <p className="text-gray-500 mt-1 text-sm ml-9">
+              Planifiez vos révisions et suivez votre progression vers les examens
+            </p>
           </div>
-
-          {/* Main Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left / Main area */}
-            <div className="lg:col-span-2">
-              <AnimatePresence mode="wait">
-                {viewMode === 'cards' && (
-                  <motion.div
-                    key="cards"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-lg font-bold text-gray-900">Examens à venir</h2>
-                      <Badge variant="outline" className="text-xs">{upcomingExams.length} examens</Badge>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {upcomingExams.map((exam, i) => (
-                        <ExamCard key={exam.id} exam={exam} index={i} />
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-
-                {viewMode === 'timeline' && (
-                  <motion.div
-                    key="timeline"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-lg font-bold text-gray-900">Chronologie des examens</h2>
-                      <div className="flex items-center gap-3 text-xs text-gray-400">
-                        <span className="flex items-center gap-1">
-                          <span className="w-2 h-2 rounded-full bg-emerald-500" /> À venir
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <span className="w-2 h-2 rounded-full bg-gray-400" /> Passé
-                        </span>
-                      </div>
-                    </div>
-                    <TimelineView exams={upcomingExams} pastExams={mockPastExams} />
-                  </motion.div>
-                )}
-
-                {viewMode === 'calendar' && (
-                  <motion.div
-                    key="calendar"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-lg font-bold text-gray-900">Vue calendrier</h2>
-                    </div>
-                    <CalendarView exams={upcomingExams} />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* Right Sidebar - Study Plan */}
-            <div className="space-y-5">
-              <StudyPlanSidebar />
-            </div>
-          </div>
-
-          {/* Past Exams Section (only in cards view) */}
-          {viewMode === 'cards' && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="mt-8"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-gray-900">Examens passés</h2>
-                <Badge variant="outline" className="text-xs">{mockPastExams.length} examens</Badge>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {mockPastExams.map((exam, i) => (
-                  <motion.div
-                    key={exam.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.7 + i * 0.1 }}
-                  >
-                    <Card className="border-0 shadow-sm opacity-75 hover:opacity-100 transition-opacity">
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Badge className="bg-gray-400 text-white border-0 text-xs">{exam.subject}</Badge>
-                            <p className="text-sm text-gray-500 mt-1.5 capitalize">
-                              {formatDate(exam.date)}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-2xl font-bold text-gray-700">{exam.score}</p>
-                            <p className="text-xs text-gray-400">/20</p>
-                          </div>
-                        </div>
-                        <div className="mt-3">
-                          <Progress value={(exam.score || 0) / 20 * 100} className="h-1.5" />
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
         </div>
-      </ScrollArea>
+
+        <div className="flex items-center gap-3">
+          {/* View toggle */}
+          <div className="flex items-center bg-white rounded-lg border border-gray-200 p-0.5">
+            {viewModes.map((mode) => (
+              <button
+                key={mode.key}
+                onClick={() => setViewMode(mode.key)}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all',
+                  viewMode === mode.key
+                    ? 'bg-emerald-500 text-white shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                )}
+              >
+                {mode.icon}
+                <span className="hidden sm:inline">{mode.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Add exam button */}
+          <Button
+            onClick={() => setDialogOpen(true)}
+            className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm"
+          >
+            <Plus className="h-4 w-4 mr-1.5" />
+            <span className="hidden sm:inline">Ajouter un examen</span>
+            <span className="sm:hidden">Ajouter</span>
+          </Button>
+        </div>
+      </motion.div>
+
+      {/* Stats Row */}
+      <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4 mb-6">
+        {stats.map((stat, i) => {
+          const Icon = stat.icon
+          return (
+            <Card key={stat.label} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className={cn('p-2.5 rounded-xl', stat.bg)}>
+                    <Icon className={cn('h-5 w-5', stat.color)} />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                    <p className="text-xs text-gray-500 leading-tight">{stat.label}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )
+        })}
+      </motion.div>
+
+      {/* Main Content */}
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Left / Main area */}
+        <div className="flex-1 min-w-0">
+          <AnimatePresence mode="wait">
+            {viewMode === 'cards' && (
+              <motion.div
+                key="cards"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-bold text-gray-900">Examens à venir</h2>
+                  <Badge variant="outline" className="text-xs">{upcomingExams.length} examens</Badge>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {upcomingExams.map((exam, i) => (
+                    <ExamCard key={exam.id} exam={exam} index={i} />
+                  ))}
+                </div>
+              </motion.div>
+            )}
+
+            {viewMode === 'timeline' && (
+              <motion.div
+                key="timeline"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-bold text-gray-900">Chronologie des examens</h2>
+                  <div className="flex items-center gap-3 text-xs text-gray-400">
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500" /> À venir
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-gray-400" /> Passé
+                    </span>
+                  </div>
+                </div>
+                <TimelineView exams={upcomingExams} pastExams={mockPastExams} />
+              </motion.div>
+            )}
+
+            {viewMode === 'calendar' && (
+              <motion.div
+                key="calendar"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-bold text-gray-900">Vue calendrier</h2>
+                </div>
+                <CalendarView exams={upcomingExams} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Right Sidebar - Study Plan */}
+        <motion.div variants={itemVariants} className="w-full lg:w-[300px] shrink-0">
+          <StudyPlanSidebar />
+        </motion.div>
+      </div>
+
+      {/* Past Exams Section (only in cards view) */}
+      {viewMode === 'cards' && (
+        <motion.div variants={itemVariants} className="mt-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-gray-900">Examens passés</h2>
+            <Badge variant="outline" className="text-xs">{mockPastExams.length} examens</Badge>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {mockPastExams.map((exam) => (
+              <Card key={exam.id} className="hover:shadow-md transition-shadow opacity-75 hover:opacity-100">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Badge className="bg-gray-400 text-white border-0 text-xs">{exam.subject}</Badge>
+                      <p className="text-sm text-gray-500 mt-1.5 capitalize">
+                        {formatDate(exam.date)}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl font-bold text-gray-700">{exam.score}</p>
+                      <p className="text-xs text-gray-400">/20</p>
+                    </div>
+                  </div>
+                  <div className="mt-3">
+                    <Progress value={(exam.score || 0) / 20 * 100} className="h-1.5" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </motion.div>
+      )}
 
       {/* Add Exam Dialog */}
       <AddExamDialog open={dialogOpen} onOpenChange={setDialogOpen} />
-    </div>
+    </motion.div>
   )
 }
