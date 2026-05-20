@@ -120,3 +120,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Serif accent font for landing page headings */
+.font-serif {
+  font-family: 'Georgia', 'Cambria', 'Times New Roman', 'Times', serif;
+}
