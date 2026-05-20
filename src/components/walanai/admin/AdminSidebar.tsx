@@ -112,7 +112,7 @@ function AdminSidebarContent({
         </div>
         {!collapsed && (
           <div className="flex-1 min-w-0">
-            <span className="font-bold text-lg text-white whitespace-nowrap">ScolarAI</span>
+            <span className="font-bold text-lg text-white whitespace-nowrap">WalanAI</span>
             <span className="ml-2 text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 uppercase tracking-wide">Admin</span>
           </div>
         )}

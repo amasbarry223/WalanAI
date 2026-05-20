@@ -60,7 +60,7 @@ export default function AdminLoginPage() {
     const lowerEmail = email.trim().toLowerCase()
 
     // Only allow admin emails
-    const isAdmin = lowerEmail.includes('admin') || lowerEmail === 'admin@scolarai.fr'
+    const isAdmin = lowerEmail.includes('admin') || lowerEmail === 'admin@walanai.fr'
 
     if (!isAdmin) {
       setError('Accès réservé aux administrateurs. Utilisez un compte admin.')
@@ -68,7 +68,7 @@ export default function AdminLoginPage() {
       return
     }
 
-    const isSuperAdmin = lowerEmail === 'admin@scolarai.fr'
+    const isSuperAdmin = lowerEmail === 'admin@walanai.fr'
 
     // Validate specific admin credentials
     if (isSuperAdmin && password !== 'admin2024') {
@@ -78,7 +78,7 @@ export default function AdminLoginPage() {
     }
 
     login({
-      name: isSuperAdmin ? 'Admin ScolarAI' : 'Admin',
+      name: isSuperAdmin ? 'Admin WalanAI' : 'Admin',
       email: lowerEmail,
       plan: 'pro',
       role: isSuperAdmin ? 'super-admin' : 'admin',
@@ -113,7 +113,7 @@ export default function AdminLoginPage() {
         <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-500 shadow-lg shadow-emerald-500/30">
           <GraduationCap className="h-7 w-7 text-white" />
         </div>
-        <span className="text-2xl font-bold text-white tracking-tight">ScolarAI</span>
+        <span className="text-2xl font-bold text-white tracking-tight">WalanAI</span>
       </motion.div>
 
       {/* Admin badge */}
@@ -166,7 +166,7 @@ export default function AdminLoginPage() {
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                   <Input
                     type="email"
-                    placeholder="admin@scolarai.fr"
+                    placeholder="admin@walanai.fr"
                     value={email}
                     onChange={(e) => { setEmail(e.target.value); setFieldErrors((p) => ({ ...p, email: '' })) }}
                     onKeyDown={handleKeyDown}
@@ -246,7 +246,7 @@ export default function AdminLoginPage() {
         className="mt-6 flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-300 transition-colors cursor-pointer relative z-10"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
-        Retour à ScolarAI
+        Retour à WalanAI
       </motion.button>
 
       {/* Footer */}
@@ -256,7 +256,7 @@ export default function AdminLoginPage() {
         transition={{ duration: 0.5, delay: 0.3 }}
         className="mt-4 text-xs text-slate-600 relative z-10"
       >
-        &copy; 2025 ScolarAI. Tous droits réservés.
+        &copy; 2025 WalanAI. Tous droits réservés.
       </motion.p>
     </div>
   )

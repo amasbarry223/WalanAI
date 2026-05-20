@@ -329,7 +329,7 @@ function WelcomeStep({ userName }: { userName: string }) {
       {/* Text */}
       <div className="space-y-3">
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
-          Bienvenue sur ScolarAI{userName ? `, ${userName}` : ''} !
+          Bienvenue sur WalanAI{userName ? `, ${userName}` : ''} !
         </h1>
         <p className="text-gray-500 text-base sm:text-lg max-w-md mx-auto leading-relaxed">
           Votre compagnon intelligent pour réviser efficacement. Grâce à l&apos;IA,
@@ -819,7 +819,7 @@ export default function OnboardingPage() {
           <GraduationCap className="h-6 w-6 text-white" />
         </div>
         <span className="text-2xl font-bold text-gray-900 tracking-tight">
-          ScolarAI
+          WalanAI
         </span>
       </motion.div>
 
@@ -919,7 +919,7 @@ export default function OnboardingPage() {
         transition={{ duration: 0.5, delay: 0.4 }}
         className="mt-8 text-xs text-gray-400 relative z-10"
       >
-        © 2026 ScolarAI. Tous droits réservés.
+        © 2026 WalanAI. Tous droits réservés.
       </motion.p>
     </div>
   )

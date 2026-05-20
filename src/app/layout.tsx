@@ -14,12 +14,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ScolarAI - La plateforme intelligente de révision personnalisée",
+  title: "WalanAI - La plateforme intelligente de révision personnalisée",
   description: "Transformez vos documents de cours en outils de révision personnalisés grâce à l'IA. Résumés, flashcards, quiz et assistant conversationnel.",
-  keywords: ["ScolarAI", "révision", "IA", "flashcards", "quiz", "étudiants", "apprentissage"],
-  authors: [{ name: "ScolarAI Team" }],
+  keywords: ["WalanAI", "révision", "IA", "flashcards", "quiz", "étudiants", "apprentissage"],
+  authors: [{ name: "WalanAI Team" }],
   icons: {
-    icon: "/scolarai-logo.png",
+    icon: "/favicon.ico",
   },
 };
 

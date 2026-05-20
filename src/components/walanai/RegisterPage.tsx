@@ -161,7 +161,7 @@ export default function RegisterPage() {
         <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-lg shadow-emerald-200/50">
           <GraduationCap className="h-6 w-6 text-white" />
         </div>
-        <span className="text-2xl font-bold text-gray-900 tracking-tight">ScolarAI</span>
+        <span className="text-2xl font-bold text-gray-900 tracking-tight">WalanAI</span>
       </motion.div>
 
       {/* Back to landing */}
@@ -419,7 +419,7 @@ export default function RegisterPage() {
         transition={{ duration: 0.5, delay: 0.3 }}
         className="mt-6 text-xs text-gray-400"
       >
-        © 2025 ScolarAI. Tous droits réservés.
+        © 2025 WalanAI. Tous droits réservés.
       </motion.p>
     </div>
   )

@@ -191,7 +191,7 @@ function SidebarContent({
         </div>
         {!collapsed && (
           <span className="font-bold text-lg text-gray-900 whitespace-nowrap">
-            ScolarAI
+            WalanAI
           </span>
         )}
       </div>
@@ -363,7 +363,7 @@ function MobileSidebar({
       <SheetContent side="left" className="w-[280px] p-0">
         <SheetHeader className="sr-only">
           <SheetTitle>Navigation</SheetTitle>
-          <SheetDescription>Menu de navigation ScolarAI</SheetDescription>
+          <SheetDescription>Menu de navigation WalanAI</SheetDescription>
         </SheetHeader>
         <SidebarContent collapsed={false} onNavigate={onClose} />
       </SheetContent>
@@ -381,7 +381,7 @@ function MobileHeader({
   const { currentPage, user } = useAppStore()
 
   const pageTitle: Record<PageName, string> = {
-    'landing': 'ScolarAI',
+    'landing': 'WalanAI',
     'login': 'Connexion',
     'register': 'Créer un compte',
     'forgot-password': 'Mot de passe oublié',
@@ -425,7 +425,7 @@ function MobileHeader({
         </svg>
       </button>
       <h1 className="text-sm font-semibold text-gray-900">
-        {pageTitle[currentPage] || 'ScolarAI'}
+        {pageTitle[currentPage] || 'WalanAI'}
       </h1>
       <Avatar className="h-8 w-8">
         <AvatarFallback className="bg-emerald-500 text-white text-xs font-bold">

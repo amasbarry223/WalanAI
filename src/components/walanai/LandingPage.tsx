@@ -126,7 +126,7 @@ function Navbar() {
             <Brain className="h-5 w-5 text-white" />
           </div>
           <span className="text-lg font-semibold text-zinc-900 whitespace-nowrap">
-            ScolarAI
+            WalanAI
           </span>
         </div>
 
@@ -312,7 +312,7 @@ function ProductShowcase() {
   }, [])
 
   const showcaseRow1 = [
-    { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard ScolarAI' },
+    { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard WalanAI' },
     { src: '/images/showcase/quiz-1.png', alt: 'Quiz Generator' },
     { src: '/images/showcase/flashcards-1.png', alt: 'Flashcards' },
     { src: '/images/showcase/coach-1.png', alt: 'Coach IA' },
@@ -320,7 +320,7 @@ function ProductShowcase() {
     { src: '/images/showcase/groups-1.png', alt: 'Groupes' },
     { src: '/images/showcase/pomodoro-1.png', alt: 'Pomodoro' },
     { src: '/images/showcase/documents-1.png', alt: 'Documents' },
-    { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard ScolarAI' },
+    { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard WalanAI' },
     { src: '/images/showcase/quiz-1.png', alt: 'Quiz Generator' },
     { src: '/images/showcase/flashcards-1.png', alt: 'Flashcards' },
     { src: '/images/showcase/coach-1.png', alt: 'Coach IA' },
@@ -328,7 +328,7 @@ function ProductShowcase() {
     { src: '/images/showcase/groups-1.png', alt: 'Groupes' },
     { src: '/images/showcase/pomodoro-1.png', alt: 'Pomodoro' },
     { src: '/images/showcase/documents-1.png', alt: 'Documents' },
-    { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard ScolarAI' },
+    { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard WalanAI' },
     { src: '/images/showcase/quiz-1.png', alt: 'Quiz Generator' },
     { src: '/images/showcase/flashcards-1.png', alt: 'Flashcards' },
     { src: '/images/showcase/coach-1.png', alt: 'Coach IA' },
@@ -339,7 +339,7 @@ function ProductShowcase() {
     { src: '/images/showcase/groups-1.png', alt: 'Groupes' },
     { src: '/images/showcase/pomodoro-1.png', alt: 'Pomodoro' },
     { src: '/images/showcase/documents-1.png', alt: 'Documents' },
-    { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard ScolarAI' },
+    { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard WalanAI' },
     { src: '/images/showcase/quiz-1.png', alt: 'Quiz Generator' },
     { src: '/images/showcase/flashcards-1.png', alt: 'Flashcards' },
     { src: '/images/showcase/coach-1.png', alt: 'Coach IA' },
@@ -347,7 +347,7 @@ function ProductShowcase() {
     { src: '/images/showcase/groups-1.png', alt: 'Groupes' },
     { src: '/images/showcase/pomodoro-1.png', alt: 'Pomodoro' },
     { src: '/images/showcase/documents-1.png', alt: 'Documents' },
-    { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard ScolarAI' },
+    { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard WalanAI' },
     { src: '/images/showcase/quiz-1.png', alt: 'Quiz Generator' },
     { src: '/images/showcase/flashcards-1.png', alt: 'Flashcards' },
     { src: '/images/showcase/coach-1.png', alt: 'Coach IA' },
@@ -374,7 +374,7 @@ function ProductShowcase() {
                 <div className="hidden h-2.5 w-2.5 rounded-full bg-zinc-200 transition-colors group-hover/video:bg-green-500 lg:block" />
               </div>
               <div className="font-mono text-[10px] tracking-widest text-zinc-400 uppercase">
-                app.scolarai.fr
+                app.walanai.fr
               </div>
               <div className="w-10" />
             </div>
@@ -383,7 +383,7 @@ function ProductShowcase() {
             <div className="relative">
               <img
                 src="/images/showcase/dashboard-1.png"
-                alt="ScolarAI Dashboard"
+                alt="WalanAI Dashboard"
                 className="w-full"
               />
             </div>
@@ -669,7 +669,7 @@ function ParallelGenerationSection() {
   const isInView = useInView(sectionRef, { once: true, margin: '-80px' })
   const [progressWidths, setProgressWidths] = useState({
     other1: 0,
-    scolarai: [0, 0, 0, 0],
+    walanai: [0, 0, 0, 0],
   })
 
   // Animate progress bars when section comes into view
@@ -679,14 +679,14 @@ function ParallelGenerationSection() {
     // "Others" - slow sequential animation
     const otherTimer1 = setTimeout(() => setProgressWidths(prev => ({ ...prev, other1: 19 })), 500)
 
-    // ScolarAI - fast parallel animation, all at once
-    const scolaraiTimer = setTimeout(() => {
-      setProgressWidths(prev => ({ ...prev, scolarai: [100, 100, 100, 100] }))
+    // WalanAI - fast parallel animation, all at once
+    const walanaiTimer = setTimeout(() => {
+      setProgressWidths(prev => ({ ...prev, walanai: [100, 100, 100, 100] }))
     }, 800)
 
     return () => {
       clearTimeout(otherTimer1)
-      clearTimeout(scolaraiTimer)
+      clearTimeout(walanaiTimer)
     }
   }, [isInView])
 
@@ -697,7 +697,7 @@ function ParallelGenerationSection() {
     { label: 'Fiches de synthèse', progress: 0, active: false },
   ]
 
-  const scolaraiItems = [
+  const walanaiItems = [
     { label: 'Quiz', icon: <ClipboardList className="h-3.5 w-3.5 text-white" /> },
     { label: 'Flashcards', icon: <Layers className="h-3.5 w-3.5 text-white" /> },
     { label: 'Plan de révision', icon: <Target className="h-3.5 w-3.5 text-white" /> },
@@ -717,7 +717,7 @@ function ParallelGenerationSection() {
             <span className="text-emerald-500">Générez en parallèle.</span>
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-base md:text-xl text-zinc-500">
-            Les autres outils génèrent les contenus un par un. ScolarAI les lance tous simultanément — 4 ressources en le temps qu&apos;il faut aux autres pour en faire une.
+            Les autres outils génèrent les contenus un par un. WalanAI les lance tous simultanément — 4 ressources en le temps qu&apos;il faut aux autres pour en faire une.
           </p>
         </div>
 
@@ -764,14 +764,14 @@ function ParallelGenerationSection() {
             </div>
           </div>
 
-          {/* Right Card - "ScolarAI" */}
+          {/* Right Card - "WalanAI" */}
           <div className="w-full rounded-2xl border border-emerald-300 bg-emerald-50/30 p-6 transition-all duration-500 shadow-lg shadow-emerald-100 md:p-8 lg:flex-1">
             <div className="mb-6">
-              <h3 className="text-2xl font-bold text-emerald-500">ScolarAI</h3>
+              <h3 className="text-2xl font-bold text-emerald-500">WalanAI</h3>
               <p className="mt-1 text-sm text-zinc-400">Tout en même temps</p>
             </div>
             <div className="space-y-4">
-              {scolaraiItems.map((item, i) => (
+              {walanaiItems.map((item, i) => (
                 <div key={i} className="flex items-center gap-3">
                   <div className="relative h-[42px] w-[74px] shrink-0 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100">
                     <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-emerald-100 to-teal-50">
@@ -785,11 +785,11 @@ function ParallelGenerationSection() {
                     <div className="h-2 overflow-hidden rounded-full bg-zinc-200">
                       <div
                         className="h-full rounded-full bg-emerald-500 transition-[width] duration-1000 ease-out"
-                        style={{ width: `${progressWidths.scolarai[i]}%` }}
+                        style={{ width: `${progressWidths.walanai[i]}%` }}
                       />
                     </div>
                     <span className="mt-1 block text-xs font-medium text-emerald-600">
-                      {progressWidths.scolarai[i] === 100 ? 'Terminé !' : 'Génération...'}
+                      {progressWidths.walanai[i] === 100 ? 'Terminé !' : 'Génération...'}
                     </span>
                   </div>
                 </div>
@@ -1072,7 +1072,7 @@ const testimonials = [
   {
     name: 'Marie Dupont',
     role: 'Étudiante en Droit',
-    text: "ScolarAI a complètement transformé ma façon de réviser. Les quiz personnalisés m'ont permis de doubler mes notes en 2 mois !",
+    text: "WalanAI a complètement transformé ma façon de réviser. Les quiz personnalisés m'ont permis de doubler mes notes en 2 mois !",
     avatar: 'MD',
     color: 'bg-emerald-500',
     rating: 5,
@@ -1107,7 +1107,7 @@ function TestimonialsSection() {
             </span>
           </h2>
           <p className="text-lg text-zinc-600 max-w-2xl mx-auto">
-            Découvrez comment ScolarAI aide des milliers d&apos;étudiants à atteindre leurs objectifs.
+            Découvrez comment WalanAI aide des milliers d&apos;étudiants à atteindre leurs objectifs.
           </p>
         </motion.div>
 
@@ -1145,15 +1145,15 @@ function TestimonialsSection() {
 
 const faqItems = [
   {
-    question: 'Comment ScolarAI génère-t-il des quiz personnalisés ?',
+    question: 'Comment WalanAI génère-t-il des quiz personnalisés ?',
     answer: "Notre IA analyse vos documents de cours, identifie les concepts clés et génère automatiquement des quiz adaptés à votre niveau. L'algorithme s'ajuste en temps réel en fonction de vos réponses pour optimiser votre apprentissage.",
   },
   {
     question: 'Qu\'est-ce que la révision espacée ?',
-    answer: "La révision espacée est une technique d'apprentissage basée sur la répétition à intervalles croissants. ScolarAI calcule le moment optimal pour réviser chaque notion, maximisant ainsi la rétention à long terme tout en réduisant le temps d'étude.",
+    answer: "La révision espacée est une technique d'apprentissage basée sur la répétition à intervalles croissants. WalanAI calcule le moment optimal pour réviser chaque notion, maximisant ainsi la rétention à long terme tout en réduisant le temps d'étude.",
   },
   {
-    question: 'Puis-je utiliser ScolarAI gratuitement ?',
+    question: 'Puis-je utiliser WalanAI gratuitement ?',
     answer: "Oui ! Le plan gratuit vous permet de créer jusqu'à 5 quiz par mois, d'utiliser la révision espacée basique et de suivre vos progrès. Pour débloquer toutes les fonctionnalités, vous pouvez passer au plan Pro avec un essai gratuit de 14 jours.",
   },
   {
@@ -1166,7 +1166,7 @@ const faqItems = [
   },
   {
     question: 'Quelles matières sont supportées ?',
-    answer: "ScolarAI fonctionne avec toutes les matières ! Que vous étudiez le droit, la médecine, l'économie, les sciences ou les langues, notre IA s'adapte à n'importe quel contenu pour créer des outils de révision pertinents.",
+    answer: "WalanAI fonctionne avec toutes les matières ! Que vous étudiez le droit, la médecine, l'économie, les sciences ou les langues, notre IA s'adapte à n'importe quel contenu pour créer des outils de révision pertinents.",
   },
 ]
 
@@ -1182,7 +1182,7 @@ function FAQSection() {
             </span>
           </h2>
           <p className="text-lg text-zinc-600">
-            Tout ce que vous devez savoir pour bien démarrer avec ScolarAI.
+            Tout ce que vous devez savoir pour bien démarrer avec WalanAI.
           </p>
         </motion.div>
 
@@ -1216,7 +1216,7 @@ const plans = [
     name: 'Gratuit',
     price: '0€',
     period: '/mois',
-    description: 'Parfait pour découvrir ScolarAI',
+    description: 'Parfait pour découvrir WalanAI',
     features: ['5 quiz par mois', 'Révision espacée basique', 'Suivi de progrès', 'Accès communauté'],
     cta: 'Commencer gratuitement',
     highlighted: false,
@@ -1353,7 +1353,7 @@ function CTASection() {
                 ?
               </h2>
               <p className="text-lg text-zinc-400 max-w-2xl mx-auto mb-8">
-                Rejoignez plus de 2 500 étudiants qui ont déjà boosté leurs résultats avec ScolarAI.
+                Rejoignez plus de 2 500 étudiants qui ont déjà boosté leurs résultats avec WalanAI.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Button
@@ -1420,7 +1420,7 @@ function Footer() {
               <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
                 <Brain className="h-4 w-4 text-white" />
               </div>
-              <span className="text-lg font-semibold text-zinc-900">ScolarAI</span>
+              <span className="text-lg font-semibold text-zinc-900">WalanAI</span>
             </div>
             <p className="text-sm text-zinc-500 mb-4 leading-relaxed">
               La plateforme IA qui transforme vos cours en outils de révision personnalisés.
@@ -1466,7 +1466,7 @@ function Footer() {
 
         <div className="mt-12 pt-6 border-t border-zinc-100 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-zinc-400">
-            &copy; {new Date().getFullYear()} ScolarAI. Tous droits réservés.
+            &copy; {new Date().getFullYear()} WalanAI. Tous droits réservés.
           </p>
           <div className="flex items-center gap-1 text-sm text-zinc-400">
             Fait avec <span className="text-emerald-500">♥</span> en France

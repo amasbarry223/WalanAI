@@ -142,10 +142,10 @@ export default function AdminSettingsPage() {
   const { toast } = useToast()
 
   // ── Général ──
-  const [platformName, setPlatformName] = useState('ScolarAI')
-  const [platformUrl, setPlatformUrl] = useState('https://scolarai.fr')
+  const [platformName, setPlatformName] = useState('WalanAI')
+  const [platformUrl, setPlatformUrl] = useState('https://walanai.fr')
   const [platformDescription, setPlatformDescription] = useState('')
-  const [contactEmail, setContactEmail] = useState('contact@scolarai.fr')
+  const [contactEmail, setContactEmail] = useState('contact@walanai.fr')
 
   // ── Limites ──
   const [freeMaxDocs, setFreeMaxDocs] = useState(3)
@@ -181,9 +181,9 @@ export default function AdminSettingsPage() {
   const [emailSupportTicket, setEmailSupportTicket] = useState(true)
   const [emailWeeklyReport, setEmailWeeklyReport] = useState(true)
   const [emailSecurityAlert, setEmailSecurityAlert] = useState(true)
-  const [smtpHost, setSmtpHost] = useState('smtp.scolarai.fr')
+  const [smtpHost, setSmtpHost] = useState('smtp.walanai.fr')
   const [smtpPort, setSmtpPort] = useState('587')
-  const [smtpUser, setSmtpUser] = useState('noreply@scolarai.fr')
+  const [smtpUser, setSmtpUser] = useState('noreply@walanai.fr')
 
   // ── Maintenance ──
   const [maintenanceMode, setMaintenanceMode] = useState(false)

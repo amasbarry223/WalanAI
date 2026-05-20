@@ -108,7 +108,7 @@ const faqItems = [
       'Nous acceptons les cartes bancaires (Visa, Mastercard, Carte Bleue), PayPal et les virements SEPA pour les abonnements annuels. Tous les paiements sont sécurisés et chiffrés avec la norme PCI DSS.',
   },
   {
-    question: 'Mes données sont-elles en sécurité avec ScolarAI ?',
+    question: 'Mes données sont-elles en sécurité avec WalanAI ?',
     answer:
       'Absolument. Nous utilisons un chiffrement de bout en bout pour protéger vos documents et données personnelles. Vos fichiers ne sont jamais partagés avec des tiers. Nous sommes conformes au RGPD et vous pouvez exporter ou supprimer vos données à tout moment.',
   },
@@ -120,7 +120,7 @@ const testimonials = [
     initials: 'LM',
     role: 'Étudiante en Droit',
     quote:
-      "ScolarAI Pro a complètement transformé ma façon de réviser. Les flashcards automatiques et l'assistant GPT-4 m'ont fait gagner des heures chaque semaine. Je ne pourrais plus m'en passer !",
+      "WalanAI Pro a complètement transformé ma façon de réviser. Les flashcards automatiques et l'assistant GPT-4 m'ont fait gagner des heures chaque semaine. Je ne pourrais plus m'en passer !",
     rating: 5,
   },
   {
@@ -178,7 +178,7 @@ export default function PricingPage() {
             Choisissez votre plan
           </h1>
           <p className="text-gray-500 text-lg max-w-md mx-auto">
-            Débloquez tout le potentiel de ScolarAI
+            Débloquez tout le potentiel de WalanAI
           </p>
         </motion.div>
 
@@ -240,7 +240,7 @@ export default function PricingPage() {
                   <span className="text-gray-400 text-sm ml-1">/mois</span>
                 </div>
                 <p className="text-sm text-gray-500 mt-1">
-                  Parfait pour découvrir ScolarAI
+                  Parfait pour découvrir WalanAI
                 </p>
               </CardHeader>
               <CardContent className="pt-2">
@@ -467,7 +467,7 @@ export default function PricingPage() {
                     <RefreshCw className="h-4 w-4 text-emerald-500" />
                   </h3>
                   <p className="text-sm text-gray-600 mt-1 max-w-lg">
-                    Essayez ScolarAI Pro sans risque. Si vous n&apos;êtes pas satisfait dans les
+                    Essayez WalanAI Pro sans risque. Si vous n&apos;êtes pas satisfait dans les
                     30 premiers jours, nous vous rembourserons intégralement — sans questions posées.
                   </p>
                 </div>

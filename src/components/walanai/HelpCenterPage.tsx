@@ -33,7 +33,7 @@ const faqItems = [
     category: 'Documents',
     icon: <FileText className="h-4 w-4" />,
     questions: [
-      { q: 'Quels formats de documents sont supportés ?', a: 'ScolarAI supporte les formats PDF, Word (.docx), PowerPoint (.pptx), et les images (JPG, PNG). Nous travaillons sur le support de fichiers Excel et Markdown.' },
+      { q: 'Quels formats de documents sont supportés ?', a: 'WalanAI supporte les formats PDF, Word (.docx), PowerPoint (.pptx), et les images (JPG, PNG). Nous travaillons sur le support de fichiers Excel et Markdown.' },
       { q: 'Combien de documents puis-je importer ?', a: 'Le plan Gratuit permet jusqu\'à 3 documents. Le plan Pro offre un stockage illimité avec des fichiers jusqu\'à 100 Mo chacun.' },
       { q: 'Comment fonctionne l\'importation par glisser-déposer ?', a: 'Glissez simplement vos fichiers depuis votre explorateur de fichiers vers la zone d\'importation sur la page "Mes Documents". Vous pouvez aussi cliquer sur le bouton "+" pour ouvrir le sélecteur de fichiers.' },
     ],
@@ -66,7 +66,7 @@ const faqItems = [
 ]
 
 const helpLinks = [
-  { title: 'Guide de démarrage', description: 'Apprenez les bases de ScolarAI en 5 minutes', icon: <BookOpen className="h-5 w-5" />, color: 'text-blue-500 bg-blue-50' },
+  { title: 'Guide de démarrage', description: 'Apprenez les bases de WalanAI en 5 minutes', icon: <BookOpen className="h-5 w-5" />, color: 'text-blue-500 bg-blue-50' },
   { title: 'Importer des documents', description: 'Comment téléverser vos cours', icon: <FileText className="h-5 w-5" />, color: 'text-emerald-500 bg-emerald-50' },
   { title: 'Utiliser les flashcards', description: 'Optimisez votre révision avec le SRS', icon: <Brain className="h-5 w-5" />, color: 'text-violet-500 bg-violet-50' },
   { title: 'Assistant IA', description: 'Tirez le meilleur de votre assistant', icon: <Bot className="h-5 w-5" />, color: 'text-amber-500 bg-amber-50' },

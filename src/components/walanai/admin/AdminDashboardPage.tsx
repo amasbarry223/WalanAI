@@ -180,7 +180,7 @@ export default function AdminDashboardPage() {
                   <BarChart3 className="h-6 w-6 text-emerald-400" />
                   Tableau de bord Admin
                 </h1>
-                <p className="text-slate-400 text-sm mt-1">Vue d&apos;ensemble de la plateforme ScolarAI</p>
+                <p className="text-slate-400 text-sm mt-1">Vue d&apos;ensemble de la plateforme WalanAI</p>
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20">

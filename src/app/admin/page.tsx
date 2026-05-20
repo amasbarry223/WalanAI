@@ -2,8 +2,8 @@
 
 import { useEffect, useSyncExternalStore } from 'react'
 import { useAppStore } from '@/lib/store'
-import AdminLayout from '@/components/scolarai/admin/AdminLayout'
-import AdminLoginPage from '@/components/scolarai/admin/AdminLoginPage'
+import AdminLayout from '@/components/walanai/admin/AdminLayout'
+import AdminLoginPage from '@/components/walanai/admin/AdminLoginPage'
 
 const emptySubscribe = () => () => {}
 
