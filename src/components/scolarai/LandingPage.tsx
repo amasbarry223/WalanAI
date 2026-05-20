@@ -817,54 +817,62 @@ function ParallelGenerationSection() {
 // ─── All Styles Section (youthumb.ai style marquee) ──────────
 
 const styleCardsRow1 = [
-  { label: 'Quiz QCM', icon: <ClipboardList className="h-6 w-6" />, gradient: 'from-emerald-400 to-teal-500', preview: 'QCM' },
-  { label: 'Flashcards', icon: <Layers className="h-6 w-6" />, gradient: 'from-teal-400 to-cyan-500', preview: 'Flip' },
-  { label: 'Vrai / Faux', icon: <Check className="h-6 w-6" />, gradient: 'from-green-400 to-emerald-500', preview: 'V/F' },
-  { label: 'Résumés', icon: <FileText className="h-6 w-6" />, gradient: 'from-emerald-500 to-green-600', preview: 'Sum' },
-  { label: 'Plans de révision', icon: <Target className="h-6 w-6" />, gradient: 'from-teal-500 to-emerald-600', preview: 'Plan' },
-  { label: 'Questions ouvertes', icon: <PenTool className="h-6 w-6" />, gradient: 'from-cyan-400 to-teal-500', preview: 'Q°' },
-  { label: 'Cartes mentales', icon: <BrainCircuit className="h-6 w-6" />, gradient: 'from-emerald-400 to-green-500', preview: 'Map' },
-  { label: 'Fiches de synthèse', icon: <NotebookPen className="h-6 w-6" />, gradient: 'from-green-500 to-teal-600', preview: 'Note' },
-  { label: 'Quiz QCM', icon: <ClipboardList className="h-6 w-6" />, gradient: 'from-emerald-400 to-teal-500', preview: 'QCM' },
-  { label: 'Flashcards', icon: <Layers className="h-6 w-6" />, gradient: 'from-teal-400 to-cyan-500', preview: 'Flip' },
-  { label: 'Vrai / Faux', icon: <Check className="h-6 w-6" />, gradient: 'from-green-400 to-emerald-500', preview: 'V/F' },
-  { label: 'Résumés', icon: <FileText className="h-6 w-6" />, gradient: 'from-emerald-500 to-green-600', preview: 'Sum' },
+  { label: 'Quiz QCM', icon: <ClipboardList className="h-5 w-5" />, gradient: 'from-violet-500 to-purple-600', accent: 'bg-violet-400', light: 'bg-violet-300/40' },
+  { label: 'Flashcards', icon: <Layers className="h-5 w-5" />, gradient: 'from-amber-400 to-orange-500', accent: 'bg-amber-300', light: 'bg-amber-200/40' },
+  { label: 'Vrai / Faux', icon: <Check className="h-5 w-5" />, gradient: 'from-rose-400 to-pink-500', accent: 'bg-rose-300', light: 'bg-rose-200/40' },
+  { label: 'Résumés', icon: <FileText className="h-5 w-5" />, gradient: 'from-sky-400 to-blue-500', accent: 'bg-sky-300', light: 'bg-sky-200/40' },
+  { label: 'Plans de révision', icon: <Target className="h-5 w-5" />, gradient: 'from-emerald-400 to-teal-500', accent: 'bg-emerald-300', light: 'bg-emerald-200/40' },
+  { label: 'Questions ouvertes', icon: <PenTool className="h-5 w-5" />, gradient: 'from-indigo-400 to-violet-500', accent: 'bg-indigo-300', light: 'bg-indigo-200/40' },
+  { label: 'Cartes mentales', icon: <BrainCircuit className="h-5 w-5" />, gradient: 'from-fuchsia-400 to-purple-500', accent: 'bg-fuchsia-300', light: 'bg-fuchsia-200/40' },
+  { label: 'Fiches de synthèse', icon: <NotebookPen className="h-5 w-5" />, gradient: 'from-teal-400 to-cyan-500', accent: 'bg-teal-300', light: 'bg-teal-200/40' },
+  { label: 'Quiz QCM', icon: <ClipboardList className="h-5 w-5" />, gradient: 'from-violet-500 to-purple-600', accent: 'bg-violet-400', light: 'bg-violet-300/40' },
+  { label: 'Flashcards', icon: <Layers className="h-5 w-5" />, gradient: 'from-amber-400 to-orange-500', accent: 'bg-amber-300', light: 'bg-amber-200/40' },
+  { label: 'Vrai / Faux', icon: <Check className="h-5 w-5" />, gradient: 'from-rose-400 to-pink-500', accent: 'bg-rose-300', light: 'bg-rose-200/40' },
+  { label: 'Résumés', icon: <FileText className="h-5 w-5" />, gradient: 'from-sky-400 to-blue-500', accent: 'bg-sky-300', light: 'bg-sky-200/40' },
 ]
 
 const styleCardsRow2 = [
-  { label: 'QRC', icon: <Lightbulb className="h-6 w-6" />, gradient: 'from-teal-400 to-emerald-500', preview: 'QRC' },
-  { label: 'Exercices', icon: <ListChecks className="h-6 w-6" />, gradient: 'from-green-500 to-cyan-500', preview: 'Exo' },
-  { label: 'Mind Map', icon: <BrainCircuit className="h-6 w-6" />, gradient: 'from-emerald-500 to-teal-400', preview: 'Map' },
-  { label: 'Notes structurées', icon: <BookMarked className="h-6 w-6" />, gradient: 'from-cyan-500 to-emerald-500', preview: 'Note' },
-  { label: 'Analyse de texte', icon: <ScanSearch className="h-6 w-6" />, gradient: 'from-teal-500 to-green-500', preview: 'Ana' },
-  { label: 'Quiz chronométré', icon: <Clock className="h-6 w-6" />, gradient: 'from-emerald-400 to-green-500', preview: 'Time' },
-  { label: 'Formulaires', icon: <NotebookPen className="h-6 w-6" />, gradient: 'from-green-400 to-teal-500', preview: 'Form' },
-  { label: 'Bilan de connaissances', icon: <BarChart3 className="h-6 w-6" />, gradient: 'from-teal-600 to-emerald-500', preview: 'Bilan' },
-  { label: 'QRC', icon: <Lightbulb className="h-6 w-6" />, gradient: 'from-teal-400 to-emerald-500', preview: 'QRC' },
-  { label: 'Exercices', icon: <ListChecks className="h-6 w-6" />, gradient: 'from-green-500 to-cyan-500', preview: 'Exo' },
-  { label: 'Mind Map', icon: <BrainCircuit className="h-6 w-6" />, gradient: 'from-emerald-500 to-teal-400', preview: 'Map' },
-  { label: 'Notes structurées', icon: <BookMarked className="h-6 w-6" />, gradient: 'from-cyan-500 to-emerald-500', preview: 'Note' },
+  { label: 'QRC', icon: <Lightbulb className="h-5 w-5" />, gradient: 'from-orange-400 to-red-500', accent: 'bg-orange-300', light: 'bg-orange-200/40' },
+  { label: 'Exercices', icon: <ListChecks className="h-5 w-5" />, gradient: 'from-red-400 to-rose-500', accent: 'bg-red-300', light: 'bg-red-200/40' },
+  { label: 'Mind Map', icon: <BrainCircuit className="h-5 w-5" />, gradient: 'from-purple-400 to-fuchsia-500', accent: 'bg-purple-300', light: 'bg-purple-200/40' },
+  { label: 'Notes structurées', icon: <BookMarked className="h-5 w-5" />, gradient: 'from-blue-400 to-indigo-500', accent: 'bg-blue-300', light: 'bg-blue-200/40' },
+  { label: 'Analyse de texte', icon: <ScanSearch className="h-5 w-5" />, gradient: 'from-zinc-500 to-zinc-700', accent: 'bg-zinc-400', light: 'bg-zinc-300/40' },
+  { label: 'Quiz chronométré', icon: <Clock className="h-5 w-5" />, gradient: 'from-yellow-400 to-amber-500', accent: 'bg-yellow-300', light: 'bg-yellow-200/40' },
+  { label: 'Formulaires', icon: <NotebookPen className="h-5 w-5" />, gradient: 'from-cyan-400 to-sky-500', accent: 'bg-cyan-300', light: 'bg-cyan-200/40' },
+  { label: 'Bilan de connaissances', icon: <BarChart3 className="h-5 w-5" />, gradient: 'from-emerald-500 to-green-600', accent: 'bg-emerald-400', light: 'bg-emerald-300/40' },
+  { label: 'QRC', icon: <Lightbulb className="h-5 w-5" />, gradient: 'from-orange-400 to-red-500', accent: 'bg-orange-300', light: 'bg-orange-200/40' },
+  { label: 'Exercices', icon: <ListChecks className="h-5 w-5" />, gradient: 'from-red-400 to-rose-500', accent: 'bg-red-300', light: 'bg-red-200/40' },
+  { label: 'Mind Map', icon: <BrainCircuit className="h-5 w-5" />, gradient: 'from-purple-400 to-fuchsia-500', accent: 'bg-purple-300', light: 'bg-purple-200/40' },
+  { label: 'Notes structurées', icon: <BookMarked className="h-5 w-5" />, gradient: 'from-blue-400 to-indigo-500', accent: 'bg-blue-300', light: 'bg-blue-200/40' },
 ]
 
 function StyleCard({ card }: { card: typeof styleCardsRow1[0] }) {
   return (
-    <div className="aspect-video w-56 shrink-0 overflow-hidden rounded-xl shadow-lg md:w-72">
-      <div className={`relative h-full w-full bg-gradient-to-br ${card.gradient} flex flex-col items-center justify-center gap-2 p-4`}>
-        {/* Icon circle */}
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm text-white">
-          {card.icon}
+    <div className="aspect-video w-56 shrink-0 overflow-hidden rounded-xl shadow-lg transition-transform duration-300 hover:scale-[1.03] md:w-72">
+      <div className={`relative h-full w-full bg-gradient-to-br ${card.gradient} flex flex-col p-4`}>
+        {/* Top row: icon + label */}
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/20 backdrop-blur-sm text-white shrink-0">
+            {card.icon}
+          </div>
+          <span className="text-sm font-bold text-white drop-shadow-sm leading-tight">{card.label}</span>
         </div>
-        {/* Label */}
-        <span className="text-sm font-semibold text-white drop-shadow-sm">{card.label}</span>
-        {/* Mini content preview */}
-        <div className="mt-1 flex flex-col gap-1 w-full max-w-[80%]">
-          <div className="h-1.5 w-3/4 rounded-full bg-white/30" />
-          <div className="h-1.5 w-full rounded-full bg-white/20" />
-          <div className="h-1.5 w-2/3 rounded-full bg-white/20" />
-        </div>
-        {/* Preview badge */}
-        <div className="absolute top-2 right-2 rounded-md bg-white/20 px-1.5 py-0.5 text-[10px] font-bold text-white backdrop-blur-sm">
-          {card.preview}
+
+        {/* Content preview area */}
+        <div className="mt-auto space-y-1.5">
+          {/* Simulated content lines */}
+          <div className="flex items-center gap-1.5">
+            <div className={`h-2 w-2 rounded-full ${card.accent} shrink-0`} />
+            <div className="h-1.5 w-3/4 rounded-full bg-white/30" />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className={`h-2 w-2 rounded-full ${card.accent} shrink-0`} />
+            <div className="h-1.5 w-full rounded-full bg-white/25" />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className={`h-2 w-2 rounded-full ${card.light} shrink-0`} />
+            <div className="h-1.5 w-2/3 rounded-full bg-white/20" />
+          </div>
         </div>
       </div>
     </div>
@@ -900,13 +908,19 @@ function AllStylesSection() {
   }, [])
 
   return (
-    <section className="overflow-hidden py-12">
+    <section className="overflow-hidden py-12 bg-zinc-50/50">
       <div className="mb-8 text-center">
-        <div className="mb-3 inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 px-3 py-1.5 text-xs font-semibold tracking-widest text-white uppercase shadow-lg">
+        <div className="mb-3 inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-violet-500 via-rose-500 to-amber-500 px-3 py-1.5 text-xs font-semibold tracking-widest text-white uppercase shadow-lg">
           <Palette className="h-3.5 w-3.5" />
           Tous les Styles
         </div>
-        <p className="text-lg text-zinc-600">Choisis et génère n&apos;importe quel style de contenu éducatif</p>
+        <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">
+          Choisis et génère{' '}
+          <span className="bg-gradient-to-r from-violet-500 via-rose-500 to-amber-500 bg-clip-text text-transparent">
+            n&apos;importe quel style
+          </span>{' '}
+          de contenu éducatif
+        </h2>
       </div>
 
       <div className="space-y-6">
