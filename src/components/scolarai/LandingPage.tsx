@@ -11,7 +11,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { motion, useInView } from 'framer-motion'
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import {
   Brain,
@@ -34,10 +34,6 @@ import {
   X,
   Flame,
   Crown,
-  Layers,
-  PenTool,
-  Lightbulb,
-  ChevronDown,
   Globe,
   Mail,
 } from 'lucide-react'
@@ -82,35 +78,7 @@ function AnimatedSection({ children, className = '', id }: { children: React.Rea
   )
 }
 
-// ─── Infinite Scroll Marquee ──────────────────────────────────
 
-function InfiniteMarquee({ children, speed = 30 }: { children: React.ReactNode; speed?: number }) {
-  const scrollerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!scrollerRef.current) return
-    const scroller = scrollerRef.current
-    const scrollContent = Array.from(scroller.children)
-    scrollContent.forEach((item) => {
-      const duplicatedItem = item.cloneNode(true)
-      scroller.appendChild(duplicatedItem)
-    })
-    gsap.to(scroller, {
-      x: `-50%`,
-      duration: speed,
-      repeat: -1,
-      ease: 'none',
-    })
-  }, [speed])
-
-  return (
-    <div className="overflow-hidden">
-      <div ref={scrollerRef} className="flex gap-6 w-max">
-        {children}
-      </div>
-    </div>
-  )
-}
 
 // ─── Navbar ───────────────────────────────────────────────────
 
@@ -298,148 +266,182 @@ function HeroSection() {
 
 function ProductShowcase() {
   const showcaseRef = useRef<HTMLDivElement>(null)
+  const row1Ref = useRef<HTMLDivElement>(null)
+  const row2Ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!showcaseRef.current) return
     gsap.fromTo(
       showcaseRef.current,
-      { y: 60, opacity: 0 },
-      { y: 0, opacity: 1, duration: 1, ease: 'power3.out', delay: 0.8 }
+      { opacity: 0 },
+      { opacity: 1, duration: 1, ease: 'power2.out', delay: 0.3 }
     )
   }, [])
 
+  useEffect(() => {
+    // Row 1: scrolls left continuously
+    if (!row1Ref.current) return
+    const el = row1Ref.current
+    const totalWidth = el.scrollWidth / 2
+    gsap.to(el, {
+      x: -totalWidth,
+      duration: 50,
+      ease: 'none',
+      repeat: -1,
+    })
+  }, [])
+
+  useEffect(() => {
+    // Row 2: scrolls left continuously (different speed)
+    if (!row2Ref.current) return
+    const el = row2Ref.current
+    const totalWidth = el.scrollWidth / 2
+    gsap.to(el, {
+      x: -totalWidth,
+      duration: 60,
+      ease: 'none',
+      repeat: -1,
+    })
+  }, [])
+
+  // Showcase images for the scrolling rows
+  const showcaseRow1 = [
+    { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard ScolarAI' },
+    { src: '/images/showcase/quiz-1.png', alt: 'Quiz Generator' },
+    { src: '/images/showcase/flashcards-1.png', alt: 'Flashcards' },
+    { src: '/images/showcase/coach-1.png', alt: 'Coach IA' },
+    { src: '/images/showcase/progress-1.png', alt: 'Progrès' },
+    { src: '/images/showcase/groups-1.png', alt: 'Groupes' },
+    { src: '/images/showcase/pomodoro-1.png', alt: 'Pomodoro' },
+    { src: '/images/showcase/documents-1.png', alt: 'Documents' },
+    { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard ScolarAI' },
+    { src: '/images/showcase/quiz-1.png', alt: 'Quiz Generator' },
+    { src: '/images/showcase/flashcards-1.png', alt: 'Flashcards' },
+    { src: '/images/showcase/coach-1.png', alt: 'Coach IA' },
+    { src: '/images/showcase/progress-1.png', alt: 'Progrès' },
+    { src: '/images/showcase/groups-1.png', alt: 'Groupes' },
+    { src: '/images/showcase/pomodoro-1.png', alt: 'Pomodoro' },
+    { src: '/images/showcase/documents-1.png', alt: 'Documents' },
+    { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard ScolarAI' },
+    { src: '/images/showcase/quiz-1.png', alt: 'Quiz Generator' },
+    { src: '/images/showcase/flashcards-1.png', alt: 'Flashcards' },
+    { src: '/images/showcase/coach-1.png', alt: 'Coach IA' },
+  ]
+
+  const showcaseRow2 = [
+    { src: '/images/showcase/progress-1.png', alt: 'Progrès' },
+    { src: '/images/showcase/groups-1.png', alt: 'Groupes' },
+    { src: '/images/showcase/pomodoro-1.png', alt: 'Pomodoro' },
+    { src: '/images/showcase/documents-1.png', alt: 'Documents' },
+    { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard ScolarAI' },
+    { src: '/images/showcase/quiz-1.png', alt: 'Quiz Generator' },
+    { src: '/images/showcase/flashcards-1.png', alt: 'Flashcards' },
+    { src: '/images/showcase/coach-1.png', alt: 'Coach IA' },
+    { src: '/images/showcase/progress-1.png', alt: 'Progrès' },
+    { src: '/images/showcase/groups-1.png', alt: 'Groupes' },
+    { src: '/images/showcase/pomodoro-1.png', alt: 'Pomodoro' },
+    { src: '/images/showcase/documents-1.png', alt: 'Documents' },
+    { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard ScolarAI' },
+    { src: '/images/showcase/quiz-1.png', alt: 'Quiz Generator' },
+    { src: '/images/showcase/flashcards-1.png', alt: 'Flashcards' },
+    { src: '/images/showcase/coach-1.png', alt: 'Coach IA' },
+    { src: '/images/showcase/progress-1.png', alt: 'Progrès' },
+    { src: '/images/showcase/groups-1.png', alt: 'Groupes' },
+    { src: '/images/showcase/pomodoro-1.png', alt: 'Pomodoro' },
+    { src: '/images/showcase/documents-1.png', alt: 'Documents' },
+  ]
+
   return (
-    <section className="relative overflow-x-clip bg-white pb-12">
-      <div ref={showcaseRef} className="mx-auto mb-6 max-w-5xl px-4">
-        {/* Browser Mockup */}
-        <div className="group overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50 p-2 shadow-[0_20px_70px_-15px_rgba(16,185,129,0.25),0_10px_40px_-10px_rgba(0,0,0,0.15)]">
-          {/* Browser Bar */}
-          <div className="flex items-center justify-between border-b border-zinc-200 bg-white px-4 py-3">
-            <div className="flex gap-1.5">
-              <div className="h-2.5 w-2.5 rounded-full bg-zinc-200 transition-colors group-hover:bg-red-400" />
-              <div className="hidden h-2.5 w-2.5 rounded-full bg-zinc-200 transition-colors group-hover:bg-yellow-400 sm:block" />
-              <div className="hidden h-2.5 w-2.5 rounded-full bg-zinc-200 transition-colors group-hover:bg-green-400 sm:block" />
-            </div>
-            <div className="font-mono text-[10px] tracking-widest text-zinc-400 uppercase">
-              app.scolarai.fr
-            </div>
-            <div className="w-10" />
-          </div>
-
-          {/* App Content */}
-          <div className="bg-white p-4 sm:p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {/* Sidebar Preview */}
-              <div className="space-y-3 order-2 sm:order-1">
-                <div className="h-3 bg-zinc-100 rounded-full w-2/3" />
-                {[
-                  { label: 'Quiz', icon: '📝', active: true },
-                  { label: 'Flashcards', icon: '🃏', active: false },
-                  { label: 'Révision', icon: '🔄', active: false },
-                  { label: 'Progrès', icon: '📊', active: false },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className={`flex items-center gap-2.5 rounded-lg p-2.5 text-sm ${
-                      item.active ? 'bg-emerald-50 text-emerald-700 font-medium' : 'text-zinc-500'
-                    }`}
-                  >
-                    <span className="text-base">{item.icon}</span>
-                    {item.label}
-                  </div>
-                ))}
+    <section className="relative overflow-x-clip py-12">
+      {/* Browser Mockup - centered on top, absolute positioned on lg */}
+      <div
+        ref={showcaseRef}
+        className="mx-auto mb-6 max-w-5xl px-4 lg:absolute lg:inset-0 lg:z-10 lg:mb-0 lg:flex lg:max-w-none lg:items-center lg:justify-center lg:px-6"
+      >
+        <div className="w-full lg:max-w-3xl xl:max-w-4xl">
+          <div className="group/video overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50 p-2 shadow-[0_20px_70px_-15px_rgba(16,185,129,0.3),0_10px_40px_-10px_rgba(0,0,0,0.2)]">
+            {/* Browser Bar */}
+            <div className="flex items-center justify-between border-b border-zinc-200 bg-white px-4 py-3">
+              <div className="flex gap-1.5">
+                <div className="h-2.5 w-2.5 rounded-full bg-zinc-200 transition-colors group-hover/video:bg-red-500" />
+                <div className="hidden h-2.5 w-2.5 rounded-full bg-zinc-200 transition-colors group-hover/video:bg-yellow-500 lg:block" />
+                <div className="hidden h-2.5 w-2.5 rounded-full bg-zinc-200 transition-colors group-hover/video:bg-green-500 lg:block" />
               </div>
-
-              {/* Main Content Preview */}
-              <div className="sm:col-span-2 space-y-4 order-1 sm:order-2">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="h-4 bg-zinc-100 rounded-full w-32 mb-1" />
-                    <div className="h-2.5 bg-zinc-50 rounded-full w-48" />
-                  </div>
-                  <div className="h-8 bg-emerald-500 rounded-lg w-24 flex items-center justify-center">
-                    <span className="text-[10px] font-semibold text-white">Générer</span>
-                  </div>
-                </div>
-
-                {/* Stats Cards */}
-                <div className="grid grid-cols-3 gap-3">
-                  {[
-                    { label: 'Score', value: '8 050', icon: '🟢', bg: 'bg-emerald-50' },
-                    { label: 'Série', value: '15j', icon: '🔥', bg: 'bg-orange-50' },
-                    { label: 'Quiz', value: '47', icon: '📊', bg: 'bg-violet-50' },
-                  ].map((card) => (
-                    <div key={card.label} className={`${card.bg} rounded-xl p-3 text-center`}>
-                      <div className="text-base mb-0.5">{card.icon}</div>
-                      <div className="text-sm font-bold text-zinc-900">{card.value}</div>
-                      <div className="text-[9px] text-zinc-500 uppercase tracking-wider">{card.label}</div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Chart Preview */}
-                <div className="h-28 bg-gradient-to-br from-emerald-50/60 to-teal-50/60 rounded-xl border border-emerald-100/60 flex items-end justify-around p-3">
-                  {[40, 65, 50, 80, 60, 90, 75, 55, 85].map((h, i) => (
-                    <motion.div
-                      key={i}
-                      className="w-5 sm:w-7 bg-gradient-to-t from-emerald-400 to-teal-300 rounded-t-sm"
-                      initial={{ height: 0 }}
-                      animate={{ height: `${h}%` }}
-                      transition={{ duration: 0.8, delay: 1 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                    />
-                  ))}
-                </div>
+              <div className="font-mono text-[10px] tracking-widest text-zinc-400 uppercase">
+                app.scolarai.fr
               </div>
+              <div className="w-10" />
+            </div>
+
+            {/* Video / Image content */}
+            <div className="relative">
+              <img
+                src="/images/showcase/dashboard-1.png"
+                alt="ScolarAI Dashboard"
+                className="w-full"
+              />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Scrolling Feature Cards */}
-      <div className="space-y-4">
-        <InfiniteMarquee speed={40}>
-          {[
-            { title: 'Quiz IA', desc: 'Générés en 10 secondes', icon: <Target className="h-4 w-4" />, color: 'from-emerald-50 to-teal-50 border-emerald-200/60' },
-            { title: 'Flashcards', desc: 'Répétition espacée', icon: <Layers className="h-4 w-4" />, color: 'from-violet-50 to-purple-50 border-violet-200/60' },
-            { title: 'Coach IA', desc: 'Disponible 24/7', icon: <MessageCircle className="h-4 w-4" />, color: 'from-amber-50 to-orange-50 border-amber-200/60' },
-            { title: 'Progrès', desc: 'Suivi en temps réel', icon: <BarChart3 className="h-4 w-4" />, color: 'from-rose-50 to-pink-50 border-rose-200/60' },
-            { title: 'Révision', desc: 'Algorithme adaptatif', icon: <Clock className="h-4 w-4" />, color: 'from-cyan-50 to-sky-50 border-cyan-200/60' },
-            { title: 'Groupes', desc: 'Collaboration entre pairs', icon: <Users className="h-4 w-4" />, color: 'from-lime-50 to-green-50 border-lime-200/60' },
-          ].map((item, i) => (
-            <div
-              key={i}
-              className={`shrink-0 w-56 rounded-xl border bg-gradient-to-br ${item.color} p-4 shadow-sm`}
-            >
-              <div className="flex items-center gap-2 mb-2 text-zinc-700">
-                {item.icon}
-                <span className="font-semibold text-sm">{item.title}</span>
+      {/* Scrolling Showcase Rows - same structure as youthumb.ai */}
+      <div className="space-y-6">
+        {/* Row 1 */}
+        <div className="flex gap-6" ref={row1Ref}>
+          <div className="flex gap-6">
+            {showcaseRow1.map((item, i) => (
+              <div key={`r1-${i}`} className="aspect-video w-56 shrink-0 overflow-hidden rounded-xl shadow-lg md:w-80">
+                <img
+                  alt={item.alt}
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                  src={item.src}
+                />
               </div>
-              <p className="text-xs text-zinc-500">{item.desc}</p>
-            </div>
-          ))}
-        </InfiniteMarquee>
+            ))}
+          </div>
+          <div className="flex gap-6">
+            {showcaseRow1.map((item, i) => (
+              <div key={`r1d-${i}`} className="aspect-video w-56 shrink-0 overflow-hidden rounded-xl shadow-lg md:w-80">
+                <img
+                  alt={item.alt}
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                  src={item.src}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
 
-        <InfiniteMarquee speed={50}>
-          {[
-            { title: 'Planificateur', desc: 'Organisation intelligente', icon: <Rocket className="h-4 w-4" />, color: 'from-teal-50 to-emerald-50 border-teal-200/60' },
-            { title: 'Pomodoro', desc: 'Gestion du temps', icon: <Clock className="h-4 w-4" />, color: 'from-red-50 to-rose-50 border-red-200/60' },
-            { title: 'Documents', desc: 'Importez vos PDF', icon: <BookOpen className="h-4 w-4" />, color: 'from-blue-50 to-indigo-50 border-blue-200/60' },
-            { title: 'Notes', desc: 'Prise de notes IA', icon: <PenTool className="h-4 w-4" />, color: 'from-yellow-50 to-amber-50 border-yellow-200/60' },
-            { title: 'Classement', desc: 'Competez sainement', icon: <Trophy className="h-4 w-4" />, color: 'from-orange-50 to-red-50 border-orange-200/60' },
-            { title: 'Ressources', desc: 'Bibliothèque partagée', icon: <Lightbulb className="h-4 w-4" />, color: 'from-fuchsia-50 to-pink-50 border-fuchsia-200/60' },
-          ].map((item, i) => (
-            <div
-              key={i}
-              className={`shrink-0 w-56 rounded-xl border bg-gradient-to-br ${item.color} p-4 shadow-sm`}
-            >
-              <div className="flex items-center gap-2 mb-2 text-zinc-700">
-                {item.icon}
-                <span className="font-semibold text-sm">{item.title}</span>
+        {/* Row 2 */}
+        <div className="flex gap-6" ref={row2Ref}>
+          <div className="flex gap-6">
+            {showcaseRow2.map((item, i) => (
+              <div key={`r2-${i}`} className="aspect-video w-56 shrink-0 overflow-hidden rounded-xl shadow-lg md:w-80">
+                <img
+                  alt={item.alt}
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                  src={item.src}
+                />
               </div>
-              <p className="text-xs text-zinc-500">{item.desc}</p>
-            </div>
-          ))}
-        </InfiniteMarquee>
+            ))}
+          </div>
+          <div className="flex gap-6">
+            {showcaseRow2.map((item, i) => (
+              <div key={`r2d-${i}`} className="aspect-video w-56 shrink-0 overflow-hidden rounded-xl shadow-lg md:w-80">
+                <img
+                  alt={item.alt}
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                  src={item.src}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   )
