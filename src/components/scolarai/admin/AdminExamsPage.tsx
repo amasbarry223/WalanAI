@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   ClipboardCheck,
@@ -14,10 +15,15 @@ import {
   Download,
   Plus,
   ArrowUpDown,
+  Search,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +31,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { useToast } from '@/hooks/use-toast'
 import {
   BarChart,
   Bar,
@@ -100,6 +123,17 @@ const mockExams: Exam[] = [
 ]
 
 export default function AdminExamsPage() {
+  const { toast } = useToast()
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [confirmAction, setConfirmAction] = useState<{ title: string; description: string; onConfirm: () => void } | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [detailOpen, setDetailOpen] = useState(false)
+  const [selectedExam, setSelectedExam] = useState<Exam | null>(null)
+  const [sortField, setSortField] = useState<string>('matiere')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 8
+
   const stats = [
     {
       title: 'Examens à venir',
@@ -135,6 +169,26 @@ export default function AdminExamsPage() {
     },
   ]
 
+  const toggleSort = (field: string) => {
+    if (sortField === field) setSortDir(sortDir === 'asc' ? 'desc' : 'asc')
+    else { setSortField(field); setSortDir('asc') }
+  }
+
+  // Filter + sort + paginate
+  let filtered = mockExams.filter((exam) =>
+    exam.matiere.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+  filtered = [...filtered].sort((a, b) => {
+    const aVal = (a as any)[sortField]
+    const bVal = (b as any)[sortField]
+    if (typeof aVal === 'string' && typeof bVal === 'string') {
+      return sortDir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
+    }
+    return sortDir === 'asc' ? aVal - bVal : bVal - aVal
+  })
+  const totalPages = Math.ceil(filtered.length / itemsPerPage)
+  const paginatedExams = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+
   return (
     <motion.div
       className="p-4 md:p-6 lg:p-8"
@@ -159,17 +213,17 @@ export default function AdminExamsPage() {
                 </p>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30">{mockExams.length} examens</Badge>
+                <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30">{filtered.length} examens</Badge>
               </div>
             </div>
           </div>
         </div>
         <div className="flex gap-2 mt-4">
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2" onClick={() => toast({ title: "Export en cours", description: "Le fichier CSV sera téléchargé sous peu." })}>
             <Download className="h-4 w-4" />
             <span className="hidden sm:inline">Exporter</span>
           </Button>
-          <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2">
+          <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2" onClick={() => toast({ title: "Fonctionnalité à venir", description: "La planification d'examens sera bientôt disponible." })}>
             <Plus className="h-4 w-4" />
             Planifier
           </Button>
@@ -291,6 +345,23 @@ export default function AdminExamsPage() {
         </Card>
       </motion.div>
 
+      {/* Search/Filter Bar */}
+      <motion.div variants={itemVariants} className="mb-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Rechercher par matière..."
+                className="pl-9"
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1) }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
       {/* Exams Table */}
       <motion.div variants={itemVariants}>
         <Card className="hover:shadow-md transition-shadow">
@@ -301,7 +372,7 @@ export default function AdminExamsPage() {
                 Liste des examens
               </CardTitle>
               <Badge variant="secondary" className="text-xs">
-                {mockExams.length} examens
+                {filtered.length} examens
               </Badge>
             </div>
           </CardHeader>
@@ -311,97 +382,212 @@ export default function AdminExamsPage() {
                 <thead>
                   <tr className="border-b bg-gray-50/80">
                     <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                      <button className="flex items-center gap-1 hover:text-gray-700">
+                      <button onClick={() => toggleSort('matiere')} className="flex items-center gap-1 hover:text-gray-700">
                         Matière <ArrowUpDown className="h-3 w-3" />
                       </button>
                     </th>
                     <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">
-                      <button className="flex items-center gap-1 hover:text-gray-700">
+                      <button onClick={() => toggleSort('date')} className="flex items-center gap-1 hover:text-gray-700">
                         Date <ArrowUpDown className="h-3 w-3" />
                       </button>
                     </th>
-                    <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Inscrits</th>
-                    <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden lg:table-cell">Note moyenne</th>
-                    <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden lg:table-cell">Taux réussite</th>
+                    <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">
+                      <button onClick={() => toggleSort('inscrits')} className="flex items-center gap-1 hover:text-gray-700">
+                        Inscrits <ArrowUpDown className="h-3 w-3" />
+                      </button>
+                    </th>
+                    <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden lg:table-cell">
+                      <button onClick={() => toggleSort('noteMoyenne')} className="flex items-center gap-1 hover:text-gray-700">
+                        Note moyenne <ArrowUpDown className="h-3 w-3" />
+                      </button>
+                    </th>
+                    <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden lg:table-cell">
+                      <button onClick={() => toggleSort('tauxReussite')} className="flex items-center gap-1 hover:text-gray-700">
+                        Taux réussite <ArrowUpDown className="h-3 w-3" />
+                      </button>
+                    </th>
                     <th className="text-right py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {mockExams.map((exam) => (
-                    <tr key={exam.id} className="border-b last:border-0 hover:bg-gray-50/50 transition-colors">
-                      <td className="py-3 px-4">
-                        <Badge className={`${exam.badgeBg} ${exam.badgeColor} text-xs border-0 font-medium`}>
-                          {exam.matiere}
-                        </Badge>
-                      </td>
-                      <td className="py-3 px-4 text-sm text-gray-600 hidden sm:table-cell">
-                        <div className="flex items-center gap-1.5">
-                          <CalendarClock className="h-3.5 w-3.5 text-gray-400" />
-                          {exam.date}
+                  {paginatedExams.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-12 text-center">
+                        <div className="flex flex-col items-center gap-2">
+                          <ClipboardCheck className="h-8 w-8 text-gray-300" />
+                          <p className="text-sm text-gray-400">Aucun examen trouvé</p>
                         </div>
-                      </td>
-                      <td className="py-3 px-4 text-sm font-medium text-gray-900 hidden md:table-cell">
-                        {exam.inscrits}
-                      </td>
-                      <td className="py-3 px-4 hidden lg:table-cell">
-                        <span className={`text-sm font-semibold ${
-                          exam.noteMoyenne >= 14 ? 'text-emerald-600' :
-                          exam.noteMoyenne >= 12 ? 'text-amber-600' :
-                          'text-red-500'
-                        }`}>
-                          {exam.noteMoyenne.toFixed(1)}/20
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 hidden lg:table-cell">
-                        <div className="flex items-center gap-2">
-                          <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full ${
-                                exam.tauxReussite >= 75 ? 'bg-emerald-500' :
-                                exam.tauxReussite >= 60 ? 'bg-amber-500' :
-                                'bg-red-500'
-                              }`}
-                              style={{ width: `${exam.tauxReussite}%` }}
-                            />
-                          </div>
-                          <span className={`text-xs font-semibold ${
-                            exam.tauxReussite >= 75 ? 'text-emerald-600' :
-                            exam.tauxReussite >= 60 ? 'text-amber-600' :
-                            'text-red-500'
-                          }`}>
-                            {exam.tauxReussite}%
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4 text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <MoreHorizontal className="h-4 w-4 text-gray-400" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                              <Eye className="h-4 w-4 mr-2" /> Voir les détails
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Pencil className="h-4 w-4 mr-2" /> Modifier
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-red-600">
-                              <Trash2 className="h-4 w-4 mr-2" /> Supprimer
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    paginatedExams.map((exam) => (
+                      <tr key={exam.id} className="border-b last:border-0 hover:bg-gray-50/50 transition-colors">
+                        <td className="py-3 px-4">
+                          <Badge className={`${exam.badgeBg} ${exam.badgeColor} text-xs border-0 font-medium`}>
+                            {exam.matiere}
+                          </Badge>
+                        </td>
+                        <td className="py-3 px-4 text-sm text-gray-600 hidden sm:table-cell">
+                          <div className="flex items-center gap-1.5">
+                            <CalendarClock className="h-3.5 w-3.5 text-gray-400" />
+                            {exam.date}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-sm font-medium text-gray-900 hidden md:table-cell">
+                          {exam.inscrits}
+                        </td>
+                        <td className="py-3 px-4 hidden lg:table-cell">
+                          <span className={`text-sm font-semibold ${
+                            exam.noteMoyenne >= 14 ? 'text-emerald-600' :
+                            exam.noteMoyenne >= 12 ? 'text-amber-600' :
+                            'text-red-500'
+                          }`}>
+                            {exam.noteMoyenne.toFixed(1)}/20
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 hidden lg:table-cell">
+                          <div className="flex items-center gap-2">
+                            <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full ${
+                                  exam.tauxReussite >= 75 ? 'bg-emerald-500' :
+                                  exam.tauxReussite >= 60 ? 'bg-amber-500' :
+                                  'bg-red-500'
+                                }`}
+                                style={{ width: `${exam.tauxReussite}%` }}
+                              />
+                            </div>
+                            <span className={`text-xs font-semibold ${
+                              exam.tauxReussite >= 75 ? 'text-emerald-600' :
+                              exam.tauxReussite >= 60 ? 'text-amber-600' :
+                              'text-red-500'
+                            }`}>
+                              {exam.tauxReussite}%
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <MoreHorizontal className="h-4 w-4 text-gray-400" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => {
+                                setSelectedExam(exam)
+                                setDetailOpen(true)
+                              }}>
+                                <Eye className="h-4 w-4 mr-2" /> Voir les détails
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => toast({ title: "Examen modifié", description: "Les modifications ont été enregistrées." })}>
+                                <Pencil className="h-4 w-4 mr-2" /> Modifier
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem className="text-red-600" onClick={() => {
+                                setConfirmAction({
+                                  title: 'Supprimer l\'examen',
+                                  description: 'Voulez-vous vraiment supprimer cet examen ? Cette action est irréversible.',
+                                  onConfirm: () => {
+                                    toast({ title: 'Examen supprimé', description: 'L\'examen a été supprimé avec succès.', variant: 'destructive' })
+                                    setConfirmOpen(false)
+                                  }
+                                })
+                                setConfirmOpen(true)
+                              }}>
+                                <Trash2 className="h-4 w-4 mr-2" /> Supprimer
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between px-4 py-3 border-t">
+                <p className="text-xs text-gray-500">
+                  {filtered.length} examen(s) trouvé(s)
+                </p>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <Button
+                      key={page}
+                      variant={page === currentPage ? 'default' : 'outline'}
+                      size="icon"
+                      className={page === currentPage ? 'h-8 w-8 bg-emerald-500 hover:bg-emerald-600 text-white' : 'h-8 w-8'}
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </Button>
+                  ))}
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Exam Detail Dialog */}
+      <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ClipboardCheck className="h-5 w-5 text-emerald-500" />
+              Détails de l&apos;examen
+            </DialogTitle>
+          </DialogHeader>
+          {selectedExam && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div><Label>Matière</Label><Badge className={`${selectedExam.badgeBg} ${selectedExam.badgeColor} text-xs border-0 font-medium mt-1`}>{selectedExam.matiere}</Badge></div>
+                <div><Label>Date</Label><p className="text-sm text-gray-700 mt-1">{selectedExam.date}</p></div>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center p-3 rounded-lg bg-gray-50"><p className="text-lg font-bold text-gray-900">{selectedExam.inscrits}</p><p className="text-[10px] text-gray-500 uppercase">Inscrits</p></div>
+                <div className="text-center p-3 rounded-lg bg-gray-50"><p className="text-lg font-bold text-gray-900">{selectedExam.noteMoyenne}/20</p><p className="text-[10px] text-gray-500 uppercase">Moyenne</p></div>
+                <div className="text-center p-3 rounded-lg bg-gray-50"><p className="text-lg font-bold text-gray-900">{selectedExam.tauxReussite}%</p><p className="text-[10px] text-gray-500 uppercase">Réussite</p></div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirmation AlertDialog */}
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{confirmAction?.title}</AlertDialogTitle>
+            <AlertDialogDescription>{confirmAction?.description}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmAction?.onConfirm} className="bg-red-600 hover:bg-red-700 text-white">Confirmer</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </motion.div>
   )
 }

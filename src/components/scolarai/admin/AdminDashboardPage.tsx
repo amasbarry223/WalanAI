@@ -22,6 +22,8 @@ import {
   BarChart3,
   Eye,
 } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
+import type { AdminPageName } from '@/lib/store'
 import {
   BarChart,
   Bar,
@@ -97,13 +99,14 @@ const recentUsers = [
 ]
 
 const alerts = [
-  { id: 1, type: 'warning' as const, title: 'Abonnements expirants', desc: '23 abonnements Pro expirent cette semaine', icon: AlertTriangle },
-  { id: 2, type: 'info' as const, title: 'Tickets support ouverts', desc: '8 tickets en attente de traitement', icon: Clock },
-  { id: 3, type: 'success' as const, title: 'Objectif mensuel atteint', desc: 'Revenue mensuel dépassé de 12%', icon: CheckCircle2 },
+  { id: 1, type: 'warning' as const, title: 'Abonnements expirants', desc: '23 abonnements Pro expirent cette semaine', icon: AlertTriangle, targetPage: 'admin-subscriptions' as AdminPageName },
+  { id: 2, type: 'info' as const, title: 'Tickets support ouverts', desc: '8 tickets en attente de traitement', icon: Clock, targetPage: 'admin-support' as AdminPageName },
+  { id: 3, type: 'success' as const, title: 'Objectif mensuel atteint', desc: 'Revenue mensuel dépassé de 12%', icon: CheckCircle2, targetPage: 'admin-analytics' as AdminPageName },
 ]
 
 export default function AdminDashboardPage() {
   const { setCurrentAdminPage } = useAppStore()
+  const { toast } = useToast()
 
   const kpis = [
     {
@@ -115,6 +118,7 @@ export default function AdminDashboardPage() {
       color: 'text-blue-600',
       bg: 'bg-blue-50',
       border: 'border-l-blue-500',
+      targetPage: 'admin-users' as AdminPageName,
     },
     {
       title: 'Revenu mensuel',
@@ -125,6 +129,7 @@ export default function AdminDashboardPage() {
       color: 'text-emerald-600',
       bg: 'bg-emerald-50',
       border: 'border-l-emerald-500',
+      targetPage: 'admin-subscriptions' as AdminPageName,
     },
     {
       title: 'Taux de conversion',
@@ -135,6 +140,7 @@ export default function AdminDashboardPage() {
       color: 'text-violet-600',
       bg: 'bg-violet-50',
       border: 'border-l-violet-500',
+      targetPage: 'admin-analytics' as AdminPageName,
     },
     {
       title: 'Utilisateurs actifs',
@@ -145,6 +151,7 @@ export default function AdminDashboardPage() {
       color: 'text-amber-600',
       bg: 'bg-amber-50',
       border: 'border-l-amber-500',
+      targetPage: 'admin-users' as AdminPageName,
     },
   ]
 
@@ -190,7 +197,7 @@ export default function AdminDashboardPage() {
       {/* KPI Cards */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
         {kpis.map((kpi) => (
-          <Card key={kpi.title} className={`border-l-4 ${kpi.border} hover:shadow-md transition-shadow`}>
+          <Card key={kpi.title} className={`border-l-4 ${kpi.border} hover:shadow-lg transition-shadow cursor-pointer`} onClick={() => setCurrentAdminPage(kpi.targetPage)}>
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-3">
                 <div className={`p-2.5 rounded-xl ${kpi.bg}`}>
@@ -354,7 +361,7 @@ export default function AdminDashboardPage() {
                 Derniers inscrits
               </CardTitle>
               <button
-                onClick={() => setCurrentAdminPage('admin-users' as any)}
+                onClick={() => setCurrentAdminPage('admin-users')}
                 className="text-sm text-emerald-500 hover:text-emerald-600 font-medium"
               >
                 Voir tout
@@ -398,7 +405,14 @@ export default function AdminDashboardPage() {
                 success: { bg: 'bg-emerald-50 border-emerald-200', icon: 'text-emerald-500', dot: 'bg-emerald-400' },
               }[alert.type]
               return (
-                <div key={alert.id} className={`p-3 rounded-lg border ${config.bg}`}>
+                <div
+                  key={alert.id}
+                  className={`p-3 rounded-lg border ${config.bg} cursor-pointer hover:shadow-md transition-shadow`}
+                  onClick={() => {
+                    setCurrentAdminPage(alert.targetPage)
+                    toast({ title: alert.title, description: alert.desc })
+                  }}
+                >
                   <div className="flex items-start gap-2.5">
                     <alert.icon className={`h-4 w-4 ${config.icon} mt-0.5 shrink-0`} />
                     <div className="flex-1 min-w-0">

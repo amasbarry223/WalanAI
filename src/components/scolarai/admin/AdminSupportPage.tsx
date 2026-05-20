@@ -47,6 +47,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { useToast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils'
 
 const containerVariants = {
@@ -262,6 +273,9 @@ const categoryLabels: Record<Category, string> = {
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export default function AdminSupportPage() {
+  const { toast } = useToast()
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [confirmAction, setConfirmAction] = useState<{ title: string; description: string; onConfirm: () => void } | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('tous')
   const [priorityFilter, setPriorityFilter] = useState<string>('toutes')
@@ -293,7 +307,7 @@ export default function AdminSupportPage() {
   // Stats
   const openCount = mockTickets.filter(t => t.status === 'ouvert').length
   const inProgressCount = mockTickets.filter(t => t.status === 'en-cours').length
-  const resolvedToday = mockTickets.filter(t => t.status === 'resolu').length
+  const resolvedToday = 2
   const avgResolutionTime = '2.4h'
 
   const openDetail = (ticket: SupportTicket) => {
@@ -484,11 +498,21 @@ export default function AdminSupportPage() {
                               <DropdownMenuItem onClick={() => openDetail(ticket)}>
                                 <MessageSquare className="h-4 w-4 mr-2" /> Répondre
                               </DropdownMenuItem>
-                              <DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => toast({ title: 'Ticket escaladé', description: 'Le ticket a été escaladé à l\'équipe supérieure.' })}>
                                 <ArrowUpRight className="h-4 w-4 mr-2" /> Escalader
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem className="text-red-600">
+                              <DropdownMenuItem className="text-red-600" onClick={() => {
+                                setConfirmAction({
+                                  title: 'Fermer le ticket',
+                                  description: 'Voulez-vous vraiment fermer ce ticket ? Cette action est irréversible.',
+                                  onConfirm: () => {
+                                    toast({ title: 'Ticket fermé', description: 'Le ticket a été fermé avec succès.' })
+                                    setConfirmOpen(false)
+                                  }
+                                })
+                                setConfirmOpen(true)
+                              }}>
                                 <XCircle className="h-4 w-4 mr-2" /> Fermer
                               </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -648,7 +672,14 @@ export default function AdminSupportPage() {
                 </div>
                 <Button
                   className="w-full bg-emerald-500 hover:bg-emerald-600 text-white gap-2"
-                  onClick={() => setDetailOpen(false)}
+                  onClick={() => {
+                    if (!responseText.trim()) {
+                      toast({ title: 'Erreur', description: 'Veuillez écrire une réponse avant d\'envoyer.', variant: 'destructive' })
+                      return
+                    }
+                    toast({ title: 'Réponse envoyée', description: 'Votre réponse a été envoyée à l\'utilisateur.' })
+                    setDetailOpen(false)
+                  }}
                 >
                   <Send className="h-4 w-4" />
                   Envoyer la réponse
@@ -658,6 +689,20 @@ export default function AdminSupportPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Confirm AlertDialog */}
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{confirmAction?.title}</AlertDialogTitle>
+            <AlertDialogDescription>{confirmAction?.description}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmAction?.onConfirm} className="bg-red-600 hover:bg-red-700 text-white">Confirmer</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </motion.div>
   )
 }

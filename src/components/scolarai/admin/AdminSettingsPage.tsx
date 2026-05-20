@@ -11,6 +11,17 @@ import {
   Save,
   Trash2,
 } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -64,13 +75,38 @@ export default function AdminSettingsPage() {
   // Maintenance
   const [maintenanceMode, setMaintenanceMode] = useState(false)
   const [maintenanceMessage, setMaintenanceMessage] = useState('')
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [maintenanceConfirmOpen, setMaintenanceConfirmOpen] = useState(false)
+  const [pendingMaintenance, setPendingMaintenance] = useState(false)
+  const { toast } = useToast()
 
   const handleClearCache = () => {
-    // Placeholder action
+    toast({ title: 'Cache vidé', description: 'Le cache des données temporaires a été supprimé.' })
   }
 
   const handleSave = () => {
-    // Placeholder action
+    toast({ title: 'Configuration enregistrée', description: 'Les paramètres de la plateforme ont été mis à jour avec succès.' })
+  }
+
+  const handleMaintenanceToggle = (checked: boolean) => {
+    if (checked) {
+      setPendingMaintenance(true)
+      setMaintenanceConfirmOpen(true)
+    } else {
+      setMaintenanceMode(false)
+    }
+  }
+
+  const confirmMaintenance = () => {
+    setMaintenanceMode(true)
+    setMaintenanceConfirmOpen(false)
+    setPendingMaintenance(false)
+    toast({ title: 'Mode maintenance activé', description: 'La plateforme est désormais inaccessible pour les utilisateurs.' })
+  }
+
+  const cancelMaintenance = () => {
+    setMaintenanceConfirmOpen(false)
+    setPendingMaintenance(false)
   }
 
   return (
@@ -344,7 +380,7 @@ export default function AdminSettingsPage() {
                 <Switch
                   id="maintenance-mode"
                   checked={maintenanceMode}
-                  onCheckedChange={setMaintenanceMode}
+                  onCheckedChange={handleMaintenanceToggle}
                 />
               </div>
 
@@ -376,7 +412,7 @@ export default function AdminSettingsPage() {
                 <Button
                   variant="outline"
                   className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-                  onClick={handleClearCache}
+                  onClick={() => setConfirmOpen(true)}
                 >
                   <Trash2 className="h-4 w-4" />
                   Vider le cache
@@ -397,6 +433,49 @@ export default function AdminSettingsPage() {
           Enregistrer la configuration
         </Button>
       </motion.div>
+      {/* Clear Cache Confirmation Dialog */}
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Vider le cache</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir vider le cache des données temporaires ? Cette action est irréversible.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={handleClearCache}
+            >
+              Vider le cache
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Maintenance Mode Confirmation Dialog */}
+      <AlertDialog open={maintenanceConfirmOpen} onOpenChange={(open) => {
+        if (!open) cancelMaintenance()
+      }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Activer le mode maintenance</AlertDialogTitle>
+            <AlertDialogDescription>
+              La plateforme sera inaccessible pour tous les utilisateurs. Seuls les administrateurs pourront y accéder. Voulez-vous continuer ?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelMaintenance}>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-amber-600 hover:bg-amber-700 text-white"
+              onClick={confirmMaintenance}
+            >
+              Activer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </motion.div>
   )
 }

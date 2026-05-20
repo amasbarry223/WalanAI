@@ -22,6 +22,7 @@ import {
   ChevronRight,
   Download,
   ArrowUpDown,
+  TrendingUp,
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -51,6 +52,17 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Switch } from '@/components/ui/switch'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { useToast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils'
 
 const containerVariants = {
@@ -110,6 +122,10 @@ export default function AdminUsersPage() {
   const [addOpen, setAddOpen] = useState(false)
   const [sortField, setSortField] = useState<string>('name')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [confirmAction, setConfirmAction] = useState<{ title: string; description: string; onConfirm: () => void } | null>(null)
+
+  const { toast } = useToast()
 
   const itemsPerPage = 10
 
@@ -195,7 +211,7 @@ export default function AdminUsersPage() {
           </div>
         </div>
         <div className="flex gap-2 mt-4">
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2" onClick={() => toast({ title: "Export en cours", description: "Le fichier CSV sera téléchargé sous peu." })}>
             <Download className="h-4 w-4" />
             <span className="hidden sm:inline">Exporter</span>
           </Button>
@@ -358,14 +374,38 @@ export default function AdminUsersPage() {
                             <DropdownMenuItem onClick={() => { setSelectedUser(user); setEditOpen(true) }}>
                               <Pencil className="h-4 w-4 mr-2" /> Modifier
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => {
+                              toast({ title: "Email envoyé", description: `Un email a été envoyé à ${user.email}` })
+                            }}>
                               <Mail className="h-4 w-4 mr-2" /> Envoyer un email
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-amber-600">
+                            <DropdownMenuItem className="text-amber-600" onClick={() => {
+                              setConfirmAction({
+                                title: user.active ? 'Suspendre le compte' : 'Réactiver le compte',
+                                description: user.active
+                                  ? `Voulez-vous vraiment suspendre le compte de ${user.name} ? L'utilisateur ne pourra plus se connecter.`
+                                  : `Voulez-vous réactiver le compte de ${user.name} ?`,
+                                onConfirm: () => {
+                                  toast({ title: user.active ? 'Compte suspendu' : 'Compte réactivé', description: `Le compte de ${user.name} a été ${user.active ? 'suspendu' : 'réactivé'}.` })
+                                  setConfirmOpen(false)
+                                }
+                              })
+                              setConfirmOpen(true)
+                            }}>
                               <Ban className="h-4 w-4 mr-2" /> {user.active ? 'Suspendre' : 'Réactiver'}
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600">
+                            <DropdownMenuItem className="text-red-600" onClick={() => {
+                              setConfirmAction({
+                                title: 'Supprimer le compte',
+                                description: `Voulez-vous vraiment supprimer le compte de ${user.name} ? Cette action est irréversible.`,
+                                onConfirm: () => {
+                                  toast({ title: 'Compte supprimé', description: `Le compte de ${user.name} a été supprimé.`, variant: 'destructive' })
+                                  setConfirmOpen(false)
+                                }
+                              })
+                              setConfirmOpen(true)
+                            }}>
                               <Trash2 className="h-4 w-4 mr-2" /> Supprimer
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -532,7 +572,10 @@ export default function AdminUsersPage() {
                 </div>
                 <Switch defaultChecked={selectedUser.active} />
               </div>
-              <Button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white" onClick={() => setEditOpen(false)}>
+              <Button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white" onClick={() => {
+                toast({ title: "Modifications enregistrées", description: `Le profil de ${selectedUser?.name} a été mis à jour.` })
+                setEditOpen(false)
+              }}>
                 Enregistrer les modifications
               </Button>
             </div>
@@ -577,22 +620,28 @@ export default function AdminUsersPage() {
                 </SelectContent>
               </Select>
             </div>
-            <Button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white" onClick={() => setAddOpen(false)}>
+            <Button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white" onClick={() => {
+              toast({ title: "Utilisateur créé", description: "Le nouveau compte utilisateur a été créé avec succès." })
+              setAddOpen(false)
+            }}>
               <UserPlus className="h-4 w-4 mr-2" />
               Créer l&apos;utilisateur
             </Button>
           </div>
         </DialogContent>
       </Dialog>
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{confirmAction?.title}</AlertDialogTitle>
+            <AlertDialogDescription>{confirmAction?.description}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmAction?.onConfirm} className="bg-red-600 hover:bg-red-700 text-white">Confirmer</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </motion.div>
-  )
-}
-
-function TrendingUp({ className }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-      <polyline points="16 7 22 7 22 13" />
-    </svg>
   )
 }

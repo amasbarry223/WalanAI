@@ -42,6 +42,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useToast } from '@/hooks/use-toast'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 
 const containerVariants = {
@@ -146,6 +163,12 @@ export default function AdminContentPage() {
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
   const [currentPage, setCurrentPage] = useState(1)
 
+  const { toast } = useToast()
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [confirmAction, setConfirmAction] = useState<{ title: string; description: string; onConfirm: () => void } | null>(null)
+  const [previewOpen, setPreviewOpen] = useState(false)
+  const [selectedContent, setSelectedContent] = useState<ContentItem | null>(null)
+
   const itemsPerPage = 10
 
   // Filter by tab
@@ -225,13 +248,9 @@ export default function AdminContentPage() {
           </div>
         </div>
         <div className="flex gap-2 mt-4">
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2" onClick={() => toast({ title: "Export en cours", description: "Le fichier CSV sera téléchargé sous peu." })}>
             <Download className="h-4 w-4" />
             <span className="hidden sm:inline">Exporter</span>
-          </Button>
-          <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2">
-            <Filter className="h-4 w-4" />
-            <span className="hidden sm:inline">Filtrer</span>
           </Button>
         </div>
       </motion.div>
@@ -400,14 +419,27 @@ export default function AdminContentPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => {
+                                setSelectedContent(item)
+                                setPreviewOpen(true)
+                              }}>
                                 <Eye className="h-4 w-4 mr-2" /> Voir
                               </DropdownMenuItem>
-                              <DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => toast({ title: "Contenu modéré", description: "Le contenu a été signalé pour révision." })}>
                                 <Shield className="h-4 w-4 mr-2" /> Modérer
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem className="text-red-600">
+                              <DropdownMenuItem className="text-red-600" onClick={() => {
+                                setConfirmAction({
+                                  title: 'Supprimer le contenu',
+                                  description: 'Voulez-vous vraiment supprimer ce contenu ? Cette action est irréversible.',
+                                  onConfirm: () => {
+                                    toast({ title: 'Contenu supprimé', description: 'Le contenu a été supprimé avec succès.', variant: 'destructive' })
+                                    setConfirmOpen(false)
+                                  }
+                                })
+                                setConfirmOpen(true)
+                              }}>
                                 <Trash2 className="h-4 w-4 mr-2" /> Supprimer
                               </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -462,6 +494,52 @@ export default function AdminContentPage() {
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Preview Dialog */}
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Eye className="h-5 w-5 text-emerald-500" />
+              Aperçu du contenu
+            </DialogTitle>
+          </DialogHeader>
+          {selectedContent && (
+            <div className="space-y-4">
+              <div>
+                <Label>Titre</Label>
+                <p className="text-sm text-gray-900 mt-1 font-medium">{selectedContent.titre}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><Label>Type</Label><div className="mt-1">{getTypeBadge(selectedContent.type)}</div></div>
+                <div><Label>Statut</Label><div className="mt-1">{getStatusBadge(selectedContent.statut)}</div></div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><Label>Propriétaire</Label><p className="text-sm text-gray-700 mt-1">{selectedContent.propriétaire}</p></div>
+                <div><Label>Matière</Label><Badge className={cn('text-[10px] border-0 mt-1', getMatiereColor(selectedContent.matière))}>{selectedContent.matière}</Badge></div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><Label>Taille/Pages</Label><p className="text-sm text-gray-700 mt-1">{selectedContent.taillePages}</p></div>
+                <div><Label>Date</Label><p className="text-sm text-gray-700 mt-1">{selectedContent.date}</p></div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirmation AlertDialog */}
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{confirmAction?.title}</AlertDialogTitle>
+            <AlertDialogDescription>{confirmAction?.description}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmAction?.onConfirm} className="bg-red-600 hover:bg-red-700 text-white">Confirmer</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </motion.div>
   )
 }

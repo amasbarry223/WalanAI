@@ -26,6 +26,13 @@ export default function AdminPage() {
     }
   }, [mounted, isAdminMode, enterAdminMode])
 
+  // Redirect to home when exiting admin mode
+  useEffect(() => {
+    if (mounted && !isAdminMode && isAuthenticated) {
+      window.location.href = '/'
+    }
+  }, [mounted, isAdminMode, isAuthenticated])
+
   if (!mounted) {
     return (
       <div className="flex h-screen items-center justify-center bg-slate-900">

@@ -11,7 +11,19 @@ import {
   Clock,
   Users,
   Calendar,
+  Download,
 } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -101,11 +113,13 @@ export default function AdminAuditPage() {
   const [entityFilter, setEntityFilter] = useState<string>('all')
   const [dateRange, setDateRange] = useState<string>('7d')
   const [currentPage, setCurrentPage] = useState(1)
+  const [exportConfirmOpen, setExportConfirmOpen] = useState(false)
+  const { toast } = useToast()
 
   const itemsPerPage = 8
 
   // Filtering
-  const filtered = mockAuditLog.filter((entry) => {
+  let filtered = mockAuditLog.filter((entry) => {
     const matchSearch =
       entry.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       entry.details.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -115,6 +129,23 @@ export default function AdminAuditPage() {
     const matchEntity = entityFilter === 'all' || entry.entity === entityFilter
     return matchSearch && matchAction && matchEntity
   })
+
+  // Apply date range filter
+  // Mock data is sorted newest-first; first 7 entries are "today", first 14 are "last 7 days"
+  if (dateRange === 'today') {
+    filtered = filtered.filter((_, index) => index < 7)
+  } else if (dateRange === '7d') {
+    filtered = filtered.filter((_, index) => index < 14)
+  }
+  // '30d' shows all entries
+
+  const handleExport = () => {
+    setExportConfirmOpen(false)
+    toast({
+      title: 'Export réussi',
+      description: `Le journal d'audit a été exporté (${filtered.length} entrée(s)).`,
+    })
+  }
 
   // Pagination
   const totalPages = Math.ceil(filtered.length / itemsPerPage)
@@ -236,6 +267,14 @@ export default function AdminAuditPage() {
                   <SelectItem value="30d">30 derniers jours</SelectItem>
                 </SelectContent>
               </Select>
+              <Button
+                variant="outline"
+                className="gap-2"
+                onClick={() => setExportConfirmOpen(true)}
+              >
+                <Download className="h-4 w-4" />
+                Exporter
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -405,6 +444,26 @@ export default function AdminAuditPage() {
           </CardContent>
         </Card>
       </motion.div>
+      {/* Export Confirmation Dialog */}
+      <AlertDialog open={exportConfirmOpen} onOpenChange={setExportConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Exporter le journal d&apos;audit</AlertDialogTitle>
+            <AlertDialogDescription>
+              Voulez-vous exporter les {filtered.length} entrée(s) filtrée(s) du journal d&apos;audit au format CSV ?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-emerald-500 hover:bg-emerald-600 text-white"
+              onClick={handleExport}
+            >
+              Exporter
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </motion.div>
   )
 }

@@ -99,7 +99,6 @@ function AdminSidebarContent({
 
   const handleExitAdmin = () => {
     exitAdminMode()
-    window.location.href = '/'
   }
 
   const initials = user?.name

@@ -39,6 +39,8 @@ export default function AdminLoginPage() {
 
     if (!password) {
       errors.password = 'Le mot de passe est requis.'
+    } else if (password.length < 4) {
+      errors.password = 'Le mot de passe doit contenir au moins 4 caractères.'
     }
 
     setFieldErrors(errors)
@@ -67,6 +69,13 @@ export default function AdminLoginPage() {
     }
 
     const isSuperAdmin = lowerEmail === 'admin@scolarai.fr'
+
+    // Validate specific admin credentials
+    if (isSuperAdmin && password !== 'admin2024') {
+      setError('Identifiants invalides. Vérifiez votre email et mot de passe.')
+      setIsLoading(false)
+      return
+    }
 
     login({
       name: isSuperAdmin ? 'Admin ScolarAI' : 'Admin',
@@ -221,7 +230,7 @@ export default function AdminLoginPage() {
             <div className="p-3 rounded-lg bg-slate-700/30 border border-slate-600/30">
               <p className="text-xs text-slate-400 text-center">
                 <Shield className="h-3 w-3 inline mr-1 text-amber-400" />
-                Utilisez <span className="text-emerald-400 font-mono">admin@scolarai.fr</span> pour accéder au back-office
+                Accès réservé aux administrateurs de la plateforme
               </p>
             </div>
           </CardContent>

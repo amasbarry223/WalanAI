@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   CreditCard,
@@ -19,6 +20,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +37,24 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { useToast } from '@/hooks/use-toast'
+import { Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import {
   BarChart,
   Bar,
@@ -148,6 +177,27 @@ const getStatusBadge = (status: string) => {
 }
 
 export default function AdminSubscriptionsPage() {
+  const { toast } = useToast()
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [confirmAction, setConfirmAction] = useState<{ title: string; description: string; onConfirm: () => void } | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [planFilter, setPlanFilter] = useState<string>('all')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [detailOpen, setDetailOpen] = useState(false)
+  const [selectedSub, setSelectedSub] = useState<Subscription | null>(null)
+  const itemsPerPage = 8
+
+  // Filtering + pagination
+  const filtered = activeSubscriptions.filter((sub) => {
+    const matchSearch = sub.name.toLowerCase().includes(searchQuery.toLowerCase()) || sub.email.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchPlan = planFilter === 'all' || sub.plan === planFilter
+    const matchStatus = statusFilter === 'all' || sub.status === statusFilter
+    return matchSearch && matchPlan && matchStatus
+  })
+  const totalPages = Math.ceil(filtered.length / itemsPerPage)
+  const paginatedSubs = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+
   const kpis = [
     {
       title: 'MRR',
@@ -335,6 +385,47 @@ export default function AdminSubscriptionsPage() {
         </Card>
       </motion.div>
 
+      {/* Search / Filter Card */}
+      <motion.div variants={itemVariants} className="mb-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Rechercher par nom ou email..."
+                  className="pl-9"
+                  value={searchQuery}
+                  onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1) }}
+                />
+              </div>
+              <Select value={planFilter} onValueChange={(v) => { setPlanFilter(v); setCurrentPage(1) }}>
+                <SelectTrigger className="w-full sm:w-[140px]">
+                  <SelectValue placeholder="Plan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous les plans</SelectItem>
+                  <SelectItem value="gratuit">Gratuit</SelectItem>
+                  <SelectItem value="pro">Pro</SelectItem>
+                  <SelectItem value="enterprise">Enterprise</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setCurrentPage(1) }}>
+                <SelectTrigger className="w-full sm:w-[140px]">
+                  <SelectValue placeholder="Statut" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous</SelectItem>
+                  <SelectItem value="actif">Actif</SelectItem>
+                  <SelectItem value="expiré">Expiré</SelectItem>
+                  <SelectItem value="annulé">Annulé</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
       {/* Active Subscriptions Table */}
       <motion.div variants={itemVariants} className="mb-6">
         <Card>
@@ -345,7 +436,7 @@ export default function AdminSubscriptionsPage() {
                 Abonnements actifs
               </CardTitle>
               <Badge variant="secondary" className="text-xs w-fit">
-                {activeSubscriptions.filter(s => s.status === 'actif').length} actifs
+                {filtered.filter(s => s.status === 'actif').length} actifs
               </Badge>
             </div>
           </CardHeader>
@@ -368,7 +459,7 @@ export default function AdminSubscriptionsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {activeSubscriptions.map((sub) => (
+                  {paginatedSubs.map((sub) => (
                     <tr key={sub.id} className="border-b last:border-0 hover:bg-gray-50/50 transition-colors">
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
@@ -402,20 +493,30 @@ export default function AdminSubscriptionsPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => { setSelectedSub(sub); setDetailOpen(true) }}>
                               <Eye className="h-4 w-4 mr-2" /> Voir les détails
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => toast({ title: 'Abonnement modifié', description: 'Les modifications ont été enregistrées.' })}>
                               <Pencil className="h-4 w-4 mr-2" /> Modifier l&apos;abonnement
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => toast({ title: 'Rappel envoyé', description: 'Un email de rappel a été envoyé.' })}>
                               <Mail className="h-4 w-4 mr-2" /> Envoyer un rappel
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => toast({ title: 'Abonnement renouvelé', description: 'L\'abonnement a été renouvelé avec succès.' })}>
                               <RefreshCw className="h-4 w-4 mr-2" /> Renouveler
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600">
+                            <DropdownMenuItem className="text-red-600" onClick={() => {
+                              setConfirmAction({
+                                title: 'Annuler l\'abonnement',
+                                description: `Voulez-vous vraiment annuler l'abonnement de ${sub.name} ? Cette action est irréversible.`,
+                                onConfirm: () => {
+                                  toast({ title: 'Abonnement annulé', description: `L'abonnement de ${sub.name} a été annulé.` })
+                                  setConfirmOpen(false)
+                                }
+                              })
+                              setConfirmOpen(true)
+                            }}>
                               <XCircle className="h-4 w-4 mr-2" /> Annuler l&apos;abonnement
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -423,9 +524,56 @@ export default function AdminSubscriptionsPage() {
                       </td>
                     </tr>
                   ))}
+                  {paginatedSubs.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="py-12 text-center">
+                        <p className="text-sm text-gray-400">Aucun abonnement trouvé</p>
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between px-4 py-3 border-t">
+                <p className="text-xs text-gray-500">
+                  {filtered.length} abonnement(s) trouvé(s)
+                </p>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <Button
+                      key={page}
+                      variant={page === currentPage ? 'default' : 'outline'}
+                      size="icon"
+                      className={`h-8 w-8 ${page === currentPage ? 'bg-emerald-500 hover:bg-emerald-600 text-white' : ''}`}
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </Button>
+                  ))}
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </motion.div>
@@ -470,7 +618,7 @@ export default function AdminSubscriptionsPage() {
                     {sub.daysLeft === 1 ? 'Expire demain' : `Expire dans ${sub.daysLeft} jours`}
                   </p>
                 </div>
-                <Button variant="outline" size="sm" className="shrink-0 text-xs gap-1.5 border-amber-300 text-amber-700 hover:bg-amber-100">
+                <Button variant="outline" size="sm" className="shrink-0 text-xs gap-1.5 border-amber-300 text-amber-700 hover:bg-amber-100" onClick={() => toast({ title: 'Rappel envoyé', description: `Un email de rappel a été envoyé à ${sub.name}.` })}>
                   <Mail className="h-3 w-3" />
                   <span className="hidden sm:inline">Rappeler</span>
                 </Button>
@@ -479,6 +627,55 @@ export default function AdminSubscriptionsPage() {
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Subscription Detail Dialog */}
+      <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-emerald-500" />
+              Détails de l&apos;abonnement
+            </DialogTitle>
+          </DialogHeader>
+          {selectedSub && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <Avatar className="h-12 w-12">
+                  <AvatarFallback className="bg-gradient-to-br from-emerald-400 to-teal-500 text-sm font-bold text-white">
+                    {selectedSub.name.split(' ').map(n => n[0]).join('')}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">{selectedSub.name}</h3>
+                  <p className="text-sm text-gray-500">{selectedSub.email}</p>
+                </div>
+              </div>
+              <Separator />
+              <div className="grid grid-cols-2 gap-4">
+                <div><Label>Plan</Label><div className="mt-1">{getPlanBadge(selectedSub.plan)}</div></div>
+                <div><Label>Statut</Label><div className="mt-1">{getStatusBadge(selectedSub.status)}</div></div>
+                <div><Label>Montant</Label><p className="text-sm text-gray-700 mt-1 font-medium">{selectedSub.amount}</p></div>
+                <div><Label>Date début</Label><p className="text-sm text-gray-700 mt-1">{selectedSub.startDate}</p></div>
+                <div><Label>Date fin</Label><p className="text-sm text-gray-700 mt-1">{selectedSub.endDate}</p></div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirm AlertDialog */}
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{confirmAction?.title}</AlertDialogTitle>
+            <AlertDialogDescription>{confirmAction?.description}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmAction?.onConfirm} className="bg-red-600 hover:bg-red-700 text-white">Confirmer</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </motion.div>
   )
 }

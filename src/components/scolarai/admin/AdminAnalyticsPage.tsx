@@ -29,8 +29,12 @@ import {
   CartesianGrid,
   ResponsiveContainer,
   Tooltip as RechartsTooltip,
+  Cell,
 } from 'recharts'
 import { cn } from '@/lib/utils'
+import { useToast } from '@/hooks/use-toast'
+import { useAppStore } from '@/lib/store'
+import type { AdminPageName } from '@/lib/store'
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -152,49 +156,71 @@ function getHeatmapTextColor(intensity: number): string {
 
 export default function AdminAnalyticsPage() {
   const [activePeriod, setActivePeriod] = useState<PeriodKey>('30j')
+  const { toast } = useToast()
+  const { setCurrentAdminPage } = useAppStore()
 
-  const statsCards = [
-    {
-      title: 'Utilisateurs actifs/jour',
-      value: '342',
-      icon: Users,
-      color: 'text-blue-600',
-      bg: 'bg-blue-50',
-      border: 'border-l-blue-500',
-      trend: '+8.2%',
-      trendUp: true,
-    },
-    {
-      title: 'Temps moyen/session',
-      value: '24 min',
-      icon: Clock,
-      color: 'text-emerald-600',
-      bg: 'bg-emerald-50',
-      border: 'border-l-emerald-500',
-      trend: '+2.1 min',
-      trendUp: true,
-    },
-    {
-      title: 'Pages vues',
-      value: '12 450',
-      icon: Eye,
-      color: 'text-violet-600',
-      bg: 'bg-violet-50',
-      border: 'border-l-violet-500',
-      trend: '+15.3%',
-      trendUp: true,
-    },
-    {
-      title: 'Taux de rebond',
-      value: '32%',
-      icon: TrendingDown,
-      color: 'text-amber-600',
-      bg: 'bg-amber-50',
-      border: 'border-l-amber-500',
-      trend: '-4.1%',
-      trendUp: true, // decrease in bounce rate is positive
-    },
-  ]
+  const getRetentionData = () => {
+    switch (activePeriod) {
+      case '7j': return retentionData.slice(-2)
+      case '30j': return retentionData
+      case '90j': return retentionData
+      case '12m': return retentionData
+      default: return retentionData
+    }
+  }
+
+  const getStatsCards = () => {
+    const multipliers: Record<PeriodKey, number> = { '7j': 0.25, '30j': 1, '90j': 3, '12m': 12 }
+    const m = multipliers[activePeriod]
+    return [
+      {
+        title: 'Utilisateurs actifs/jour',
+        value: Math.round(342 * (activePeriod === '7j' ? 0.8 : activePeriod === '90j' ? 1.3 : activePeriod === '12m' ? 1.5 : 1)).toString(),
+        icon: Users,
+        color: 'text-blue-600',
+        bg: 'bg-blue-50',
+        border: 'border-l-blue-500',
+        trend: '+8.2%',
+        trendUp: true,
+        targetPage: 'admin-users' as AdminPageName,
+      },
+      {
+        title: 'Temps moyen/session',
+        value: activePeriod === '7j' ? '22 min' : activePeriod === '90j' ? '26 min' : activePeriod === '12m' ? '28 min' : '24 min',
+        icon: Clock,
+        color: 'text-emerald-600',
+        bg: 'bg-emerald-50',
+        border: 'border-l-emerald-500',
+        trend: '+2.1 min',
+        trendUp: true,
+        targetPage: 'admin-analytics' as AdminPageName,
+      },
+      {
+        title: 'Pages vues',
+        value: Math.round(12450 * m).toLocaleString('fr-FR'),
+        icon: Eye,
+        color: 'text-violet-600',
+        bg: 'bg-violet-50',
+        border: 'border-l-violet-500',
+        trend: '+15.3%',
+        trendUp: true,
+        targetPage: 'admin-analytics' as AdminPageName,
+      },
+      {
+        title: 'Taux de rebond',
+        value: activePeriod === '7j' ? '35%' : activePeriod === '90j' ? '30%' : activePeriod === '12m' ? '28%' : '32%',
+        icon: TrendingDown,
+        color: 'text-amber-600',
+        bg: 'bg-amber-50',
+        border: 'border-l-amber-500',
+        trend: '-4.1%',
+        trendUp: true, // decrease in bounce rate is positive
+        targetPage: 'admin-analytics' as AdminPageName,
+      },
+    ]
+  }
+
+  const statsCards = getStatsCards()
 
   return (
     <motion.div
@@ -225,7 +251,10 @@ export default function AdminAnalyticsPage() {
                     key={p.key}
                     variant="ghost"
                     size="sm"
-                    onClick={() => setActivePeriod(p.key)}
+                    onClick={() => {
+                      setActivePeriod(p.key)
+                      toast({ title: 'Période mise à jour', description: `Affichage des données sur ${p.label}` })
+                    }}
                     className={cn(
                       'text-xs font-medium px-3 py-1.5 rounded-md transition-all',
                       activePeriod === p.key
@@ -245,7 +274,7 @@ export default function AdminAnalyticsPage() {
       {/* Stats Row */}
       <motion.div variants={itemVariants} className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
         {statsCards.map((stat) => (
-          <Card key={stat.title} className={`border-l-4 ${stat.border} hover:shadow-md transition-shadow`}>
+          <Card key={stat.title} className={`border-l-4 ${stat.border} hover:shadow-lg transition-shadow cursor-pointer`} onClick={() => setCurrentAdminPage(stat.targetPage)}>
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-3">
                 <div className={`p-2.5 rounded-xl ${stat.bg}`}>
@@ -285,7 +314,7 @@ export default function AdminAnalyticsPage() {
           <CardContent>
             <div className="h-[280px]">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={retentionData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+                <AreaChart data={getRetentionData()} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
                   <defs>
                     <linearGradient id="retentionGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
@@ -381,9 +410,7 @@ export default function AdminAnalyticsPage() {
                   <Bar dataKey="value" radius={[0, 4, 4, 0]} animationDuration={800}>
                     {funnelData.map((entry, index) => {
                       const colors = ['#10B981', '#34D399', '#6EE7B7', '#A7F3D0']
-                      return (
-                        <rect key={`cell-${index}`} fill={colors[index]} />
-                      )
+                      return <Cell key={`cell-${index}`} fill={colors[index]} />
                     })}
                   </Bar>
                 </BarChart>
