@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Mail,
@@ -11,51 +11,224 @@ import {
   Loader2,
   CheckCircle2,
   KeyRound,
+  ShieldCheck,
+  Lock,
+  Eye,
+  EyeOff,
 } from 'lucide-react'
 import { useAppStore } from '@/lib/store'
+import { useToast } from '@/hooks/use-toast'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 
+type Step = 'email' | 'code' | 'password' | 'success'
+
+// ─── Simulated verification code ──────────────────────────────
+const SIMULATED_CODE = '847291'
+
 export default function ForgotPasswordPage() {
   const { setCurrentPage } = useAppStore()
+  const { toast } = useToast()
+
+  // Step management
+  const [step, setStep] = useState<Step>('email')
+
+  // Email step
   const [email, setEmail] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
-  const [emailSent, setEmailSent] = useState(false)
+  const [emailError, setEmailError] = useState('')
+  const [isSendingEmail, setIsSendingEmail] = useState(false)
 
-  const validateForm = useCallback((): boolean => {
-    const errors: Record<string, string> = {}
+  // Code step
+  const [code, setCode] = useState(['', '', '', '', '', ''])
+  const [codeError, setCodeError] = useState('')
+  const [isVerifyingCode, setIsVerifyingCode] = useState(false)
+  const [resendCooldown, setResendCooldown] = useState(0)
+  const codeInputs = useRef<(HTMLInputElement | null)[]>([])
 
+  // Password step
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [passwordErrors, setPasswordErrors] = useState<Record<string, string>>({})
+  const [isResetting, setIsResetting] = useState(false)
+
+  // Resend cooldown timer
+  useEffect(() => {
+    if (resendCooldown <= 0) return
+    const timer = setTimeout(() => setResendCooldown((c) => c - 1), 1000)
+    return () => clearTimeout(timer)
+  }, [resendCooldown])
+
+  // ─── Email Validation ────────────────────────────────────────
+
+  const validateEmail = useCallback((): boolean => {
     if (!email.trim()) {
-      errors.email = "L'email est requis."
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.email = 'Veuillez entrer un email valide.'
+      setEmailError("L'email est requis.")
+      return false
     }
-
-    setFieldErrors(errors)
-    return Object.keys(errors).length === 0
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError('Veuillez entrer un email valide.')
+      return false
+    }
+    setEmailError('')
+    return true
   }, [email])
 
-  const handleSubmit = async () => {
-    setError(null)
+  const handleSendEmail = async () => {
+    if (!validateEmail()) return
 
-    if (!validateForm()) return
+    setIsSendingEmail(true)
+    await new Promise((r) => setTimeout(r, 1200))
 
-    setIsLoading(true)
+    setStep('code')
+    setIsSendingEmail(false)
+    setResendCooldown(30)
 
-    // Simulate network delay for UX
+    toast({
+      title: 'Code envoyé',
+      description: `Un code de vérification a été envoyé à ${email}`,
+    })
+  }
+
+  // ─── Code Verification ───────────────────────────────────────
+
+  const handleCodeChange = (index: number, value: string) => {
+    if (value.length > 1) {
+      // Handle paste: fill all inputs from the pasted value
+      const pasted = value.replace(/\D/g, '').slice(0, 6)
+      const newCode = [...code]
+      for (let i = 0; i < 6; i++) {
+        newCode[i] = pasted[i] || ''
+      }
+      setCode(newCode)
+      // Focus last filled or the next empty
+      const nextIndex = Math.min(pasted.length, 5)
+      codeInputs.current[nextIndex]?.focus()
+      return
+    }
+
+    const digit = value.replace(/\D/g, '')
+    const newCode = [...code]
+    newCode[index] = digit
+    setCode(newCode)
+    setCodeError('')
+
+    // Auto-advance to next input
+    if (digit && index < 5) {
+      codeInputs.current[index + 1]?.focus()
+    }
+  }
+
+  const handleCodeKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === 'Backspace' && !code[index] && index > 0) {
+      codeInputs.current[index - 1]?.focus()
+    }
+  }
+
+  const handleVerifyCode = async () => {
+    const fullCode = code.join('')
+    if (fullCode.length < 6) {
+      setCodeError('Veuillez entrer le code complet à 6 chiffres.')
+      return
+    }
+
+    setIsVerifyingCode(true)
     await new Promise((r) => setTimeout(r, 1000))
 
-    // Frontend-only: simulate email sent
-    setEmailSent(true)
-    setIsLoading(false)
+    if (fullCode !== SIMULATED_CODE) {
+      setCodeError('Code incorrect. Veuillez réessayer.')
+      setIsVerifyingCode(false)
+      return
+    }
+
+    setStep('password')
+    setIsVerifyingCode(false)
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') handleSubmit()
+  const handleResendCode = async () => {
+    if (resendCooldown > 0) return
+    setResendCooldown(30)
+    setCode(['', '', '', '', '', ''])
+    setCodeError('')
+
+    toast({
+      title: 'Code renvoyé',
+      description: 'Un nouveau code de vérification a été envoyé.',
+    })
   }
+
+  // ─── Password Reset ──────────────────────────────────────────
+
+  const validatePassword = useCallback((): boolean => {
+    const errors: Record<string, string> = {}
+
+    if (!newPassword) {
+      errors.newPassword = 'Le nouveau mot de passe est requis.'
+    } else if (newPassword.length < 8) {
+      errors.newPassword = 'Le mot de passe doit contenir au moins 8 caractères.'
+    } else if (!/[A-Z]/.test(newPassword)) {
+      errors.newPassword = 'Le mot de passe doit contenir au moins une majuscule.'
+    } else if (!/[0-9]/.test(newPassword)) {
+      errors.newPassword = 'Le mot de passe doit contenir au moins un chiffre.'
+    }
+
+    if (!confirmPassword) {
+      errors.confirmPassword = 'La confirmation est requise.'
+    } else if (newPassword !== confirmPassword) {
+      errors.confirmPassword = 'Les mots de passe ne correspondent pas.'
+    }
+
+    setPasswordErrors(errors)
+    return Object.keys(errors).length === 0
+  }, [newPassword, confirmPassword])
+
+  const handleResetPassword = async () => {
+    if (!validatePassword()) return
+
+    setIsResetting(true)
+    await new Promise((r) => setTimeout(r, 1200))
+
+    setStep('success')
+    setIsResetting(false)
+
+    toast({
+      title: 'Mot de passe modifié',
+      description: 'Votre mot de passe a été réinitialisé avec succès.',
+    })
+  }
+
+  // ─── Password Strength ───────────────────────────────────────
+
+  const getPasswordStrength = (): { level: number; label: string; color: string } => {
+    if (!newPassword) return { level: 0, label: '', color: '' }
+    let score = 0
+    if (newPassword.length >= 8) score++
+    if (newPassword.length >= 12) score++
+    if (/[A-Z]/.test(newPassword)) score++
+    if (/[0-9]/.test(newPassword)) score++
+    if (/[^A-Za-z0-9]/.test(newPassword)) score++
+
+    if (score <= 1) return { level: 1, label: 'Faible', color: 'bg-red-500' }
+    if (score <= 2) return { level: 2, label: 'Moyen', color: 'bg-amber-500' }
+    if (score <= 3) return { level: 3, label: 'Bon', color: 'bg-emerald-400' }
+    return { level: 4, label: 'Excellent', color: 'bg-emerald-600' }
+  }
+
+  const strength = getPasswordStrength()
+
+  // ─── Step indicator ──────────────────────────────────────────
+
+  const steps = [
+    { key: 'email', label: 'Email', icon: Mail },
+    { key: 'code', label: 'Vérification', icon: ShieldCheck },
+    { key: 'password', label: 'Nouveau mot de passe', icon: Lock },
+  ] as const
+
+  const currentStepIndex = steps.findIndex((s) => s.key === step)
+
+  // ─── Render ──────────────────────────────────────────────────
 
   return (
     <div className="h-full flex flex-col items-center justify-center bg-gray-50 px-4 py-8 overflow-y-auto">
@@ -94,8 +267,8 @@ export default function ForgotPasswordPage() {
         <Card className="border-gray-200/80 shadow-lg shadow-gray-200/50">
           <CardContent className="space-y-5 p-6 sm:p-8">
             <AnimatePresence mode="wait">
-              {emailSent ? (
-                /* ── Success State ── */
+              {/* ─── STEP: SUCCESS ──────────────────────────────── */}
+              {step === 'success' ? (
                 <motion.div
                   key="success"
                   initial={{ opacity: 0, y: 20 }}
@@ -116,134 +289,389 @@ export default function ForgotPasswordPage() {
                     </motion.div>
                   </div>
 
-                  {/* Header */}
                   <div className="text-center space-y-1.5">
-                    <h1 className="text-2xl font-bold text-gray-900">Email envoyé !</h1>
+                    <h1 className="text-2xl font-bold text-gray-900">Mot de passe modifié !</h1>
                     <p className="text-sm text-gray-500">
-                      Si un compte existe avec l&apos;adresse <span className="font-semibold text-gray-700">{email}</span>, vous recevrez un lien pour réinitialiser votre mot de passe.
+                      Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.
                     </p>
                   </div>
 
-                  {/* Info box */}
-                  <div className="rounded-lg bg-amber-50 border border-amber-200 p-3">
-                    <p className="text-xs text-amber-700 leading-relaxed">
-                      <strong>Attention :</strong> Vérifiez également votre dossier de spam ou courrier indésirable. Le lien expirera dans 15 minutes.
-                    </p>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="space-y-3">
-                    <Button
-                      onClick={() => setCurrentPage('login')}
-                      className="w-full h-11 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold text-sm shadow-lg shadow-emerald-200/50 cursor-pointer"
-                    >
-                      Retour à la connexion
-                      <ArrowRight className="h-4 w-4 ml-1" />
-                    </Button>
-
-                    <button
-                      type="button"
-                      onClick={() => { setEmailSent(false); setEmail('') }}
-                      className="w-full text-center text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
-                    >
-                      Je n&apos;ai pas reçu l&apos;email, renvoyer
-                    </button>
-                  </div>
+                  <Button
+                    onClick={() => setCurrentPage('login')}
+                    className="w-full h-11 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold text-sm shadow-lg shadow-emerald-200/50 cursor-pointer"
+                  >
+                    Se connecter
+                    <ArrowRight className="h-4 w-4 ml-1" />
+                  </Button>
                 </motion.div>
               ) : (
-                /* ── Form State ── */
                 <motion.div
-                  key="form"
+                  key="form-steps"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.4 }}
                   className="space-y-5"
                 >
-                  {/* Icon */}
-                  <div className="flex justify-center">
-                    <div className="w-14 h-14 rounded-full bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center">
-                      <KeyRound className="h-7 w-7 text-emerald-500" />
-                    </div>
+                  {/* Step indicator */}
+                  <div className="flex items-center justify-center gap-2">
+                    {steps.map((s, i) => {
+                      const isCompleted = currentStepIndex > i
+                      const isCurrent = currentStepIndex === i
+                      return (
+                        <div key={s.key} className="flex items-center gap-2">
+                          <div
+                            className={cn(
+                              'w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors',
+                              isCompleted
+                                ? 'bg-emerald-500 text-white'
+                                : isCurrent
+                                  ? 'bg-emerald-100 text-emerald-600 border-2 border-emerald-500'
+                                  : 'bg-gray-100 text-gray-400'
+                            )}
+                          >
+                            {isCompleted ? (
+                              <CheckCircle2 className="h-4 w-4" />
+                            ) : (
+                              i + 1
+                            )}
+                          </div>
+                          {i < steps.length - 1 && (
+                            <div
+                              className={cn(
+                                'w-8 h-0.5 rounded-full transition-colors',
+                                isCompleted ? 'bg-emerald-500' : 'bg-gray-200'
+                              )}
+                            />
+                          )}
+                        </div>
+                      )
+                    })}
                   </div>
 
-                  {/* Header */}
-                  <div className="text-center space-y-1.5">
-                    <h1 className="text-2xl font-bold text-gray-900">Mot de passe oublié ?</h1>
-                    <p className="text-sm text-gray-500">
-                      Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe.
-                    </p>
-                  </div>
-
-                  {/* Global Error */}
-                  <AnimatePresence>
-                    {error && (
+                  <AnimatePresence mode="wait">
+                    {/* ─── STEP: EMAIL ─────────────────────────── */}
+                    {step === 'email' && (
                       <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg"
+                        key="step-email"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-4"
                       >
-                        <AlertCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
-                        <p className="text-sm text-red-700">{error}</p>
+                        {/* Icon */}
+                        <div className="flex justify-center">
+                          <div className="w-14 h-14 rounded-full bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center">
+                            <KeyRound className="h-7 w-7 text-emerald-500" />
+                          </div>
+                        </div>
+
+                        <div className="text-center space-y-1.5">
+                          <h1 className="text-2xl font-bold text-gray-900">Mot de passe oublié ?</h1>
+                          <p className="text-sm text-gray-500">
+                            Entrez votre adresse email et nous vous enverrons un code de vérification pour réinitialiser votre mot de passe.
+                          </p>
+                        </div>
+
+                        {/* Email input */}
+                        <div className="space-y-1.5">
+                          <label className="text-sm font-medium text-gray-700">Adresse email</label>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Input
+                              type="email"
+                              placeholder="vous@email.com"
+                              value={email}
+                              onChange={(e) => { setEmail(e.target.value); setEmailError('') }}
+                              onKeyDown={(e) => e.key === 'Enter' && handleSendEmail()}
+                              className={`pl-10 h-11 bg-gray-50/50 ${
+                                emailError ? 'border-red-300 focus-visible:border-red-500 focus-visible:ring-red-500/20' : 'border-gray-200 focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20'
+                              }`}
+                              disabled={isSendingEmail}
+                              autoFocus
+                            />
+                          </div>
+                          {emailError && <p className="text-xs text-red-500">{emailError}</p>}
+                        </div>
+
+                        {/* Submit */}
+                        <Button
+                          onClick={handleSendEmail}
+                          disabled={isSendingEmail}
+                          className="w-full h-11 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold text-sm shadow-lg shadow-emerald-200/50 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                        >
+                          {isSendingEmail ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Envoi en cours...
+                            </>
+                          ) : (
+                            <>
+                              Envoyer le code
+                              <ArrowRight className="h-4 w-4 ml-1" />
+                            </>
+                          )}
+                        </Button>
+
+                        {/* Info box */}
+                        <div className="rounded-lg bg-blue-50 border border-blue-200 p-3">
+                          <p className="text-xs text-blue-700 leading-relaxed">
+                            <strong>Démo :</strong> Le code de vérification est <code className="font-mono bg-blue-100 px-1 py-0.5 rounded text-blue-800 font-bold">{SIMULATED_CODE}</code>
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* ─── STEP: CODE VERIFICATION ────────────── */}
+                    {step === 'code' && (
+                      <motion.div
+                        key="step-code"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-4"
+                      >
+                        {/* Icon */}
+                        <div className="flex justify-center">
+                          <div className="w-14 h-14 rounded-full bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center">
+                            <ShieldCheck className="h-7 w-7 text-emerald-500" />
+                          </div>
+                        </div>
+
+                        <div className="text-center space-y-1.5">
+                          <h1 className="text-2xl font-bold text-gray-900">Vérification</h1>
+                          <p className="text-sm text-gray-500">
+                            Entrez le code à 6 chiffres envoyé à <span className="font-semibold text-gray-700">{email}</span>
+                          </p>
+                        </div>
+
+                        {/* Code inputs */}
+                        <div className="flex justify-center gap-2">
+                          {code.map((digit, i) => (
+                            <Input
+                              key={i}
+                              ref={(el) => { codeInputs.current[i] = el }}
+                              type="text"
+                              inputMode="numeric"
+                              maxLength={6}
+                              value={digit}
+                              onChange={(e) => handleCodeChange(i, e.target.value)}
+                              onKeyDown={(e) => handleCodeKeyDown(i, e)}
+                              className={`w-11 h-12 text-center text-lg font-bold bg-gray-50/50 ${
+                                codeError
+                                  ? 'border-red-300 focus-visible:border-red-500 focus-visible:ring-red-500/20'
+                                  : 'border-gray-200 focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20'
+                              }`}
+                              disabled={isVerifyingCode}
+                              autoFocus={i === 0}
+                            />
+                          ))}
+                        </div>
+
+                        {codeError && (
+                          <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <AlertCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+                            <p className="text-sm text-red-700">{codeError}</p>
+                          </div>
+                        )}
+
+                        {/* Verify */}
+                        <Button
+                          onClick={handleVerifyCode}
+                          disabled={isVerifyingCode || code.some((d) => !d)}
+                          className="w-full h-11 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold text-sm shadow-lg shadow-emerald-200/50 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                        >
+                          {isVerifyingCode ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Vérification...
+                            </>
+                          ) : (
+                            <>
+                              Vérifier le code
+                              <ArrowRight className="h-4 w-4 ml-1" />
+                            </>
+                          )}
+                        </Button>
+
+                        {/* Resend */}
+                        <div className="text-center">
+                          {resendCooldown > 0 ? (
+                            <p className="text-sm text-gray-400">
+                              Renvoyer le code dans <span className="font-semibold text-gray-600">{resendCooldown}s</span>
+                            </p>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={handleResendCode}
+                              className="text-sm font-semibold text-emerald-500 hover:text-emerald-600 transition-colors cursor-pointer"
+                            >
+                              Renvoyer le code
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Back */}
+                        <button
+                          type="button"
+                          onClick={() => { setStep('email'); setCode(['', '', '', '', '', '']); setCodeError('') }}
+                          className="w-full flex items-center justify-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
+                        >
+                          <ArrowLeft className="h-3.5 w-3.5" />
+                          Changer d&apos;adresse email
+                        </button>
+                      </motion.div>
+                    )}
+
+                    {/* ─── STEP: NEW PASSWORD ─────────────────── */}
+                    {step === 'password' && (
+                      <motion.div
+                        key="step-password"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-4"
+                      >
+                        {/* Icon */}
+                        <div className="flex justify-center">
+                          <div className="w-14 h-14 rounded-full bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center">
+                            <Lock className="h-7 w-7 text-emerald-500" />
+                          </div>
+                        </div>
+
+                        <div className="text-center space-y-1.5">
+                          <h1 className="text-2xl font-bold text-gray-900">Nouveau mot de passe</h1>
+                          <p className="text-sm text-gray-500">
+                            Choisissez un mot de passe sécurisé pour votre compte.
+                          </p>
+                        </div>
+
+                        {/* New password */}
+                        <div className="space-y-1.5">
+                          <label className="text-sm font-medium text-gray-700">Nouveau mot de passe</label>
+                          <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Input
+                              type={showNewPassword ? 'text' : 'password'}
+                              placeholder="Au moins 8 caractères"
+                              value={newPassword}
+                              onChange={(e) => { setNewPassword(e.target.value); setPasswordErrors((p) => ({ ...p, newPassword: '' })) }}
+                              className={`pl-10 pr-10 h-11 bg-gray-50/50 ${
+                                passwordErrors.newPassword ? 'border-red-300 focus-visible:border-red-500 focus-visible:ring-red-500/20' : 'border-gray-200 focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20'
+                              }`}
+                              autoFocus
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowNewPassword(!showNewPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                              {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
+                          </div>
+                          {passwordErrors.newPassword && <p className="text-xs text-red-500">{passwordErrors.newPassword}</p>}
+
+                          {/* Strength indicator */}
+                          {newPassword && (
+                            <div className="space-y-1.5">
+                              <div className="flex gap-1">
+                                {[1, 2, 3, 4].map((level) => (
+                                  <div
+                                    key={level}
+                                    className={cn(
+                                      'h-1.5 flex-1 rounded-full transition-colors',
+                                      strength.level >= level ? strength.color : 'bg-gray-200'
+                                    )}
+                                  />
+                                ))}
+                              </div>
+                              <p className={cn(
+                                'text-xs font-medium',
+                                strength.level <= 1 ? 'text-red-500' : strength.level <= 2 ? 'text-amber-500' : 'text-emerald-500'
+                              )}>
+                                Force : {strength.label}
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Requirements */}
+                          <div className="grid grid-cols-1 gap-1">
+                            {[
+                              { label: 'Au moins 8 caractères', met: newPassword.length >= 8 },
+                              { label: 'Une majuscule', met: /[A-Z]/.test(newPassword) },
+                              { label: 'Un chiffre', met: /[0-9]/.test(newPassword) },
+                              { label: 'Un caractère spécial', met: /[^A-Za-z0-9]/.test(newPassword) },
+                            ].map((req) => (
+                              <div key={req.label} className="flex items-center gap-1.5">
+                                <div className={cn(
+                                  'w-3.5 h-3.5 rounded-full flex items-center justify-center transition-colors',
+                                  req.met ? 'bg-emerald-500' : 'bg-gray-200'
+                                )}>
+                                  {req.met && <CheckCircle2 className="h-2.5 w-2.5 text-white" />}
+                                </div>
+                                <span className={cn('text-[11px]', req.met ? 'text-emerald-600 font-medium' : 'text-gray-400')}>
+                                  {req.label}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Confirm password */}
+                        <div className="space-y-1.5">
+                          <label className="text-sm font-medium text-gray-700">Confirmer le mot de passe</label>
+                          <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Input
+                              type={showConfirmPassword ? 'text' : 'password'}
+                              placeholder="Confirmez votre mot de passe"
+                              value={confirmPassword}
+                              onChange={(e) => { setConfirmPassword(e.target.value); setPasswordErrors((p) => ({ ...p, confirmPassword: '' })) }}
+                              onKeyDown={(e) => e.key === 'Enter' && handleResetPassword()}
+                              className={`pl-10 pr-10 h-11 bg-gray-50/50 ${
+                                passwordErrors.confirmPassword ? 'border-red-300 focus-visible:border-red-500 focus-visible:ring-red-500/20' : confirmPassword && newPassword === confirmPassword ? 'border-emerald-300 focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20' : 'border-gray-200 focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20'
+                              }`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                              {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
+                          </div>
+                          {passwordErrors.confirmPassword && <p className="text-xs text-red-500">{passwordErrors.confirmPassword}</p>}
+                          {confirmPassword && newPassword === confirmPassword && !passwordErrors.confirmPassword && (
+                            <p className="text-xs text-emerald-500 font-medium flex items-center gap-1">
+                              <CheckCircle2 className="h-3 w-3" /> Les mots de passe correspondent
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Submit */}
+                        <Button
+                          onClick={handleResetPassword}
+                          disabled={isResetting}
+                          className="w-full h-11 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold text-sm shadow-lg shadow-emerald-200/50 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                        >
+                          {isResetting ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Réinitialisation...
+                            </>
+                          ) : (
+                            <>
+                              Réinitialiser le mot de passe
+                              <ArrowRight className="h-4 w-4 ml-1" />
+                            </>
+                          )}
+                        </Button>
                       </motion.div>
                     )}
                   </AnimatePresence>
-
-                  {/* Form */}
-                  <div className="space-y-4">
-                    {/* Email */}
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-medium text-gray-700">Adresse email</label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input
-                          type="email"
-                          placeholder="vous@email.com"
-                          value={email}
-                          onChange={(e) => { setEmail(e.target.value); setFieldErrors((p) => ({ ...p, email: '' })) }}
-                          onKeyDown={handleKeyDown}
-                          className={`pl-10 h-11 bg-gray-50/50 ${
-                            fieldErrors.email ? 'border-red-300 focus-visible:border-red-500 focus-visible:ring-red-500/20' : 'border-gray-200 focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20'
-                          }`}
-                          disabled={isLoading}
-                          autoFocus
-                        />
-                      </div>
-                      {fieldErrors.email && <p className="text-xs text-red-500">{fieldErrors.email}</p>}
-                    </div>
-
-                    {/* Submit button */}
-                    <Button
-                      onClick={handleSubmit}
-                      disabled={isLoading}
-                      className="w-full h-11 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold text-sm shadow-lg shadow-emerald-200/50 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
-                    >
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Envoi en cours...
-                        </>
-                      ) : (
-                        <>
-                          Envoyer le lien
-                          <ArrowRight className="h-4 w-4 ml-1" />
-                        </>
-                      )}
-                    </Button>
-                  </div>
-
-                  {/* Register link */}
-                  <p className="text-center text-sm text-gray-500">
-                    Pas encore de compte ?{' '}
-                    <button
-                      type="button"
-                      onClick={() => setCurrentPage('register')}
-                      className="font-semibold text-emerald-500 hover:text-emerald-600 transition-colors"
-                    >
-                      Créer un compte
-                    </button>
-                  </p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -262,4 +690,8 @@ export default function ForgotPasswordPage() {
       </motion.p>
     </div>
   )
+}
+
+function cn(...inputs: (string | boolean | undefined | null)[]) {
+  return inputs.filter(Boolean).join(' ')
 }
