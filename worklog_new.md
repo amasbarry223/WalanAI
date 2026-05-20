@@ -251,3 +251,33 @@ Stage Summary:
 - Three cards: "Cours PDF → Quiz Généré", "Notes de cours → Flashcards Créées", "Sujet d'examen → Plan de Révision"
 - Hover interaction reveals the AI-generated result below the inspiration content
 - Clean zinc/emerald color scheme maintained throughout
+
+---
+Task ID: 6
+Agent: Main Agent
+Task: Add "Génération parallèle" comparison section to landing page (youthumb.ai style)
+
+Work Log:
+- Analyzed the youthumb.ai "Génération parallèle" HTML section provided by user
+- Created ParallelGenerationSection component matching the exact structure:
+  - Gradient badge with Zap icon ("Génération parallèle") in emerald
+  - Heading: "N'attendez plus. Générez en parallèle."
+  - Description about parallel vs sequential generation
+  - Two side-by-side comparison cards:
+    - Left card (zinc-50): "Les autres" - "Un à la fois" with 4 progress bars (1 active at 19%, 3 waiting at 0% with opacity-35)
+    - Right card (emerald-50/30, border-emerald-300): "ScolarAI" - "Tout en même temps" with 4 completed progress bars showing icons and green check badges
+  - VS badge: h-14 w-14 circle, bg-zinc-900, positioned absolutely centered between cards on lg
+  - Bottom "5x plus rapide" badge: rounded-full bg-emerald-500 with Zap icon
+- Animated progress bars: triggered when section comes into view via useInView
+  - "Others" first bar animates to 19% after 500ms (slow, sequential feel)
+  - ScolarAI all 4 bars animate to 100% after 800ms (fast, parallel feel)
+- Adapted content for ScolarAI: Quiz, Flashcards, Plan de révision, Fiches de synthèse
+- Icons for each ScolarAI item: ClipboardList, Layers, Target, FileText
+- Placed between FeaturesSection and HowItWorksSection
+- ESLint passes clean, dev server compiles successfully
+
+Stage Summary:
+- New ParallelGenerationSection added to landing page
+- Exact youthumb.ai structure: badge, heading, two comparison cards with progress bars, VS badge, "5x plus rapide" CTA
+- Animated progress bars that trigger on scroll into view
+- Emerald color scheme instead of red for ScolarAI branding

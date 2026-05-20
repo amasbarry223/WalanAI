@@ -654,6 +654,158 @@ function FeaturesSection() {
   )
 }
 
+// ─── Parallel Generation Section (youthumb.ai style) ──────────
+
+function ParallelGenerationSection() {
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const isInView = useInView(sectionRef, { once: true, margin: '-80px' })
+  const [progressWidths, setProgressWidths] = useState({
+    other1: 0,
+    scolarai: [0, 0, 0, 0],
+  })
+
+  // Animate progress bars when section comes into view
+  useEffect(() => {
+    if (!isInView) return
+
+    // "Others" - slow sequential animation
+    const otherTimer1 = setTimeout(() => setProgressWidths(prev => ({ ...prev, other1: 19 })), 500)
+
+    // ScolarAI - fast parallel animation, all at once
+    const scolaraiTimer = setTimeout(() => {
+      setProgressWidths(prev => ({ ...prev, scolarai: [100, 100, 100, 100] }))
+    }, 800)
+
+    return () => {
+      clearTimeout(otherTimer1)
+      clearTimeout(scolaraiTimer)
+    }
+  }, [isInView])
+
+  const otherItems = [
+    { label: 'Quiz', progress: progressWidths.other1, active: true },
+    { label: 'Flashcards', progress: 0, active: false },
+    { label: 'Plan de révision', progress: 0, active: false },
+    { label: 'Fiches de synthèse', progress: 0, active: false },
+  ]
+
+  const scolaraiItems = [
+    { label: 'Quiz', icon: <ClipboardList className="h-3.5 w-3.5 text-white" /> },
+    { label: 'Flashcards', icon: <Layers className="h-3.5 w-3.5 text-white" /> },
+    { label: 'Plan de révision', icon: <Target className="h-3.5 w-3.5 text-white" /> },
+    { label: 'Fiches de synthèse', icon: <FileText className="h-3.5 w-3.5 text-white" /> },
+  ]
+
+  return (
+    <section className="px-6 py-24 bg-white">
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-16 text-center">
+          <div className="mx-auto mb-4 inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 px-3 py-1.5 text-xs font-semibold tracking-widest text-white uppercase shadow-lg">
+            <Zap className="h-3.5 w-3.5" />
+            Génération parallèle
+          </div>
+          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900 md:text-4xl">
+            N&apos;attendez plus.{' '}
+            <span className="text-emerald-500">Générez en parallèle.</span>
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-xl text-zinc-500">
+            Les autres outils génèrent les contenus un par un. ScolarAI les lance tous simultanément — 4 ressources en le temps qu&apos;il faut aux autres pour en faire une.
+          </p>
+        </div>
+
+        <div ref={sectionRef} className="relative flex flex-col items-center gap-8 lg:flex-row lg:items-stretch lg:gap-6">
+          {/* Left Card - "Les autres" */}
+          <div className="w-full rounded-2xl border border-zinc-200 bg-zinc-50 p-6 md:p-8 lg:flex-1">
+            <div className="mb-6">
+              <h3 className="text-2xl font-bold text-zinc-400">Les autres</h3>
+              <p className="mt-1 text-sm text-zinc-400">Un à la fois</p>
+            </div>
+            <div className="space-y-4">
+              {otherItems.map((item, i) => (
+                <div key={i} className={`flex items-center gap-3 ${!item.active ? 'opacity-35' : ''}`}>
+                  <div className="h-[42px] w-[74px] shrink-0 overflow-hidden rounded-lg bg-zinc-200">
+                    <div
+                      className="h-full bg-zinc-300 transition-[width] duration-1000 ease-out"
+                      style={{ width: `${item.progress}%` }}
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="h-2 overflow-hidden rounded-full bg-zinc-200">
+                      <div
+                        className="h-full rounded-full bg-zinc-400 transition-[width] duration-1000 ease-out"
+                        style={{ width: `${item.progress}%` }}
+                      />
+                    </div>
+                    <span className="mt-1 block text-xs font-medium text-zinc-400">
+                      {item.active ? `${item.progress}%` : 'En attente...'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex items-center justify-center gap-2 text-zinc-400">
+              <Clock className="h-4 w-4" />
+              <span className="text-sm font-semibold">~40s par ressource = ~160s au total</span>
+            </div>
+          </div>
+
+          {/* VS Badge */}
+          <div className="z-10 flex items-center justify-center lg:absolute lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-zinc-900 text-sm font-black text-white shadow-xl">
+              VS
+            </div>
+          </div>
+
+          {/* Right Card - "ScolarAI" */}
+          <div className="w-full rounded-2xl border border-emerald-300 bg-emerald-50/30 p-6 transition-all duration-500 shadow-lg shadow-emerald-100 md:p-8 lg:flex-1">
+            <div className="mb-6">
+              <h3 className="text-2xl font-bold text-emerald-500">ScolarAI</h3>
+              <p className="mt-1 text-sm text-zinc-400">Tout en même temps</p>
+            </div>
+            <div className="space-y-4">
+              {scolaraiItems.map((item, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="relative h-[42px] w-[74px] shrink-0 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-100">
+                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-emerald-100 to-teal-50">
+                      {item.icon}
+                    </div>
+                    <div className="absolute right-0.5 bottom-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500">
+                      <Check className="h-2.5 w-2.5 text-white" />
+                    </div>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="h-2 overflow-hidden rounded-full bg-zinc-200">
+                      <div
+                        className="h-full rounded-full bg-emerald-500 transition-[width] duration-1000 ease-out"
+                        style={{ width: `${progressWidths.scolarai[i]}%` }}
+                      />
+                    </div>
+                    <span className="mt-1 block text-xs font-medium text-emerald-600">
+                      {progressWidths.scolarai[i] === 100 ? 'Terminé !' : 'Génération...'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex items-center justify-center gap-2 text-emerald-600">
+              <Clock className="h-4 w-4" />
+              <span className="text-sm font-semibold">~30s au total pour les 4</span>
+            </div>
+          </div>
+        </div>
+
+        {/* "5x plus rapide" Badge */}
+        <div className="mt-8 flex justify-center">
+          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-3 font-bold text-white shadow-lg shadow-emerald-500/25">
+            <Zap className="h-5 w-5" />
+            5x plus rapide
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // ─── How It Works Section ─────────────────────────────────────
 
 const steps = [
@@ -1174,6 +1326,7 @@ export default function LandingPage() {
       <HeroSection />
       <ProductShowcase />
       <FeaturesSection />
+      <ParallelGenerationSection />
       <HowItWorksSection />
       <StatsSection />
       <TestimonialsSection />
