@@ -24,11 +24,8 @@ import {
   Eye,
   Edit3,
   Trash2,
-  MoreVertical,
   LayoutGrid,
   List,
-  X,
-  ArrowRight,
 } from 'lucide-react'
 import { useState, useMemo } from 'react'
 

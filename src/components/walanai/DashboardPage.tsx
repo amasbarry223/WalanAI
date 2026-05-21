@@ -1,6 +1,7 @@
 'use client'
 
 import { useAppStore } from '@/lib/store'
+import { useToast } from '@/hooks/use-toast'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -251,6 +252,8 @@ function StreakHeatmap() {
 
 export default function DashboardPage() {
   const { user, setCurrentPage } = useAppStore()
+  const { toast } = useToast()
+  const [notifications, setNotifications] = useState(mockNotifications)
 
   const greeting = useMemo(() => {
     const hour = new Date().getHours()
@@ -302,11 +305,11 @@ export default function DashboardPage() {
             <PopoverContent className="w-80 p-0" align="end">
               <div className="flex items-center justify-between px-4 py-3 border-b">
                 <h4 className="font-semibold text-sm">Notifications</h4>
-                <button className="text-xs text-emerald-500 hover:text-emerald-600 font-medium">Tout marquer lu</button>
+                <button className="text-xs text-emerald-500 hover:text-emerald-600 font-medium" onClick={() => { setNotifications((prev) => prev.map((n) => ({ ...n, read: true }))); toast({ title: 'Toutes les notifications marquées comme lues' }) }}>Tout marquer lu</button>
               </div>
               <ScrollArea className="h-[300px]">
                 <div className="divide-y">
-                  {mockNotifications.map((notif) => (
+                  {notifications.map((notif) => (
                     <div
                       key={notif.id}
                       className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer ${!notif.read ? 'bg-emerald-50/50' : ''}`}
@@ -325,7 +328,7 @@ export default function DashboardPage() {
                 </div>
               </ScrollArea>
               <div className="border-t px-4 py-2.5">
-                <button className="text-xs text-emerald-500 hover:text-emerald-600 font-medium w-full text-center">
+                <button className="text-xs text-emerald-500 hover:text-emerald-600 font-medium w-full text-center" onClick={() => toast({ title: 'Centre de notifications bientôt disponible' })}>
                   Voir toutes les notifications
                 </button>
               </div>

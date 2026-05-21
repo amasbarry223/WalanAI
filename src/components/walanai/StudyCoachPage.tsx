@@ -37,7 +37,10 @@ import {
   BarChart3,
   Timer,
   RefreshCw,
+  ArrowLeft,
 } from 'lucide-react'
+import { useAppStore } from '@/lib/store'
+import { useToast } from '@/hooks/use-toast'
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
@@ -467,15 +470,21 @@ function AnimatedCounter({ target, suffix = '', duration = 1.2 }: { target: numb
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function StudyCoachPage() {
+  const { setCurrentPage } = useAppStore()
+  const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [dismissedInsights, setDismissedInsights] = useState<Set<string>>(new Set())
   const [currentTip, setCurrentTip] = useState(0)
   const [expandedStrength, setExpandedStrength] = useState<string | null>(null)
   const [expandedWeakness, setExpandedWeakness] = useState<string | null>(null)
+  const [insightOrder, setInsightOrder] = useState<string[]>(aiInsights.map(i => i.id))
 
   const handleNewAnalysis = () => {
     setIsLoading(true)
-    setTimeout(() => setIsLoading(false), 2000)
+    setTimeout(() => {
+      setIsLoading(false)
+      setInsightOrder(prev => [...prev].sort(() => Math.random() - 0.5))
+    }, 2000)
   }
 
   const dismissInsight = (id: string) => {
@@ -493,7 +502,40 @@ export default function StudyCoachPage() {
   const nextTip = useCallback(() => setCurrentTip((p) => (p + 1) % studyTips.length), [])
   const prevTip = useCallback(() => setCurrentTip((p) => (p - 1 + studyTips.length) % studyTips.length), [])
 
-  const visibleInsights = aiInsights.filter((i) => !dismissedInsights.has(i.id))
+  const visibleInsights = insightOrder
+    .map(id => aiInsights.find(i => i.id === id))
+    .filter((i): i is AIInsight => !!i && !dismissedInsights.has(i.id))
+
+  const handleInsightAction = (insight: AIInsight) => {
+    switch (insight.action) {
+      case 'Commencer la révision':
+        setCurrentPage('revision')
+        break
+      case 'Voir les détails':
+        toast({ title: 'Détails disponibles prochainement' })
+        break
+      case 'Ajuster le plan':
+        toast({ title: 'Personnalisation du plan bientôt disponible' })
+        break
+      case 'Voir le bilan':
+        setCurrentPage('progress')
+        break
+      case 'En savoir plus':
+        toast({ title: 'Plus d\'informations bientôt disponibles' })
+        break
+      case 'Réviser maintenant':
+        setCurrentPage('revision')
+        break
+      case 'Continuer':
+        setCurrentPage('flashcard-deck')
+        break
+      case 'Créer un quiz':
+        setCurrentPage('quiz-generator')
+        break
+      default:
+        toast({ title: insight.action })
+    }
+  }
 
   return (
     <ScrollArea className="h-full">
@@ -505,20 +547,25 @@ export default function StudyCoachPage() {
       >
         {/* ─── Header ─────────────────────────────────────────── */}
         <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <motion.span
-                animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.15, 1] }}
-                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-              >
-                <Sparkles className="h-7 w-7 text-emerald-500" />
-              </motion.span>
-              Coach IA
-            </h1>
-            <p className="text-sm text-gray-500 mt-0.5">Votre assistant d&apos;étude personnalisé</p>
-            <p className="text-xs text-gray-400 mt-1">
-              Dernière analyse : aujourd&apos;hui à 14:32
-            </p>
+          <div className="flex items-start gap-3">
+            <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')} className="mt-1">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <motion.span
+                  animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.15, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                >
+                  <Sparkles className="h-7 w-7 text-emerald-500" />
+                </motion.span>
+                Coach IA
+              </h1>
+              <p className="text-sm text-gray-500 mt-0.5">Votre assistant d&apos;étude personnalisé</p>
+              <p className="text-xs text-gray-400 mt-1">
+                Dernière analyse : aujourd&apos;hui à 14:32
+              </p>
+            </div>
           </div>
           <Button
             onClick={handleNewAnalysis}
@@ -651,6 +698,7 @@ export default function StudyCoachPage() {
                               <Button
                                 size="sm"
                                 className="h-7 text-xs bg-emerald-500 hover:bg-emerald-600 text-white gap-1"
+                                onClick={() => handleInsightAction(insight)}
                               >
                                 {insight.action}
                                 <ArrowRight className="h-3 w-3" />
@@ -731,11 +779,11 @@ export default function StudyCoachPage() {
                   ))}
                 </div>
                 <div className="flex gap-2 mt-4">
-                  <Button size="sm" variant="outline" className="flex-1 h-8 text-xs gap-1">
+                  <Button size="sm" variant="outline" className="flex-1 h-8 text-xs gap-1" onClick={() => toast({ title: 'Personnalisation bientôt disponible' })}>
                     <Zap className="h-3 w-3" />
                     Personnaliser
                   </Button>
-                  <Button size="sm" className="flex-1 h-8 text-xs bg-emerald-500 hover:bg-emerald-600 text-white gap-1">
+                  <Button size="sm" className="flex-1 h-8 text-xs bg-emerald-500 hover:bg-emerald-600 text-white gap-1" onClick={() => toast({ title: 'Plan appliqué au planificateur !' })}>
                     <CheckCircle2 className="h-3 w-3" />
                     Appliquer au planificateur
                   </Button>

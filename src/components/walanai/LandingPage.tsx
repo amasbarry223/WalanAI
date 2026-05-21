@@ -228,7 +228,7 @@ function HeroSection() {
           {/* Badge */}
           <div className="gsap-hero mb-6 inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 px-3 py-1.5 text-xs font-semibold tracking-widest text-white uppercase shadow-lg">
             <Sparkles className="h-3.5 w-3.5" />
-            <span>50 000+</span>+ Quiz IA Générés
+            <span>50 000+</span> Quiz IA Générés
           </div>
 
           {/* Main Title */}

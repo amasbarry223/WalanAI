@@ -9,6 +9,18 @@ import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import { useToast } from '@/hooks/use-toast'
 import { motion } from 'framer-motion'
 import {
   ArrowLeft,
@@ -42,6 +54,7 @@ const itemVariants = {
 
 export default function SettingsPage() {
   const { user, setCurrentPage, logout } = useAppStore()
+  const { toast } = useToast()
   const [notifications, setNotifications] = useState(true)
   const [emailNotif, setEmailNotif] = useState(true)
   const [darkMode, setDarkMode] = useState(false)
@@ -50,6 +63,11 @@ export default function SettingsPage() {
   const initials = user?.name
     ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
     : 'U'
+
+  const handleDeleteAccount = () => {
+    toast({ title: 'Fonctionnalité à venir' })
+    logout()
+  }
 
   return (
     <motion.div
@@ -89,7 +107,10 @@ export default function SettingsPage() {
                     {initials}
                   </AvatarFallback>
                 </Avatar>
-                <button className="absolute bottom-0 right-0 p-1.5 bg-emerald-500 rounded-full text-white hover:bg-emerald-600 transition-colors">
+                <button
+                  className="absolute bottom-0 right-0 p-1.5 bg-emerald-500 rounded-full text-white hover:bg-emerald-600 transition-colors"
+                  onClick={() => toast({ title: 'Fonctionnalité à venir' })}
+                >
                   <Camera className="h-3.5 w-3.5" />
                 </button>
               </div>
@@ -114,7 +135,10 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <Button className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white">
+            <Button
+              className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white"
+              onClick={() => toast({ title: 'Profil mis à jour avec succès' })}
+            >
               Enregistrer les modifications
             </Button>
           </CardContent>
@@ -141,7 +165,10 @@ export default function SettingsPage() {
                 </p>
               </div>
               {user?.plan !== 'pro' && (
-                <Button className="bg-white text-emerald-600 hover:bg-emerald-50 font-semibold">
+                <Button
+                  className="bg-white text-emerald-600 hover:bg-emerald-50 font-semibold"
+                  onClick={() => setCurrentPage('pricing')}
+                >
                   <Crown className="h-4 w-4 mr-2" />
                   Passer à Pro
                 </Button>
@@ -232,14 +259,22 @@ export default function SettingsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button variant="outline" className="w-full justify-start gap-3 h-12">
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-3 h-12"
+              onClick={() => toast({ title: 'Fonctionnalité à venir — la réinitialisation du mot de passe sera bientôt disponible' })}
+            >
               <Lock className="h-4 w-4 text-gray-400" />
               <div className="text-left">
                 <p className="text-sm font-medium">Changer le mot de passe</p>
                 <p className="text-xs text-gray-400">Dernière modification il y a 30 jours</p>
               </div>
             </Button>
-            <Button variant="outline" className="w-full justify-start gap-3 h-12">
+            <Button
+              variant="outline"
+              className="w-full justify-start gap-3 h-12"
+              onClick={() => toast({ title: 'Fonctionnalité à venir — la 2FA sera bientôt disponible' })}
+            >
               <Shield className="h-4 w-4 text-gray-400" />
               <div className="text-left">
                 <p className="text-sm font-medium">Authentification à deux facteurs</p>
@@ -264,10 +299,31 @@ export default function SettingsPage() {
               <LogOut className="h-4 w-4" />
               Se déconnecter
             </Button>
-            <Button variant="outline" className="w-full justify-start gap-3 text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200">
-              <Trash2 className="h-4 w-4" />
-              Supprimer mon compte
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" className="w-full justify-start gap-3 text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200">
+                  <Trash2 className="h-4 w-4" />
+                  Supprimer mon compte
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Supprimer votre compte ?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Cette action est irréversible. Toutes vos données, documents et paramètres seront définitivement supprimés.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-red-500 hover:bg-red-600 text-white"
+                    onClick={handleDeleteAccount}
+                  >
+                    Supprimer
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </CardContent>
         </Card>
       </motion.div>

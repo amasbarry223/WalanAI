@@ -1,8 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useAppStore } from '@/lib/store'
+import { useToast } from '@/hooks/use-toast'
 import {
+  ArrowLeft,
   Calendar,
   Clock,
   MapPin,
@@ -104,7 +107,7 @@ const subjectColors: Record<string, string> = {
 
 const now = new Date()
 
-const mockExams: Exam[] = [
+const initialExams: Exam[] = [
   {
     id: '1',
     subject: 'Droit Civil',
@@ -445,7 +448,8 @@ function CountdownTimer({ targetDate }: { targetDate: Date }) {
 
 // ─── Exam Card ───────────────────────────────────────────────────────────────
 
-function ExamCard({ exam, index }: { exam: Exam; index: number }) {
+function ExamCard({ exam, index, onToggleTopic }: { exam: Exam; index: number; onToggleTopic: (examId: string, topicId: string) => void }) {
+  const { toast } = useToast()
   const priorityConfig = getPriorityConfig(exam.priority)
   const PriorityIcon = priorityConfig.icon
   const completedTopics = exam.topics.filter((t) => t.completed).length
@@ -507,7 +511,16 @@ function ExamCard({ exam, index }: { exam: Exam; index: number }) {
             </div>
             <div className="space-y-1.5 max-h-32 overflow-y-auto custom-scrollbar">
               {exam.topics.map((topic) => (
-                <div key={topic.id} className="flex items-center gap-2 text-sm">
+                <div
+                  key={topic.id}
+                  className="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 rounded px-1 py-0.5 transition-colors"
+                  onClick={() => {
+                    onToggleTopic(exam.id, topic.id)
+                    toast({
+                      title: topic.completed ? 'Sujet marqué comme non terminé' : 'Sujet marqué comme terminé',
+                    })
+                  }}
+                >
                   {topic.completed ? (
                     <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
                   ) : (
@@ -716,10 +729,14 @@ function CalendarView({ exams }: { exams: Exam[] }) {
 
 function StudyPlanSidebar() {
   const [generating, setGenerating] = useState(false)
+  const { toast } = useToast()
 
   const handleGenerate = () => {
     setGenerating(true)
-    setTimeout(() => setGenerating(false), 2500)
+    setTimeout(() => {
+      setGenerating(false)
+      toast({ title: 'Plan de révision généré avec succès !' })
+    }, 2500)
   }
 
   const totalHours = mockStudyPlan.reduce(
@@ -861,7 +878,7 @@ function StudyPlanSidebar() {
 
 // ─── Add Exam Dialog ─────────────────────────────────────────────────────────
 
-function AddExamDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
+function AddExamDialog({ open, onOpenChange, onSave }: { open: boolean; onOpenChange: (open: boolean) => void; onSave: (exam: Exam) => void }) {
   const [subject, setSubject] = useState('')
   const [date, setDate] = useState('')
   const [time, setTime] = useState('')
@@ -870,6 +887,7 @@ function AddExamDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o
   const [color, setColor] = useState('#10B981')
   const [topics, setTopics] = useState<string[]>([])
   const [newTopic, setNewTopic] = useState('')
+  const { toast } = useToast()
 
   const handleAddTopic = () => {
     if (newTopic.trim() && !topics.includes(newTopic.trim())) {
@@ -883,7 +901,21 @@ function AddExamDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o
   }
 
   const handleSave = () => {
+    if (!subject) return
+    const newExam: Exam = {
+      id: `e${Date.now()}`,
+      subject,
+      date: date ? new Date(date) : new Date(),
+      time: time || '09:00',
+      room: room || 'Salle à définir',
+      topics: topics.map((t, i) => ({ id: `nt${Date.now()}-${i}`, name: t, completed: false })),
+      progress: 0,
+      priority,
+      color: subjectColors[subject] || color,
+    }
+    onSave(newExam)
     onOpenChange(false)
+    toast({ title: 'Examen ajouté avec succès' })
     // Reset
     setSubject('')
     setDate('')
@@ -1029,11 +1061,38 @@ function AddExamDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 export default function ExamTrackerPage() {
+  const { setCurrentPage } = useAppStore()
   const [viewMode, setViewMode] = useState<ViewMode>('cards')
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [exams, setExams] = useState<Exam[]>(initialExams)
 
-  const upcomingExams = mockExams
-  const allExams = [...mockPastExams, ...mockExams]
+  const upcomingExams = exams
+  const allExams = [...mockPastExams, ...exams]
+
+  const handleAddExam = useCallback((newExam: Exam) => {
+    setExams((prev) => [...prev, newExam])
+  }, [])
+
+  const handleToggleTopic = useCallback((examId: string, topicId: string) => {
+    setExams((prev) =>
+      prev.map((exam) => {
+        if (exam.id !== examId) return exam
+        return {
+          ...exam,
+          topics: exam.topics.map((t) =>
+            t.id === topicId ? { ...t, completed: !t.completed } : t
+          ),
+          progress: Math.round(
+            (exam.topics.filter((t) =>
+              t.id === topicId ? !t.completed : t.completed
+            ).length /
+              exam.topics.length) *
+              100
+          ),
+        }
+      })
+    )
+  }, [])
 
   // Stats
   const nextExamDays = getCountdown(upcomingExams[0]?.date || new Date()).days
@@ -1091,6 +1150,9 @@ export default function ExamTrackerPage() {
       {/* Header */}
       <motion.div variants={itemVariants} className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
               <div className="p-2 rounded-xl bg-emerald-50">
@@ -1177,7 +1239,7 @@ export default function ExamTrackerPage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {upcomingExams.map((exam, i) => (
-                    <ExamCard key={exam.id} exam={exam} index={i} />
+                    <ExamCard key={exam.id} exam={exam} index={i} onToggleTopic={handleToggleTopic} />
                   ))}
                 </div>
               </motion.div>
@@ -1263,7 +1325,7 @@ export default function ExamTrackerPage() {
       )}
 
       {/* Add Exam Dialog */}
-      <AddExamDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+      <AddExamDialog open={dialogOpen} onOpenChange={setDialogOpen} onSave={handleAddExam} />
     </motion.div>
   )
 }

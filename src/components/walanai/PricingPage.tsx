@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useAppStore } from '@/lib/store'
+import { useToast } from '@/hooks/use-toast'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -142,7 +143,8 @@ const testimonials = [
 ]
 
 export default function PricingPage() {
-  const { user, setCurrentPage } = useAppStore()
+  const { user, setCurrentPage, updateUserPlan } = useAppStore()
+  const { toast } = useToast()
   const [isAnnual, setIsAnnual] = useState(false)
 
   const proPrice = isAnnual ? '7.99' : '9.99'
@@ -342,7 +344,8 @@ export default function PricingPage() {
                       disabled={currentPlan === 'pro'}
                       onClick={() => {
                         if (currentPlan !== 'pro') {
-                          // Handle upgrade
+                          toast({ title: 'Merci de votre intérêt ! Le paiement sera bientôt disponible.' })
+                          updateUserPlan('pro')
                         }
                       }}
                     >

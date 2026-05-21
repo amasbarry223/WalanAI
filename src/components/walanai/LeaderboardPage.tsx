@@ -26,6 +26,7 @@ import {
   Swords,
 } from 'lucide-react'
 import { useState, useMemo } from 'react'
+import { useToast } from '@/hooks/use-toast'
 
 // ─── Mock Data ───────────────────────────────────────────────
 
@@ -33,6 +34,9 @@ interface Student {
   id: number
   name: string
   score: number
+  weeklyScore: number
+  monthlyScore: number
+  allTimeScore: number
   streak: number
   trend: 'up' | 'down' | 'same'
   subject: string
@@ -40,26 +44,26 @@ interface Student {
 }
 
 const allStudents: Student[] = [
-  { id: 1, name: 'Léa Dupont', score: 9850, streak: 32, trend: 'up', subject: 'Droit', achievements: ['Maître du Droit', 'Série dorée'] },
-  { id: 2, name: 'Maxime Bernard', score: 9420, streak: 28, trend: 'up', subject: 'Informatique', achievements: ['Codeur exceptionnel'] },
-  { id: 3, name: 'Chloé Martin', score: 9180, streak: 25, trend: 'same', subject: 'Économie', achievements: ['Économiste en herbe'] },
-  { id: 4, name: 'Lucas Petit', score: 8740, streak: 21, trend: 'up', subject: 'Mathématiques', achievements: ['Esprit logique'] },
-  { id: 5, name: 'Emma Leroy', score: 8520, streak: 19, trend: 'down', subject: 'Histoire', achievements: ['Historien passionné'] },
-  { id: 6, name: 'Hugo Moreau', score: 8310, streak: 17, trend: 'up', subject: 'Droit', achievements: [] },
-  { id: 7, name: 'Camille Roux', score: 8050, streak: 15, trend: 'up', subject: 'Informatique', achievements: ['Série dorée'] },
-  { id: 8, name: 'Nathan Simon', score: 7830, streak: 14, trend: 'down', subject: 'Économie', achievements: [] },
-  { id: 9, name: 'Inès Laurent', score: 7620, streak: 12, trend: 'up', subject: 'Histoire', achievements: [] },
-  { id: 10, name: 'Théo Michel', score: 7410, streak: 11, trend: 'same', subject: 'Mathématiques', achievements: [] },
-  { id: 11, name: 'Jade Garcia', score: 7190, streak: 10, trend: 'up', subject: 'Droit', achievements: [] },
-  { id: 12, name: 'Louis Thomas', score: 6950, streak: 9, trend: 'down', subject: 'Informatique', achievements: [] },
-  { id: 13, name: 'Manon Robert', score: 6720, streak: 8, trend: 'up', subject: 'Économie', achievements: [] },
-  { id: 14, name: 'Raphaël Richard', score: 6510, streak: 7, trend: 'same', subject: 'Histoire', achievements: [] },
-  { id: 15, name: 'Lina Durand', score: 6280, streak: 6, trend: 'up', subject: 'Mathématiques', achievements: [] },
-  { id: 16, name: 'Arthur Mercier', score: 6040, streak: 5, trend: 'down', subject: 'Droit', achievements: [] },
-  { id: 17, name: 'Chloé Lefevre', score: 5810, streak: 4, trend: 'up', subject: 'Informatique', achievements: [] },
-  { id: 18, name: 'Adam Bonnet', score: 5570, streak: 3, trend: 'same', subject: 'Économie', achievements: [] },
-  { id: 19, name: 'Sarah Dupuis', score: 5320, streak: 2, trend: 'up', subject: 'Histoire', achievements: [] },
-  { id: 20, name: 'Olivier Lambert', score: 5080, streak: 1, trend: 'down', subject: 'Mathématiques', achievements: [] },
+  { id: 1, name: 'Léa Dupont', score: 9850, weeklyScore: 1250, monthlyScore: 4800, allTimeScore: 9850, streak: 32, trend: 'up', subject: 'Droit', achievements: ['Maître du Droit', 'Série dorée'] },
+  { id: 2, name: 'Maxime Bernard', score: 9420, weeklyScore: 1100, monthlyScore: 4600, allTimeScore: 9420, streak: 28, trend: 'up', subject: 'Informatique', achievements: ['Codeur exceptionnel'] },
+  { id: 3, name: 'Chloé Martin', score: 9180, weeklyScore: 980, monthlyScore: 4400, allTimeScore: 9180, streak: 25, trend: 'same', subject: 'Économie', achievements: ['Économiste en herbe'] },
+  { id: 4, name: 'Lucas Petit', score: 8740, weeklyScore: 920, monthlyScore: 4200, allTimeScore: 8740, streak: 21, trend: 'up', subject: 'Mathématiques', achievements: ['Esprit logique'] },
+  { id: 5, name: 'Emma Leroy', score: 8520, weeklyScore: 850, monthlyScore: 4100, allTimeScore: 8520, streak: 19, trend: 'down', subject: 'Histoire', achievements: ['Historien passionné'] },
+  { id: 6, name: 'Hugo Moreau', score: 8310, weeklyScore: 800, monthlyScore: 3900, allTimeScore: 8310, streak: 17, trend: 'up', subject: 'Droit', achievements: [] },
+  { id: 7, name: 'Camille Roux', score: 8050, weeklyScore: 780, monthlyScore: 3700, allTimeScore: 8050, streak: 15, trend: 'up', subject: 'Informatique', achievements: ['Série dorée'] },
+  { id: 8, name: 'Nathan Simon', score: 7830, weeklyScore: 720, monthlyScore: 3600, allTimeScore: 7830, streak: 14, trend: 'down', subject: 'Économie', achievements: [] },
+  { id: 9, name: 'Inès Laurent', score: 7620, weeklyScore: 680, monthlyScore: 3400, allTimeScore: 7620, streak: 12, trend: 'up', subject: 'Histoire', achievements: [] },
+  { id: 10, name: 'Théo Michel', score: 7410, weeklyScore: 650, monthlyScore: 3200, allTimeScore: 7410, streak: 11, trend: 'same', subject: 'Mathématiques', achievements: [] },
+  { id: 11, name: 'Jade Garcia', score: 7190, weeklyScore: 620, monthlyScore: 3000, allTimeScore: 7190, streak: 10, trend: 'up', subject: 'Droit', achievements: [] },
+  { id: 12, name: 'Louis Thomas', score: 6950, weeklyScore: 580, monthlyScore: 2800, allTimeScore: 6950, streak: 9, trend: 'down', subject: 'Informatique', achievements: [] },
+  { id: 13, name: 'Manon Robert', score: 6720, weeklyScore: 540, monthlyScore: 2600, allTimeScore: 6720, streak: 8, trend: 'up', subject: 'Économie', achievements: [] },
+  { id: 14, name: 'Raphaël Richard', score: 6510, weeklyScore: 500, monthlyScore: 2400, allTimeScore: 6510, streak: 7, trend: 'same', subject: 'Histoire', achievements: [] },
+  { id: 15, name: 'Lina Durand', score: 6280, weeklyScore: 460, monthlyScore: 2200, allTimeScore: 6280, streak: 6, trend: 'up', subject: 'Mathématiques', achievements: [] },
+  { id: 16, name: 'Arthur Mercier', score: 6040, weeklyScore: 420, monthlyScore: 2000, allTimeScore: 6040, streak: 5, trend: 'down', subject: 'Droit', achievements: [] },
+  { id: 17, name: 'Chloé Lefevre', score: 5810, weeklyScore: 380, monthlyScore: 1800, allTimeScore: 5810, streak: 4, trend: 'up', subject: 'Informatique', achievements: [] },
+  { id: 18, name: 'Adam Bonnet', score: 5570, weeklyScore: 340, monthlyScore: 1600, allTimeScore: 5570, streak: 3, trend: 'same', subject: 'Économie', achievements: [] },
+  { id: 19, name: 'Sarah Dupuis', score: 5320, weeklyScore: 300, monthlyScore: 1400, allTimeScore: 5320, streak: 2, trend: 'up', subject: 'Histoire', achievements: [] },
+  { id: 20, name: 'Olivier Lambert', score: 5080, weeklyScore: 260, monthlyScore: 1200, allTimeScore: 5080, streak: 1, trend: 'down', subject: 'Mathématiques', achievements: [] },
 ]
 
 const CURRENT_USER_ID = 7
@@ -189,13 +193,32 @@ function getPodiumStyle(rank: number) {
 
 export default function LeaderboardPage() {
   const { setCurrentPage, user } = useAppStore()
+  const { toast } = useToast()
   const [selectedCategory, setSelectedCategory] = useState('Tous')
-  const [timePeriod, setTimePeriod] = useState('week')
+  const [timePeriod, setTimePeriod] = useState<'week' | 'month' | 'all'>('week')
 
   const filteredStudents = useMemo(() => {
-    if (selectedCategory === 'Tous') return allStudents
-    return allStudents.filter(s => s.subject === selectedCategory)
-  }, [selectedCategory])
+    const getScore = (student: Student): number => {
+      switch (timePeriod) {
+        case 'week': return student.weeklyScore
+        case 'month': return student.monthlyScore
+        case 'all': return student.allTimeScore
+      }
+    }
+    let result = allStudents
+    if (selectedCategory !== 'Tous') {
+      result = result.filter(s => s.subject === selectedCategory)
+    }
+    return [...result].sort((a, b) => getScore(b) - getScore(a))
+  }, [selectedCategory, timePeriod])
+
+  const getScoreForPeriod = (student: Student): number => {
+    switch (timePeriod) {
+      case 'week': return student.weeklyScore
+      case 'month': return student.monthlyScore
+      case 'all': return student.allTimeScore
+    }
+  }
 
   const currentUser = filteredStudents.find(s => s.id === CURRENT_USER_ID)
   const currentUserRank = currentUser ? filteredStudents.findIndex(s => s.id === CURRENT_USER_ID) + 1 : null
@@ -230,9 +253,9 @@ export default function LeaderboardPage() {
       <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 mb-6">
         <Tabs value={timePeriod} onValueChange={setTimePeriod} className="w-full sm:w-auto">
           <TabsList className="w-full sm:w-auto">
-            <TabsTrigger value="week" className="text-xs sm:text-sm">Cette semaine</TabsTrigger>
-            <TabsTrigger value="month" className="text-xs sm:text-sm">Ce mois</TabsTrigger>
-            <TabsTrigger value="all" className="text-xs sm:text-sm">Tout le temps</TabsTrigger>
+              <TabsTrigger value="week" className="text-xs sm:text-sm">Semaine</TabsTrigger>
+            <TabsTrigger value="month" className="text-xs sm:text-sm">Mois</TabsTrigger>
+            <TabsTrigger value="all" className="text-xs sm:text-sm">Tout</TabsTrigger>
           </TabsList>
         </Tabs>
 
@@ -292,7 +315,7 @@ export default function LeaderboardPage() {
                           </div>
                         </div>
                         <p className="text-sm font-semibold text-gray-800 text-center max-w-[80px] truncate">{top3[1].name.split(' ')[0]}</p>
-                        <p className="text-xs text-gray-500">{formatScore(top3[1].score)}</p>
+                        <p className="text-xs text-gray-500">{formatScore(getScoreForPeriod(top3[1]))}</p>
                         <div className="flex items-center gap-1 mt-1">
                           <Flame className="h-3 w-3 text-orange-500" />
                           <span className="text-xs font-medium text-orange-600">{top3[1].streak}j</span>
@@ -328,7 +351,7 @@ export default function LeaderboardPage() {
                           </div>
                         </div>
                         <p className="text-base font-bold text-gray-900 text-center max-w-[100px] truncate">{top3[0].name.split(' ')[0]}</p>
-                        <p className="text-sm font-semibold text-amber-600">{formatScore(top3[0].score)}</p>
+                        <p className="text-sm font-semibold text-amber-600">{formatScore(getScoreForPeriod(top3[0]))}</p>
                         <div className="flex items-center gap-1 mt-1">
                           <Flame className="h-3.5 w-3.5 text-orange-500" />
                           <span className="text-xs font-semibold text-orange-600">{top3[0].streak}j</span>
@@ -363,7 +386,7 @@ export default function LeaderboardPage() {
                           </div>
                         </div>
                         <p className="text-sm font-semibold text-gray-800 text-center max-w-[80px] truncate">{top3[2].name.split(' ')[0]}</p>
-                        <p className="text-xs text-gray-500">{formatScore(top3[2].score)}</p>
+                        <p className="text-xs text-gray-500">{formatScore(getScoreForPeriod(top3[2]))}</p>
                         <div className="flex items-center gap-1 mt-1">
                           <Flame className="h-3 w-3 text-orange-500" />
                           <span className="text-xs font-medium text-orange-600">{top3[2].streak}j</span>
@@ -412,7 +435,7 @@ export default function LeaderboardPage() {
                       </div>
                       <div>
                         <p className="font-semibold text-gray-900">{user?.name || currentUser.name}</p>
-                        <p className="text-sm text-emerald-600 font-medium">{formatScore(currentUser.score)} pts</p>
+                        <p className="text-sm text-emerald-600 font-medium">{formatScore(getScoreForPeriod(currentUser))} pts</p>
                       </div>
                     </div>
 
@@ -435,7 +458,7 @@ export default function LeaderboardPage() {
                         <div className="flex items-center justify-center gap-1 mb-1">
                           <Target className="h-3.5 w-3.5 text-blue-500" />
                         </div>
-                        <p className="text-sm font-bold text-gray-900">{currentUser.score > 8000 ? 'Top 10' : 'Top 20'}</p>
+                        <p className="text-sm font-bold text-gray-900">{getScoreForPeriod(currentUser) > 8000 ? 'Top 10' : 'Top 20'}</p>
                         <p className="text-[10px] text-gray-500 uppercase tracking-wide">Groupe</p>
                       </div>
                     </div>
@@ -446,8 +469,8 @@ export default function LeaderboardPage() {
                         <div className="flex items-center justify-between mb-1.5">
                           <span className="text-xs text-gray-500">Progression vers le rang #{currentUserRank - 1}</span>
                           <span className="text-xs font-semibold text-emerald-600">
-                            {Math.round(((filteredStudents[currentUserRank - 2]?.score - currentUser.score) > 0
-                              ? 1 - (filteredStudents[currentUserRank - 2]?.score - currentUser.score) / currentUser.score
+                            {Math.round(((getScoreForPeriod(filteredStudents[currentUserRank - 2]) - getScoreForPeriod(currentUser)) > 0
+                              ? 1 - (getScoreForPeriod(filteredStudents[currentUserRank - 2]) - getScoreForPeriod(currentUser)) / getScoreForPeriod(currentUser)
                               : 1) * 100)}%
                           </span>
                         </div>
@@ -456,15 +479,15 @@ export default function LeaderboardPage() {
                             className="h-full bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full"
                             initial={{ width: 0 }}
                             animate={{
-                              width: `${Math.max(10, Math.round(((filteredStudents[currentUserRank - 2]?.score - currentUser.score) > 0
-                                ? 1 - (filteredStudents[currentUserRank - 2]?.score - currentUser.score) / currentUser.score
+                              width: `${Math.max(10, Math.round(((getScoreForPeriod(filteredStudents[currentUserRank - 2]) - getScoreForPeriod(currentUser)) > 0
+                                ? 1 - (getScoreForPeriod(filteredStudents[currentUserRank - 2]) - getScoreForPeriod(currentUser)) / getScoreForPeriod(currentUser)
                                 : 1) * 100))}%`
                             }}
                             transition={{ duration: 1, ease: 'easeOut' }}
                           />
                         </div>
                         <p className="text-[10px] text-gray-400 mt-1">
-                          +{formatScore(filteredStudents[currentUserRank - 2]?.score - currentUser.score || 0)} pts pour monter
+                          +{formatScore(getScoreForPeriod(filteredStudents[currentUserRank - 2]) - getScoreForPeriod(currentUser) || 0)} pts pour monter
                         </p>
                       </div>
                     )}
@@ -513,7 +536,7 @@ export default function LeaderboardPage() {
                     transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
                   />
                 </div>
-                <Button className="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-white gap-2">
+                <Button className="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-white gap-2" onClick={() => toast({ title: 'Défi relevé ! Bonne chance ! 🎯' })}>
                   <Target className="h-4 w-4" />
                   Relever le défi
                 </Button>
@@ -634,7 +657,7 @@ export default function LeaderboardPage() {
                     {/* Score */}
                     <div className="w-24 shrink-0 text-right">
                       <p className={`text-sm font-bold tabular-nums whitespace-nowrap ${isCurrentUser ? 'text-emerald-700' : 'text-gray-900'}`}>
-                        {formatScore(student.score)}
+                        {formatScore(getScoreForPeriod(student))}
                       </p>
                     </div>
                   </motion.div>
@@ -700,7 +723,7 @@ export default function LeaderboardPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Score moyen</span>
                   <span className="text-sm font-bold text-emerald-600">
-                    {formatScore(Math.round(filteredStudents.reduce((a, s) => a + s.score, 0) / filteredStudents.length))}
+                    {formatScore(Math.round(filteredStudents.reduce((a, s) => a + getScoreForPeriod(s), 0) / filteredStudents.length))}
                   </span>
                 </div>
                 <Separator />
@@ -715,7 +738,7 @@ export default function LeaderboardPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Score le plus élevé</span>
                   <span className="text-sm font-bold text-amber-600">
-                    {formatScore(Math.max(...filteredStudents.map(s => s.score)))}
+                    {formatScore(Math.max(...filteredStudents.map(s => getScoreForPeriod(s))))}
                   </span>
                 </div>
               </div>

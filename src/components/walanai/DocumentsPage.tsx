@@ -25,6 +25,7 @@ import {
   FileType2,
 } from 'lucide-react'
 import { useState } from 'react'
+import { useToast } from '@/hooks/use-toast'
 
 type FilterType = 'tous' | 'favoris' | 'archives'
 type ViewMode = 'grid' | 'list'
@@ -59,10 +60,10 @@ const itemVariants = {
 
 export default function DocumentsPage() {
   const { setCurrentPage } = useAppStore()
+  const { toast } = useToast()
   const [activeFilter, setActiveFilter] = useState<FilterType>('tous')
   const [searchQuery, setSearchQuery] = useState('')
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
-  const [showMockData, setShowMockData] = useState(false)
 
   const filteredDocs = mockDocuments.filter((doc) => {
     if (activeFilter === 'favoris' && !doc.favorite) return false
@@ -96,7 +97,7 @@ export default function DocumentsPage() {
         <div className="flex items-center gap-2">
           <Button
             className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2"
-            onClick={() => setShowMockData(!showMockData)}
+            onClick={() => toast({ title: 'L\'import de documents sera bientôt disponible' })}
           >
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Importer</span>
@@ -159,7 +160,7 @@ export default function DocumentsPage() {
 
       {/* Content */}
       <AnimatePresence mode="wait">
-        {!showMockData || filteredDocs.length === 0 ? (
+        {filteredDocs.length === 0 ? (
           <motion.div
             key="empty"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -174,13 +175,6 @@ export default function DocumentsPage() {
             <p className="text-gray-500 text-sm mb-6 text-center max-w-md">
               Importez votre premier document pour commencer à étudier
             </p>
-            <Button
-              className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2"
-              onClick={() => setShowMockData(true)}
-            >
-              <Upload className="h-4 w-4" />
-              Importer un document
-            </Button>
           </motion.div>
         ) : viewMode === 'grid' ? (
           <motion.div

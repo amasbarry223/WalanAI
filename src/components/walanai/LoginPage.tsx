@@ -14,6 +14,7 @@ import {
   ArrowLeft,
 } from 'lucide-react'
 import { useAppStore } from '@/lib/store'
+import { useToast } from '@/hooks/use-toast'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -33,6 +34,7 @@ const GoogleIcon = () => (
 
 export default function LoginPage() {
   const { login, setCurrentPage } = useAppStore()
+  const { toast } = useToast()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -242,6 +244,7 @@ export default function LoginPage() {
               variant="outline"
               className="w-full h-11 border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-medium text-sm cursor-pointer"
               disabled={isLoading}
+              onClick={() => toast({ title: 'La connexion avec Google sera bientôt disponible' })}
             >
               <GoogleIcon />
               Continuer avec Google

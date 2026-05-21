@@ -61,6 +61,11 @@ const mockQuizHistory: QuizResult[] = [
     date: '16 Mai 2026',
     duration: '10 min',
     type: 'qcm',
+    details: [
+      { question: 'La courbe d\'offre est-elle généralement croissante ?', isCorrect: true, yourAnswer: 'Oui', correctAnswer: 'Oui' },
+      { question: 'L\'équilibre du marché se situe à l\'intersection de l\'offre et de la demande ?', isCorrect: true, yourAnswer: 'Oui', correctAnswer: 'Oui' },
+      { question: 'Une hausse du prix entraîne toujours une baisse de la demande ?', isCorrect: false, yourAnswer: 'Oui', correctAnswer: 'Non, sauf bien inférieur' },
+    ],
   },
   {
     id: 3,
@@ -72,6 +77,11 @@ const mockQuizHistory: QuizResult[] = [
     date: '14 Mai 2026',
     duration: '8 min',
     type: 'vrai-faux',
+    details: [
+      { question: 'Le tri par insertion a une complexité de O(n log n) dans le pire cas.', isCorrect: false, yourAnswer: 'Vrai', correctAnswer: 'Faux' },
+      { question: 'La recherche binaire nécessite un tableau trié.', isCorrect: true, yourAnswer: 'Vrai', correctAnswer: 'Vrai' },
+      { question: 'Le tri fusion est un algorithme en place.', isCorrect: true, yourAnswer: 'Faux', correctAnswer: 'Faux' },
+    ],
   },
   {
     id: 4,
@@ -83,6 +93,11 @@ const mockQuizHistory: QuizResult[] = [
     date: '12 Mai 2026',
     duration: '20 min',
     type: 'ouvert',
+    details: [
+      { question: 'Quelles étaient les causes principales de la Révolution française ?', isCorrect: true, yourAnswer: 'Crise économique, inégalités sociales, philosophie des Lumières', correctAnswer: 'Crise économique, inégalités sociales, philosophie des Lumières' },
+      { question: 'Quelle est la date de la prise de la Bastille ?', isCorrect: true, yourAnswer: '14 juillet 1789', correctAnswer: '14 juillet 1789' },
+      { question: 'Quels étaient les objectifs de la Convention nationale ?', isCorrect: false, yourAnswer: 'Rédiger une constitution', correctAnswer: 'Gouverner la France après la chute de la monarchie et rédiger une constitution' },
+    ],
   },
   {
     id: 5,
@@ -94,6 +109,11 @@ const mockQuizHistory: QuizResult[] = [
     date: '10 Mai 2026',
     duration: '15 min',
     type: 'qcm',
+    details: [
+      { question: 'La médiane est-elle sensible aux valeurs extrêmes ?', isCorrect: true, yourAnswer: 'Non', correctAnswer: 'Non' },
+      { question: 'L\'écart-type mesure la dispersion autour de la moyenne ?', isCorrect: true, yourAnswer: 'Oui', correctAnswer: 'Oui' },
+      { question: 'Le mode est toujours unique dans une série statistique ?', isCorrect: false, yourAnswer: 'Oui', correctAnswer: 'Non, il peut y avoir plusieurs modes' },
+    ],
   },
 ]
 
@@ -148,7 +168,7 @@ export default function QuizHistoryPage() {
             <p className="text-sm text-gray-500">Consultez vos résultats passés</p>
           </div>
         </div>
-        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2" onClick={() => setCurrentPage('revision')}>
+        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2" onClick={() => setCurrentPage('quiz-generator')}>
           <RotateCcw className="h-4 w-4" />
           Nouveau Quiz
         </Button>

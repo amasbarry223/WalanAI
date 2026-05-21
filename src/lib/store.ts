@@ -64,6 +64,7 @@ interface AppState {
   enterAdminMode: () => void
   exitAdminMode: () => void
   setCurrentAdminPage: (page: AdminPageName) => void
+  updateUserPlan: (plan: 'gratuit' | 'pro') => void
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -105,4 +106,9 @@ export const useAppStore = create<AppState>((set) => ({
 
   setCurrentAdminPage: (page) =>
     set({ currentAdminPage: page }),
+
+  updateUserPlan: (plan) =>
+    set((state) => ({
+      user: state.user ? { ...state.user, plan } : state.user,
+    })),
 }))

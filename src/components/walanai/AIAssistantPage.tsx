@@ -16,8 +16,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
-import { useAppStore } from '@/lib/store'
+import { useToast } from '@/hooks/use-toast'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -200,10 +199,10 @@ function EmptyState({ onSuggestionClick }: { onSuggestionClick: (prompt: string)
 // ── Main component ───────────────────────────────────────────────────────────
 
 export default function AIAssistantPage() {
-  const { user } = useAppStore()
   const [messages, setMessages] = useState<Message[]>([])
   const [inputText, setInputText] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast()
   const scrollRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -340,6 +339,7 @@ export default function AIAssistantPage() {
               variant="ghost"
               size="icon"
               className="shrink-0 text-gray-400 hover:text-gray-600 h-10 w-10"
+              onClick={() => toast({ title: "L'ajout de pièces jointes sera bientôt disponible" })}
             >
               <Paperclip className="h-5 w-5" />
             </Button>

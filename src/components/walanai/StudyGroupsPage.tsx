@@ -1,8 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+import { useToast } from '@/hooks/use-toast'
+import { useAppStore } from '@/lib/store'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
+  ArrowLeft,
   Search,
   Plus,
   Users,
@@ -595,6 +598,7 @@ function ResourceTypeIcon({ type }: { type: SharedResource['type'] }) {
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 export default function StudyGroupsPage() {
+  const { setCurrentPage } = useAppStore()
   const [searchQuery, setSearchQuery] = useState('')
   const [activeFilter, setActiveFilter] = useState<'my' | 'discover' | 'online'>('my')
   const [selectedGroup, setSelectedGroup] = useState<StudyGroup | null>(null)
@@ -602,6 +606,11 @@ export default function StudyGroupsPage() {
   const [createOpen, setCreateOpen] = useState(false)
   const [joinedGroups, setJoinedGroups] = useState<Set<string>>(new Set())
   const [showAllDiscover, setShowAllDiscover] = useState(false)
+  const { toast } = useToast()
+
+  // Groups state - mutable so new groups can be added
+  const [myGroupsList, setMyGroupsList] = useState<StudyGroup[]>(myGroups)
+  const [discoverGroupsList, setDiscoverGroupsList] = useState<StudyGroup[]>(discoverGroups)
 
   // Create group form state
   const [newGroupName, setNewGroupName] = useState('')
@@ -613,6 +622,7 @@ export default function StudyGroupsPage() {
 
   const handleJoinGroup = (groupId: string) => {
     setJoinedGroups((prev) => new Set(prev).add(groupId))
+    toast({ title: 'Vous avez rejoint le groupe !' })
   }
 
   const handleOpenDetail = (group: StudyGroup) => {
@@ -621,7 +631,32 @@ export default function StudyGroupsPage() {
   }
 
   const handleCreateGroup = () => {
+    if (!newGroupName.trim()) return
+    const initials = newGroupName.trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
+    const newGroup: StudyGroup = {
+      id: `g-${Date.now()}`,
+      name: newGroupName.trim(),
+      description: newGroupDesc.trim() || 'Nouveau groupe d\'étude',
+      initials: initials || 'NG',
+      color: newGroupColor.value,
+      gradient: newGroupColor.gradient,
+      members: 1,
+      onlineCount: 1,
+      subjectTags: newGroupSubject ? [newGroupSubject] : [],
+      activityLevel: 'Actif',
+      lastActivity: "À l'instant",
+      isMember: true,
+      isActive: true,
+      privacy: newGroupPrivacy,
+      maxMembers: newGroupMaxMembers[0],
+      sharedResources: [],
+      upcomingSessions: [],
+      chatMessages: [],
+      memberList: [],
+    }
+    setMyGroupsList((prev) => [newGroup, ...prev])
     setCreateOpen(false)
+    toast({ title: 'Groupe créé avec succès !' })
     setNewGroupName('')
     setNewGroupDesc('')
     setNewGroupSubject('')
@@ -631,18 +666,18 @@ export default function StudyGroupsPage() {
   }
 
   const filters = [
-    { key: 'my' as const, label: 'Mes groupes', count: myGroups.length },
-    { key: 'discover' as const, label: 'Découvrir', count: discoverGroups.length },
-    { key: 'online' as const, label: 'En ligne maintenant', count: [...myGroups, ...discoverGroups].filter((g) => g.isActive).length },
+    { key: 'my' as const, label: 'Mes groupes', count: myGroupsList.length },
+    { key: 'discover' as const, label: 'Découvrir', count: discoverGroupsList.length },
+    { key: 'online' as const, label: 'En ligne maintenant', count: [...myGroupsList, ...discoverGroupsList].filter((g) => g.isActive).length },
   ]
 
-  const filteredMyGroups = myGroups.filter(
+  const filteredMyGroups = myGroupsList.filter(
     (g) =>
       g.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       g.subjectTags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
-  const filteredDiscover = discoverGroups
+  const filteredDiscover = discoverGroupsList
     .filter(
       (g) =>
         g.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -653,6 +688,9 @@ export default function StudyGroupsPage() {
   return (
     <div className="h-full bg-gradient-to-br from-gray-50 via-white to-emerald-50/30">
       <div className="p-4 md:p-6 lg:p-8">
+        <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')} className="mb-2">
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
         {/* ─── Header ────────────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

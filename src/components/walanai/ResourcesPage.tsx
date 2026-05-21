@@ -44,6 +44,13 @@ import {
   CircleDot,
 } from 'lucide-react'
 import { useState, useRef, useMemo } from 'react'
+import { useToast } from '@/hooks/use-toast'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -669,6 +676,7 @@ function ResourceDetailModal({
   allResources: Resource[]
   onSelectResource: (r: Resource) => void
 }) {
+  const { toast } = useToast()
   if (!resource) return null
 
   const relatedResources = allResources.filter((r) =>
@@ -755,7 +763,8 @@ function ResourceDetailModal({
                     {resource.chapters.map((chapter, index) => (
                       <div
                         key={index}
-                        className="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-emerald-50/50 transition-colors"
+                        className="flex items-center gap-3 py-2 px-3 rounded-lg hover:bg-emerald-50/50 transition-colors cursor-pointer"
+                        onClick={() => toast({ title: 'Chapitre sélectionné', description: chapter })}
                       >
                         <span className="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 text-xs font-semibold shrink-0">
                           {index + 1}
@@ -809,11 +818,11 @@ function ResourceDetailModal({
 
               {/* Action Buttons */}
               <div className="flex items-center gap-3 pt-4 border-t">
-                <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white gap-2">
+                <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white gap-2" onClick={() => { toast({ title: 'Ouverture de la ressource...' }); onClose() }}>
                   <ExternalLink className="h-4 w-4" />
                   Accéder
                 </Button>
-                <Button variant="outline" className="flex-1 gap-2 border-emerald-200 text-emerald-600 hover:bg-emerald-50">
+                <Button variant="outline" className="flex-1 gap-2 border-emerald-200 text-emerald-600 hover:bg-emerald-50" onClick={() => toast({ title: 'Téléchargement lancé !' })}>
                   <Download className="h-4 w-4" />
                   Télécharger
                 </Button>
@@ -830,11 +839,14 @@ function ResourceDetailModal({
 
 export default function ResourcesPage() {
   const { setCurrentPage } = useAppStore()
+  const { toast } = useToast()
 
   const [activeTab, setActiveTab] = useState('tous')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
+  const [filterSubject, setFilterSubject] = useState<string>('Tous')
+  const [sortBy, setSortBy] = useState<string>('default')
 
   const featuredResources = useMemo(
     () => mockResources.filter((r) => r.featured),
@@ -861,6 +873,9 @@ export default function ResourcesPage() {
     if (activeTab !== 'tous') {
       result = result.filter((r) => r.type === activeTab)
     }
+    if (filterSubject !== 'Tous') {
+      result = result.filter((r) => r.subject === filterSubject)
+    }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase()
       result = result.filter(
@@ -871,8 +886,25 @@ export default function ResourcesPage() {
           r.author.toLowerCase().includes(q)
       )
     }
+    switch (sortBy) {
+      case 'title-asc':
+        result = [...result].sort((a, b) => a.title.localeCompare(b.title, 'fr'))
+        break
+      case 'title-desc':
+        result = [...result].sort((a, b) => b.title.localeCompare(a.title, 'fr'))
+        break
+      case 'newest':
+        result = [...result].sort((a, b) => b.id - a.id)
+        break
+      case 'oldest':
+        result = [...result].sort((a, b) => a.id - b.id)
+        break
+      case 'popular':
+        result = [...result].sort((a, b) => b.downloads - a.downloads)
+        break
+    }
     return result
-  }, [activeTab, searchQuery])
+  }, [activeTab, searchQuery, filterSubject, sortBy])
 
   const handleSelectResource = (resource: Resource) => {
     setSelectedResource(resource)
@@ -889,14 +921,19 @@ export default function ResourcesPage() {
       {/* ── Header ───────────────────────────────────────────────────────── */}
       <motion.div variants={itemVariants} className="mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-              <BookOpen className="h-6 w-6 text-emerald-500" />
-              Bibliothèque de ressources
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              Explorez des cours, fiches, vidéos et outils pour booster votre apprentissage
-            </p>
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={() => setCurrentPage('dashboard')}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <BookOpen className="h-6 w-6 text-emerald-500" />
+                Bibliothèque de ressources
+              </h1>
+              <p className="text-sm text-gray-500 mt-1">
+                Explorez des cours, fiches, vidéos et outils pour booster votre apprentissage
+              </p>
+            </div>
           </div>
         </div>
 
@@ -911,14 +948,69 @@ export default function ResourcesPage() {
               className="pl-10 h-10 border-gray-200 focus:border-emerald-300 focus:ring-emerald-200"
             />
           </div>
-          <Button variant="outline" className="h-10 gap-2 border-gray-200 hover:border-emerald-200 hover:text-emerald-600">
-            <Filter className="h-4 w-4" />
-            <span className="hidden sm:inline">Filtrer</span>
-          </Button>
-          <Button variant="outline" className="h-10 gap-2 border-gray-200 hover:border-emerald-200 hover:text-emerald-600">
-            <ArrowUpDown className="h-4 w-4" />
-            <span className="hidden sm:inline">Trier</span>
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="h-10 gap-2 border-gray-200 hover:border-emerald-200 hover:text-emerald-600">
+                <Filter className="h-4 w-4" />
+                <span className="hidden sm:inline">Filtrer</span>
+                {filterSubject !== 'Tous' && <Badge className="bg-emerald-100 text-emerald-700 border-0 text-[10px] ml-1">{filterSubject}</Badge>}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setFilterSubject('Tous')} className={filterSubject === 'Tous' ? 'bg-emerald-50 text-emerald-700' : ''}>
+                Tous
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterSubject('Droit')} className={filterSubject === 'Droit' ? 'bg-emerald-50 text-emerald-700' : ''}>
+                Droit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterSubject('Économie')} className={filterSubject === 'Économie' ? 'bg-emerald-50 text-emerald-700' : ''}>
+                Économie
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterSubject('Informatique')} className={filterSubject === 'Informatique' ? 'bg-emerald-50 text-emerald-700' : ''}>
+                Informatique
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterSubject('Mathématiques')} className={filterSubject === 'Mathématiques' ? 'bg-emerald-50 text-emerald-700' : ''}>
+                Mathématiques
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterSubject('Histoire')} className={filterSubject === 'Histoire' ? 'bg-emerald-50 text-emerald-700' : ''}>
+                Histoire
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterSubject('Philosophie')} className={filterSubject === 'Philosophie' ? 'bg-emerald-50 text-emerald-700' : ''}>
+                Philosophie
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFilterSubject('Langues')} className={filterSubject === 'Langues' ? 'bg-emerald-50 text-emerald-700' : ''}>
+                Langues
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="h-10 gap-2 border-gray-200 hover:border-emerald-200 hover:text-emerald-600">
+                <ArrowUpDown className="h-4 w-4" />
+                <span className="hidden sm:inline">Trier</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setSortBy('default')} className={sortBy === 'default' ? 'bg-emerald-50 text-emerald-700' : ''}>
+                Par défaut
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy('title-asc')} className={sortBy === 'title-asc' ? 'bg-emerald-50 text-emerald-700' : ''}>
+                Titre A-Z
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy('title-desc')} className={sortBy === 'title-desc' ? 'bg-emerald-50 text-emerald-700' : ''}>
+                Titre Z-A
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy('newest')} className={sortBy === 'newest' ? 'bg-emerald-50 text-emerald-700' : ''}>
+                Plus récent
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy('oldest')} className={sortBy === 'oldest' ? 'bg-emerald-50 text-emerald-700' : ''}>
+                Plus ancien
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy('popular')} className={sortBy === 'popular' ? 'bg-emerald-50 text-emerald-700' : ''}>
+                Plus populaire
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </motion.div>
 
@@ -1011,6 +1103,7 @@ export default function ResourcesPage() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-colors hover:shadow-sm ${tool.bgColor}`}
+                    onClick={() => toast({ title: `Outil ${tool.title} bientôt disponible` })}
                   >
                     <div className={`p-2 rounded-lg bg-white shadow-sm ${tool.color}`}>
                       {tool.icon}

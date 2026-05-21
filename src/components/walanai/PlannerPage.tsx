@@ -729,7 +729,7 @@ export default function PlannerPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {sessions
+                  {[...sessions]
                     .sort((a, b) => a.day !== b.day ? a.day - b.day : a.startHour - b.startHour)
                     .map((session) => (
                       <div

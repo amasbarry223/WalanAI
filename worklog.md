@@ -232,3 +232,150 @@ Stage Summary:
 - Added Notifications tab (new): email alerts, SMTP config
 - Sidebar now has 8 items instead of 9 (Audit removed from nav)
 - AdminPageName type updated to remove 'admin-audit'
+
+---
+Task ID: 2
+Agent: Button Fix Agent
+Task: Fix non-functional buttons across 5 WalanAI components
+
+Work Log:
+- Read all 5 target files and the useToast hook before making changes
+- **LoginPage.tsx**: Added `useToast` import and onClick to "Continuer avec Google" button → toast: "La connexion avec Google sera bientôt disponible"
+- **RegisterPage.tsx**: Added `useToast` import and onClick to "Continuer avec Google" button → toast: "L'inscription avec Google sera bientôt disponible". Added onClick to CGU link → toast: "Conditions Générales d'Utilisation — bientôt disponibles". Added onClick to "Politique de confidentialité" link → toast: "Politique de confidentialité — bientôt disponible"
+- **DashboardPage.tsx**: Added `useToast` import, `notifications` state (initialized from `mockNotifications`), and `setNotifications`. Fixed "Tout marquer lu" button → marks all notifications as read + toast: "Toutes les notifications marquées comme lues". Fixed "Voir toutes les notifications" button → toast: "Centre de notifications bientôt disponible". Changed notification list to use `notifications` state instead of `mockNotifications` directly.
+- **AIAssistantPage.tsx**: Added `useToast` import and onClick to Paperclip/attachment button → toast: "L'ajout de pièces jointes sera bientôt disponible". Removed unused `user` variable from `useAppStore()` destructuring. Removed `useAppStore` import and `Separator` import (both unused).
+- **RevisionPage.tsx**: Added `useToast` import. Added `cardStatuses` state (`Record<number, string>`). Fixed "Difficile" button → sets card status to 'difficile', toast "Carte marquée comme difficile", auto-advances. Fixed "À revoir" button → sets card status to 'arevoir', toast "Carte marquée à revoir", auto-advances. Fixed "Maîtrisé" button → sets card status to 'maitrise', toast "Carte marquée comme maîtrisée ✓", auto-advances. Fixed "Générer des fiches" button → toast "Génération de fiches IA bientôt disponible". Updated progress calculation to use `cardStatuses` instead of hardcoded mock data. Updated stats row (Maîtrisées, À réviser, Nouvelles) to use `cardStatuses`. Updated badge display in both flashcard view and list view to reflect `cardStatuses`.
+- Lint passes with no errors
+- Dev server compiles successfully
+
+Stage Summary:
+- All 5 files fixed with functional onClick handlers using `useToast` from `@/hooks/use-toast`
+- No visual design changes — only behavior added
+- All existing functionality preserved
+
+---
+Task ID: 1
+Agent: Button Fix Agent
+Task: Fix non-functional buttons in SettingsPage, PricingPage, and HelpCenterPage
+
+Work Log:
+
+### File 1: SettingsPage.tsx
+1. **Avatar camera button** — Added `onClick={() => toast({ title: 'Fonctionnalité à venir' })}`
+2. **"Enregistrer les modifications" button** — Added `onClick={() => toast({ title: 'Profil mis à jour avec succès' })}`
+3. **"Passer à Pro" button** — Added `onClick={() => setCurrentPage('pricing')}`
+4. **"Changer le mot de passe" button** — Added `onClick={() => toast({ title: 'Fonctionnalité à venir — la réinitialisation du mot de passe sera bientôt disponible' })}`
+5. **"Authentification à deux facteurs" button** — Added `onClick={() => toast({ title: 'Fonctionnalité à venir — la 2FA sera bientôt disponible' })}`
+6. **"Supprimer mon compte" button** — Wrapped with AlertDialog confirmation dialog. On confirm, shows toast "Fonctionnalité à venir" and calls `logout()`.
+- Added imports: `useToast`, `AlertDialog*` components
+- Added `handleDeleteAccount` function
+
+### File 2: PricingPage.tsx
+1. **"Passer à Pro" button** — Replaced empty if block with: toast "Merci de votre intérêt ! Le paiement sera bientôt disponible." and `updateUserPlan('pro')` to simulate upgrade
+- Added `useToast` import
+- Destructured `updateUserPlan` from `useAppStore()`
+
+### File 3: HelpCenterPage.tsx
+1. **Search input** — Added `searchQuery` state, bound to Input value/onChange. Added `filteredFaqItems` that filters FAQ questions by matching search text against question or answer text. Shows empty state when no results.
+2. **4 quick help link cards** — Added `onClick={() => toast({ title: link.title })}` to each card, also added `category` field to helpLinks data
+3. **"Contacter le support" button** — Added `onClick={() => toast({ title: 'Le chat support sera bientôt disponible' })}`
+4. **"Envoyer un email" button** — Added `onClick={() => window.open('mailto:support@walanai.fr', '_blank')}`
+- Added imports: `useToast`, `useState`
+
+### Store update (store.ts)
+- Added `updateUserPlan: (plan: 'gratuit' | 'pro') => void` to AppState interface and implementation to support PricingPage upgrade simulation
+
+### Verification
+- ESLint passes with no errors
+- Dev server compiles successfully
+
+---
+Task ID: 3
+Agent: Button Fix Agent
+Task: Fix non-functional buttons in ResourcesPage, StudyCoachPage, and LeaderboardPage
+
+Work Log:
+
+### File 1: ResourcesPage.tsx
+1. **"Filtrer" button** — Replaced plain Button with DropdownMenu containing subject filter options (Tous, Droit, Économie, Informatique, Mathématiques, Histoire, Philosophie, Langues). Added `filterSubject` state. Shows active filter badge on button. Actually filters displayed resources by subject.
+2. **"Trier" button** — Replaced plain Button with DropdownMenu containing sort options (Par défaut, Titre A-Z, Titre Z-A, Plus récent, Plus ancien, Plus populaire). Added `sortBy` state. Actually sorts the displayed resources.
+3. **"Accéder" button in modal** — Added onClick that shows toast "Ouverture de la ressource..." and closes the modal via `onClose()`.
+4. **"Télécharger" button in modal** — Added onClick that shows toast "Téléchargement lancé !".
+5. **4 study tools** (Calculatrice GPA, Générateur de citations, Outil de mind mapping, Convertisseur de notes) — Added onClick to each motion.div that shows toast "Outil [name] bientôt disponible".
+6. **Chapter items in modal** — Added onClick + cursor-pointer to each chapter div that shows toast "Chapitre sélectionné" with the chapter name as description.
+7. **Back navigation** — Added a back button at the top using `setCurrentPage('dashboard')` with ArrowLeft icon.
+- Added imports: `useToast`, `DropdownMenu*` components
+- Extended `filteredResources` useMemo to include `filterSubject` and `sortBy` logic
+
+### File 2: StudyCoachPage.tsx
+1. **8 insight action buttons** — Added `handleInsightAction` function that routes each action:
+   - "Commencer la révision" → `setCurrentPage('revision')`
+   - "Voir les détails" → toast "Détails disponibles prochainement"
+   - "Ajuster le plan" → toast "Personnalisation du plan bientôt disponible"
+   - "Voir le bilan" → `setCurrentPage('progress')`
+   - "En savoir plus" → toast "Plus d'informations bientôt disponibles"
+   - "Réviser maintenant" → `setCurrentPage('revision')`
+   - "Continuer" → `setCurrentPage('flashcard-deck')`
+   - "Créer un quiz" → `setCurrentPage('quiz-generator')`
+2. **"Personnaliser" button** — Added onClick toast "Personnalisation bientôt disponible".
+3. **"Appliquer au planificateur" button** — Added onClick toast "Plan appliqué au planificateur !".
+4. **"Nouvelle analyse"** — Added `insightOrder` state. After the fake delay, shuffles the insight order using `Math.random()` to simulate a new analysis.
+5. **Back navigation** — Added a back button at the top using `setCurrentPage('dashboard')` with ArrowLeft icon.
+- Added imports: `useAppStore`, `useToast`, `ArrowLeft` icon
+
+### File 3: LeaderboardPage.tsx
+1. **Time period filter** — Added `weeklyScore`, `monthlyScore`, `allTimeScore` fields to each Student entry with proportionally scaled values. Added `getScoreForPeriod()` function that returns the appropriate score based on `timePeriod` state. Updated `filteredStudents` useMemo to sort by the period-specific score. Updated all score displays (podium, ranking table, stats cards, progress bar) to use `getScoreForPeriod()`.
+2. **"Relever le défi" button** — Added onClick that shows toast "Défi relevé ! Bonne chance ! 🎯".
+- Added import: `useToast`
+- Changed tab labels from "Cette semaine/Ce mois/Tout le temps" to "Semaine/Mois/Tout" for cleaner UI
+
+### Verification
+- ESLint passes with no errors
+- Dev server compiles successfully
+
+---
+Task ID: 4
+Agent: Bug Fix Agent
+Task: Fix non-functional buttons and bugs across 8 WalanAI components
+
+Work Log:
+
+### File 1: ExamTrackerPage.tsx
+1. **"Add Exam" dialog discards data** — Changed `mockExams` from `const` to `useState` (renamed to `initialExams`). Added `onSave` prop to `AddExamDialog`. In `handleSave()`, creates a new `Exam` object from form state and calls `onSave()`. Shows toast "Examen ajouté avec succès".
+2. **Topic checkboxes non-interactive** — Added `onToggleTopic` prop to `ExamCard`. Each topic div now has `onClick` that calls `onToggleTopic(exam.id, topic.id)`. Shows toast "Sujet marqué comme [terminé/non terminé]".
+3. **"Générer un plan IA" is fake** — After the spinner timeout, now shows toast "Plan de révision généré avec succès !".
+4. **Back navigation** — Added back button with `setCurrentPage('dashboard')` and `ArrowLeft` icon.
+- Added imports: `useAppStore`, `useToast`, `ArrowLeft`, `useCallback`
+
+### File 2: StudyGroupsPage.tsx
+1. **"Create Group" dialog discards data** — Changed groups data from `const` to `useState` (`myGroupsList`, `discoverGroupsList`). In `handleCreateGroup()`, creates a new `StudyGroup` object from form state and adds it to `myGroupsList`. Shows toast "Groupe créé avec succès !".
+2. **Join group is superficial** — After joining, shows toast "Vous avez rejoint le groupe !".
+3. **Back navigation** — Added back button with `setCurrentPage('dashboard')` and `ArrowLeft` icon.
+- Added imports: `useAppStore`, `useToast`, `ArrowLeft`, `useCallback`
+
+### File 3: QuizHistoryPage.tsx
+1. **"Nouveau Quiz" navigates to wrong page** — Changed from `setCurrentPage('revision')` to `setCurrentPage('quiz-generator')`.
+2. **Quizzes 2-5 expand to show nothing** — Added `details` arrays for all 5 quizzes (2-3 detail items each with question, isCorrect, yourAnswer, correctAnswer).
+
+### File 4: QuizGeneratorPage.tsx
+1. **Filter logic broken** — Replaced `(subjectMatch || true)` always-true filter with proper logic: `subjectMatch && difficultyMatch && typeMatch`. Filters now actually work.
+2. **Wrong correct answers in Vrai/Faux** — Instead of `correctIndex % 2`, now checks whether the original correct option text is "Vrai" and sets `correctIndex` to 0 (Vrai) or 1 (Faux) accordingly.
+3. **Unused imports removed** — Removed `Select*` components, `Trophy`, `Award`, `Pause`, `ChevronRight`.
+
+### File 5: FlashcardDeckPage.tsx
+1. **Keyboard useEffect stale closure** — Added dependency array `[handleNext, handlePrev, handleRate, toggleBookmark, isFlipped, hasRated, sessionEnded]`. Wrapped `handleRate` and `toggleBookmark` in `useCallback` with proper deps.
+2. **"Spaced repetition" mode doesn't filter cards** — Added `displayCards` useMemo. In "spaced" mode, sorts cards by rating (lower ratings first = more review needed). In "quick" mode, shuffles randomly. In "classic" mode, keeps original order. Updated `currentCard`, `handleNext`, `handlePrev`, and card count display to use `displayCards`.
+
+### File 6: PlannerPage.tsx
+1. **State mutation in render** — Replaced `sessions.sort()` with `[...sessions].sort()` to avoid mutating the state array during render.
+
+### File 7: DocumentsPage.tsx
+1. **"Importer" button toggles mock data** — Changed onClick to show toast "L'import de documents sera bientôt disponible". Removed `showMockData` state. Documents are now always visible. Removed the empty state "Importer un document" button.
+- Added import: `useToast`
+
+### File 8: LandingPage.tsx
+1. **Double ++ sign in hero badge** — Changed `<span>50 000+</span>+` to `<span>50 000+</span>` to fix "50 000++" rendering.
+
+### Verification
+- ESLint passes with no errors
+- Dev server compiles successfully

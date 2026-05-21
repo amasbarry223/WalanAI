@@ -17,6 +17,7 @@ import {
   ArrowLeft,
 } from 'lucide-react'
 import { useAppStore } from '@/lib/store'
+import { useToast } from '@/hooks/use-toast'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -82,6 +83,7 @@ function ValidationCheck({ valid, label }: { valid: boolean; label: string }) {
 
 export default function RegisterPage() {
   const { login, setCurrentPage } = useAppStore()
+  const { toast } = useToast()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -349,9 +351,9 @@ export default function RegisterPage() {
                   />
                   <label htmlFor="terms" className="text-sm text-gray-500 leading-snug cursor-pointer">
                     J&apos;accepte les{' '}
-                    <button type="button" className="text-emerald-500 font-medium hover:text-emerald-600 transition-colors">CGU</button>{' '}
+                    <button type="button" className="text-emerald-500 font-medium hover:text-emerald-600 transition-colors" onClick={() => toast({ title: 'Conditions Générales d\'Utilisation — bientôt disponibles' })}>CGU</button>{' '}
                     et la{' '}
-                    <button type="button" className="text-emerald-500 font-medium hover:text-emerald-600 transition-colors">Politique de confidentialité</button>
+                    <button type="button" className="text-emerald-500 font-medium hover:text-emerald-600 transition-colors" onClick={() => toast({ title: 'Politique de confidentialité — bientôt disponible' })}>Politique de confidentialité</button>
                   </label>
                 </div>
                 {fieldErrors.terms && <p className="text-xs text-red-500 ml-7">{fieldErrors.terms}</p>}
@@ -392,6 +394,7 @@ export default function RegisterPage() {
               variant="outline"
               className="w-full h-11 border-gray-200 bg-white hover:bg-gray-50 text-gray-700 font-medium text-sm cursor-pointer"
               disabled={isLoading}
+              onClick={() => toast({ title: 'L\'inscription avec Google sera bientôt disponible' })}
             >
               <GoogleIcon />
               Continuer avec Google

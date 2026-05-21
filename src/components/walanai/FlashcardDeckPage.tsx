@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useAppStore } from '@/lib/store'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -271,6 +271,25 @@ export default function FlashcardDeckPage() {
   // Study mode
   const [studyMode, setStudyMode] = useState<StudyMode>('classic')
 
+  // Sorted/ordered cards based on study mode
+  const displayCards = useMemo(() => {
+    if (studyMode === 'spaced') {
+      // Sort by rating: lower ratings (need review) come first
+      const ratingOrder: Record<DifficultyRating | undefined, number> = { revisit: 0, hard: 1, medium: 2, easy: 3, undefined: 4 }
+      return [...cards].sort((a, b) => (ratingOrder[a.difficulty] ?? 4) - (ratingOrder[b.difficulty] ?? 4))
+    } else if (studyMode === 'quick') {
+      // Random shuffle
+      const shuffled = [...cards]
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+      }
+      return shuffled
+    }
+    // Sequential (original order)
+    return cards
+  }, [cards, studyMode])
+
   // Session stats
   const [sessionStats, setSessionStats] = useState<SessionStats>({
     cardsReviewed: 0,
@@ -288,7 +307,7 @@ export default function FlashcardDeckPage() {
   // Session ended
   const [sessionEnded, setSessionEnded] = useState(false)
 
-  const currentCard = cards[currentIndex]
+  const currentCard = displayCards[currentIndex]
   const masteredCount = cards.filter((c) => c.status === 'mastered').length
   const learningCount = cards.filter((c) => c.status === 'learning').length
   const newCount = cards.filter((c) => c.status === 'new').length
@@ -342,16 +361,16 @@ export default function FlashcardDeckPage() {
   )
 
   const handleNext = useCallback(() => {
-    const nextIndex = (currentIndex + 1) % cards.length
+    const nextIndex = (currentIndex + 1) % displayCards.length
     goToCard(nextIndex, 1)
-  }, [currentIndex, cards.length, goToCard])
+  }, [currentIndex, displayCards.length, goToCard])
 
   const handlePrev = useCallback(() => {
-    const prevIndex = (currentIndex - 1 + cards.length) % cards.length
+    const prevIndex = (currentIndex - 1 + displayCards.length) % displayCards.length
     goToCard(prevIndex, -1)
-  }, [currentIndex, cards.length, goToCard])
+  }, [currentIndex, displayCards.length, goToCard])
 
-  const handleRate = (rating: DifficultyRating) => {
+  const handleRate = useCallback((rating: DifficultyRating) => {
     if (hasRated) return
     setHasRated(true)
 
@@ -377,13 +396,13 @@ export default function FlashcardDeckPage() {
         }
       })
     )
-  }
+  }, [hasRated, currentIndex])
 
-  const toggleBookmark = () => {
+  const toggleBookmark = useCallback(() => {
     setCards((prev) =>
       prev.map((card, i) => (i === currentIndex ? { ...card, bookmarked: !card.bookmarked } : card))
     )
-  }
+  }, [currentIndex])
 
   const handleEndSession = () => {
     setSessionEnded(true)
@@ -450,7 +469,7 @@ export default function FlashcardDeckPage() {
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  })
+  }, [handleNext, handlePrev, handleRate, toggleBookmark, isFlipped, hasRated, sessionEnded])
 
   // Estimated time remaining
   const avgTimePerCard = sessionStats.cardsReviewed > 0 ? elapsedTime / sessionStats.cardsReviewed : 30
@@ -680,7 +699,7 @@ export default function FlashcardDeckPage() {
             {/* Card Number Indicator */}
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm text-gray-500 font-medium">
-                Carte {currentIndex + 1}/{cards.length}
+                Carte {currentIndex + 1}/{displayCards.length}
               </span>
               <div className="flex items-center gap-2">
                 {currentCard.bookmarked && (

@@ -1,6 +1,7 @@
 'use client'
 
 import { useAppStore } from '@/lib/store'
+import { useToast } from '@/hooks/use-toast'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -62,12 +63,14 @@ const itemVariants = {
 
 export default function RevisionPage() {
   const { setCurrentPage } = useAppStore()
+  const { toast } = useToast()
   const [currentCardIndex, setCurrentCardIndex] = useState(0)
   const [isFlipped, setIsFlipped] = useState(false)
   const [activeTab, setActiveTab] = useState('flashcards')
+  const [cardStatuses, setCardStatuses] = useState<Record<number, string>>({})
 
   const currentCard = mockFlashcards[currentCardIndex]
-  const masteredCount = mockFlashcards.filter(c => c.status === 'mastered').length
+  const masteredCount = Object.values(cardStatuses).filter((s) => s === 'maitrise').length
   const progress = Math.round((masteredCount / mockFlashcards.length) * 100)
 
   const handleNext = () => {
@@ -101,7 +104,7 @@ export default function RevisionPage() {
             <p className="text-sm text-gray-500">Flashcards & Quiz personnalisés</p>
           </div>
         </div>
-        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2">
+        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2" onClick={() => toast({ title: 'Génération de fiches IA bientôt disponible' })}>
           <Sparkles className="h-4 w-4" />
           Générer des fiches
         </Button>
@@ -112,8 +115,8 @@ export default function RevisionPage() {
         {[
           { label: 'Total fiches', value: mockFlashcards.length, icon: <BookOpen className="h-4 w-4" />, color: 'text-blue-500' },
           { label: 'Maîtrisées', value: masteredCount, icon: <Check className="h-4 w-4" />, color: 'text-emerald-500' },
-          { label: 'À réviser', value: mockFlashcards.filter(c => c.status === 'review').length, icon: <RefreshCw className="h-4 w-4" />, color: 'text-violet-500' },
-          { label: 'Nouvelles', value: mockFlashcards.filter(c => c.status === 'new').length, icon: <Star className="h-4 w-4" />, color: 'text-amber-500' },
+          { label: 'À réviser', value: Object.values(cardStatuses).filter((s) => s === 'arevoir').length, icon: <RefreshCw className="h-4 w-4" />, color: 'text-violet-500' },
+          { label: 'Nouvelles', value: mockFlashcards.filter((c) => !cardStatuses[c.id]).length, icon: <Star className="h-4 w-4" />, color: 'text-amber-500' },
         ].map((stat) => (
           <Card key={stat.label} className="hover:shadow-md transition-shadow">
             <CardContent className="p-4 flex items-center gap-3">
@@ -163,8 +166,8 @@ export default function RevisionPage() {
                   <span className="text-sm text-gray-500">
                     Fiche {currentCardIndex + 1} / {mockFlashcards.length}
                   </span>
-                  <Badge className={statusConfig[currentCard.status].color}>
-                    {statusConfig[currentCard.status].label}
+                  <Badge className={cardStatuses[currentCard.id] === 'difficile' ? 'bg-red-100 text-red-700' : cardStatuses[currentCard.id] === 'arevoir' ? 'bg-violet-100 text-violet-700' : cardStatuses[currentCard.id] === 'maitrise' ? 'bg-emerald-100 text-emerald-700' : statusConfig[currentCard.status].color}>
+                    {cardStatuses[currentCard.id] === 'difficile' ? 'Difficile' : cardStatuses[currentCard.id] === 'arevoir' ? 'À revoir' : cardStatuses[currentCard.id] === 'maitrise' ? 'Maîtrisé' : statusConfig[currentCard.status].label}
                   </Badge>
                 </div>
 
@@ -233,15 +236,15 @@ export default function RevisionPage() {
                     Précédent
                   </Button>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm" className="gap-1.5 text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200">
+                    <Button variant="outline" size="sm" className="gap-1.5 text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200" onClick={() => { setCardStatuses((prev) => ({ ...prev, [currentCard.id]: 'difficile' })); toast({ title: 'Carte marquée comme difficile' }); handleNext() }}>
                       <X className="h-4 w-4" />
                       <span className="hidden sm:inline">Difficile</span>
                     </Button>
-                    <Button variant="outline" size="sm" className="gap-1.5 text-amber-500 hover:text-amber-600 hover:bg-amber-50 border-amber-200">
+                    <Button variant="outline" size="sm" className="gap-1.5 text-amber-500 hover:text-amber-600 hover:bg-amber-50 border-amber-200" onClick={() => { setCardStatuses((prev) => ({ ...prev, [currentCard.id]: 'arevoir' })); toast({ title: 'Carte marquée à revoir' }); handleNext() }}>
                       <RefreshCw className="h-4 w-4" />
                       <span className="hidden sm:inline">À revoir</span>
                     </Button>
-                    <Button size="sm" className="gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white">
+                    <Button size="sm" className="gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white" onClick={() => { setCardStatuses((prev) => ({ ...prev, [currentCard.id]: 'maitrise' })); toast({ title: 'Carte marquée comme maîtrisée ✓' }); handleNext() }}>
                       <Check className="h-4 w-4" />
                       Maîtrisé
                     </Button>
@@ -274,8 +277,8 @@ export default function RevisionPage() {
                           <p className="text-sm font-medium text-gray-900 line-clamp-1">{card.question}</p>
                           <p className="text-xs text-gray-400 mt-1 line-clamp-1">{card.answer}</p>
                         </div>
-                        <Badge className={`shrink-0 ${statusConfig[card.status].color}`}>
-                          {statusConfig[card.status].label}
+                        <Badge className={`shrink-0 ${cardStatuses[card.id] === 'difficile' ? 'bg-red-100 text-red-700' : cardStatuses[card.id] === 'arevoir' ? 'bg-violet-100 text-violet-700' : cardStatuses[card.id] === 'maitrise' ? 'bg-emerald-100 text-emerald-700' : statusConfig[card.status].color}`}>
+                          {cardStatuses[card.id] === 'difficile' ? 'Difficile' : cardStatuses[card.id] === 'arevoir' ? 'À revoir' : cardStatuses[card.id] === 'maitrise' ? 'Maîtrisé' : statusConfig[card.status].label}
                         </Badge>
                       </div>
                     </CardContent>

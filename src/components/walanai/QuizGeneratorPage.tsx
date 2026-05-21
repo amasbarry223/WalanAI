@@ -7,13 +7,6 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Brain,
@@ -24,18 +17,14 @@ import {
   ArrowLeft,
   RotateCcw,
   Sparkles,
-  Trophy,
   Target,
   Zap,
   BookOpen,
   Play,
-  Pause,
   AlertTriangle,
-  ChevronRight,
   History,
   ListChecks,
   Timer,
-  Award,
   BarChart3,
   Loader2,
 } from 'lucide-react'
@@ -391,24 +380,28 @@ export default function QuizGeneratorPage() {
     setTimeout(() => {
       // Filter questions based on config
       let filtered = mockQuestions.filter((q) => {
-        const subjectMatch = config.subject === 'Droit' || q.subject === config.subject
-        const difficultyMatch = config.difficulty === 'Facile' || q.difficulty === config.difficulty
+        const subjectMatch = q.subject === config.subject
+        const difficultyMatch = q.difficulty === config.difficulty
         const typeMatch =
           config.quizType === 'mixte' ||
           q.type === config.quizType
 
-        // For simplicity, show all if subject is general
-        return q.subject === config.subject || config.subject === 'Droit' ? (subjectMatch || true) && (difficultyMatch || true) : true
+        return subjectMatch && difficultyMatch && typeMatch
       })
 
       // For vrai-faux type, convert QCM questions to vrai-faux format
       if (config.quizType === 'vrai-faux') {
-        filtered = filtered.map((q) => ({
-          ...q,
-          type: 'vrai-faux' as const,
-          options: ['Vrai', 'Faux'],
-          correctIndex: q.correctIndex % 2,
-        }))
+        filtered = filtered.map((q) => {
+          // Determine correct answer for vrai-faux based on the actual correct option
+          const correctOption = q.options[q.correctIndex]
+          const isVrai = correctOption === 'Vrai'
+          return {
+            ...q,
+            type: 'vrai-faux' as const,
+            options: ['Vrai', 'Faux'],
+            correctIndex: isVrai ? 0 : 1,
+          }
+        })
       }
 
       // Take the requested number of questions

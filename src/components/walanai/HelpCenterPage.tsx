@@ -10,6 +10,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
+import { useToast } from '@/hooks/use-toast'
 import { motion } from 'framer-motion'
 import {
   ArrowLeft,
@@ -27,6 +28,7 @@ import {
   ExternalLink,
   Sparkles,
 } from 'lucide-react'
+import { useState } from 'react'
 
 const faqItems = [
   {
@@ -66,10 +68,10 @@ const faqItems = [
 ]
 
 const helpLinks = [
-  { title: 'Guide de démarrage', description: 'Apprenez les bases de WalanAI en 5 minutes', icon: <BookOpen className="h-5 w-5" />, color: 'text-blue-500 bg-blue-50' },
-  { title: 'Importer des documents', description: 'Comment téléverser vos cours', icon: <FileText className="h-5 w-5" />, color: 'text-emerald-500 bg-emerald-50' },
-  { title: 'Utiliser les flashcards', description: 'Optimisez votre révision avec le SRS', icon: <Brain className="h-5 w-5" />, color: 'text-violet-500 bg-violet-50' },
-  { title: 'Assistant IA', description: 'Tirez le meilleur de votre assistant', icon: <Bot className="h-5 w-5" />, color: 'text-amber-500 bg-amber-50' },
+  { title: 'Guide de démarrage', description: 'Apprenez les bases de WalanAI en 5 minutes', icon: <BookOpen className="h-5 w-5" />, color: 'text-blue-500 bg-blue-50', category: 'Documents' },
+  { title: 'Importer des documents', description: 'Comment téléverser vos cours', icon: <FileText className="h-5 w-5" />, color: 'text-emerald-500 bg-emerald-50', category: 'Documents' },
+  { title: 'Utiliser les flashcards', description: 'Optimisez votre révision avec le SRS', icon: <Brain className="h-5 w-5" />, color: 'text-violet-500 bg-violet-50', category: 'IA & Génération' },
+  { title: 'Assistant IA', description: 'Tirez le meilleur de votre assistant', icon: <Bot className="h-5 w-5" />, color: 'text-amber-500 bg-amber-50', category: 'IA & Génération' },
 ]
 
 const containerVariants = {
@@ -84,6 +86,19 @@ const itemVariants = {
 
 export default function HelpCenterPage() {
   const { setCurrentPage } = useAppStore()
+  const { toast } = useToast()
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const filteredFaqItems = faqItems
+    .map((category) => {
+      const filteredQuestions = category.questions.filter(
+        (item) =>
+          item.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.a.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      return { ...category, questions: filteredQuestions }
+    })
+    .filter((category) => category.questions.length > 0)
 
   return (
     <motion.div
@@ -113,6 +128,8 @@ export default function HelpCenterPage() {
           <Input
             placeholder="Rechercher dans l'aide..."
             className="pl-12 h-12 text-base bg-white border-gray-200 rounded-xl"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
       </motion.div>
@@ -120,7 +137,11 @@ export default function HelpCenterPage() {
       {/* Quick links */}
       <motion.div variants={itemVariants} className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
         {helpLinks.map((link) => (
-          <Card key={link.title} className="hover:shadow-md transition-shadow cursor-pointer group">
+          <Card
+            key={link.title}
+            className="hover:shadow-md transition-shadow cursor-pointer group"
+            onClick={() => toast({ title: link.title })}
+          >
             <CardContent className="p-4 text-center">
               <div className={`inline-flex p-2.5 rounded-lg ${link.color} mb-2 group-hover:scale-110 transition-transform`}>
                 {link.icon}
@@ -136,30 +157,38 @@ export default function HelpCenterPage() {
       <motion.div variants={itemVariants}>
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Questions fréquentes</h2>
         <div className="space-y-4">
-          {faqItems.map((category) => (
-            <Card key={category.category} className="hover:shadow-md transition-shadow">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  {category.icon}
-                  {category.category}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Accordion type="single" collapsible className="w-full">
-                  {category.questions.map((item, index) => (
-                    <AccordionItem key={index} value={`${category.category}-${index}`} className="border-b-0">
-                      <AccordionTrigger className="text-sm text-gray-700 hover:text-emerald-600 py-3 text-left">
-                        {item.q}
-                      </AccordionTrigger>
-                      <AccordionContent className="text-sm text-gray-500 pb-3">
-                        {item.a}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
+          {filteredFaqItems.length === 0 ? (
+            <Card className="hover:shadow-md transition-shadow">
+              <CardContent className="p-6 text-center text-gray-500">
+                Aucun résultat trouvé pour &laquo;{searchQuery}&raquo;
               </CardContent>
             </Card>
-          ))}
+          ) : (
+            filteredFaqItems.map((category) => (
+              <Card key={category.category} className="hover:shadow-md transition-shadow">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    {category.icon}
+                    {category.category}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Accordion type="single" collapsible className="w-full">
+                    {category.questions.map((item, index) => (
+                      <AccordionItem key={index} value={`${category.category}-${index}`} className="border-b-0">
+                        <AccordionTrigger className="text-sm text-gray-700 hover:text-emerald-600 py-3 text-left">
+                          {item.q}
+                        </AccordionTrigger>
+                        <AccordionContent className="text-sm text-gray-500 pb-3">
+                          {item.a}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
       </motion.div>
 
@@ -173,11 +202,18 @@ export default function HelpCenterPage() {
               Notre équipe est là pour vous aider
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button className="bg-white text-emerald-600 hover:bg-emerald-50 gap-2">
+              <Button
+                className="bg-white text-emerald-600 hover:bg-emerald-50 gap-2"
+                onClick={() => toast({ title: 'Le chat support sera bientôt disponible' })}
+              >
                 <MessageCircle className="h-4 w-4" />
                 Contacter le support
               </Button>
-              <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 gap-2">
+              <Button
+                variant="outline"
+                className="border-white/30 text-white hover:bg-white/10 gap-2"
+                onClick={() => window.open('mailto:support@walanai.fr', '_blank')}
+              >
                 <Mail className="h-4 w-4" />
                 Envoyer un email
               </Button>
