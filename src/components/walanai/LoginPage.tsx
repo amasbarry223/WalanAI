@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Mail,
@@ -14,6 +15,8 @@ import {
   ArrowLeft,
 } from 'lucide-react'
 import { useAppStore } from '@/lib/store'
+import { authenticateUser } from '@/lib/local-auth'
+import { useAuthNavigation } from '@/hooks/use-auth-navigation'
 import { useToast } from '@/hooks/use-toast'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -33,7 +36,9 @@ const GoogleIcon = () => (
 // ─── Main Component ───────────────────────────────────────────
 
 export default function LoginPage() {
-  const { login, setCurrentPage } = useAppStore()
+  const router = useRouter()
+  const { login } = useAppStore()
+  const { goTo } = useAuthNavigation()
   const { toast } = useToast()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -66,25 +71,21 @@ export default function LoginPage() {
 
     setIsLoading(true)
 
-    // Simulate network delay for UX
-    await new Promise((r) => setTimeout(r, 800))
+    await new Promise((r) => setTimeout(r, 500))
 
-    // Frontend-only: simulate login with form data
-    const nameFromEmail = email.trim().split('@')[0]
-    const capitalizedName = nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1)
-    const lowerEmail = email.trim().toLowerCase()
+    const result = authenticateUser(email, password)
+    if (!result.ok) {
+      setError(
+        result.error.includes('Aucun compte')
+          ? `${result.error} Utilisez « Créer un compte » ci-dessous.`
+          : result.error
+      )
+      setIsLoading(false)
+      return
+    }
 
-    // Detect admin role based on email
-    const isAdmin = lowerEmail.includes('admin') || lowerEmail === 'admin@walanai.fr'
-    const isSuperAdmin = lowerEmail === 'admin@walanai.fr'
-
-    login({
-      name: isAdmin ? 'Admin WalanAI' : capitalizedName,
-      email: lowerEmail,
-      plan: isAdmin ? 'pro' : 'gratuit',
-      role: isSuperAdmin ? 'super-admin' : isAdmin ? 'admin' : 'etudiant',
-    })
-
+    login(result.user, { onboardingCompleted: result.onboardingCompleted })
+    router.replace('/')
     setIsLoading(false)
   }
 
@@ -112,7 +113,7 @@ export default function LoginPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
-        onClick={() => setCurrentPage('landing')}
+        onClick={() => goTo('landing')}
         className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 transition-colors mb-4 cursor-pointer"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
@@ -202,7 +203,7 @@ export default function LoginPage() {
               <div className="flex justify-end">
                 <button
                   type="button"
-                  onClick={() => setCurrentPage('forgot-password')}
+                  onClick={() => goTo('forgot-password')}
                   className="text-sm font-medium text-emerald-500 hover:text-emerald-600 transition-colors cursor-pointer"
                 >
                   Mot de passe oublié ?
@@ -255,7 +256,7 @@ export default function LoginPage() {
               Pas encore de compte ?{' '}
               <button
                 type="button"
-                onClick={() => setCurrentPage('register')}
+                onClick={() => goTo('register')}
                 className="font-semibold text-emerald-500 hover:text-emerald-600 transition-colors"
               >
                 Créer un compte

@@ -3,5 +3,9 @@
 import AppLayout from '@/components/walanai/AppLayout'
 
 export default function Home() {
-  return <AppLayout />
+  return (
+    <div className="min-h-screen h-full">
+      <AppLayout />
+    </div>
+  )
 }

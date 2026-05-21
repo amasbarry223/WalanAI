@@ -344,7 +344,10 @@ export default function PricingPage() {
                       disabled={currentPlan === 'pro'}
                       onClick={() => {
                         if (currentPlan !== 'pro') {
-                          toast({ title: 'Merci de votre intérêt ! Le paiement sera bientôt disponible.' })
+                          toast({
+                            title: 'Plan Pro activé (démo locale)',
+                            description: 'Sans backend : votre abonnement est enregistré dans le navigateur.',
+                          })
                           updateUserPlan('pro')
                         }
                       }}

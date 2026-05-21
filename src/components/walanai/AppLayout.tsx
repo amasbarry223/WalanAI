@@ -1,7 +1,9 @@
 'use client'
 
+import { getAdminSettings, isMaintenanceMode } from '@/lib/admin-store'
 import { useAppStore } from '@/lib/store'
-import { useState, useSyncExternalStore, useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import { useHydrated } from '@/hooks/use-hydrated'
 import Sidebar, { MobileSidebar, MobileHeader } from './Sidebar'
 import LandingPage from './LandingPage'
 import LoginPage from './LoginPage'
@@ -28,16 +30,6 @@ import StudyCoachPage from './StudyCoachPage'
 import ExamTrackerPage from './ExamTrackerPage'
 import FlashcardDeckPage from './FlashcardDeckPage'
 
-const emptySubscribe = () => () => {}
-
-function useHydrated() {
-  return useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false
-  )
-}
-
 export default function AppLayout() {
   const { currentPage, isAuthenticated, isAdminMode, exitAdminMode } = useAppStore()
   const mounted = useHydrated()
@@ -62,22 +54,42 @@ export default function AppLayout() {
     )
   }
 
+  if (isMaintenanceMode()) {
+    const settings = getAdminSettings()
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-900 p-6">
+        <div className="max-w-md text-center text-white space-y-4">
+          <div className="mx-auto h-12 w-12 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400 text-xl font-bold">
+            !
+          </div>
+          <h1 className="text-xl font-bold">Maintenance en cours</h1>
+          <p className="text-slate-400 text-sm leading-relaxed">
+            {settings.maintenanceMessage}
+          </p>
+          <p className="text-xs text-slate-500">
+            Le back-office reste accessible sur /admin
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   // Landing page (no sidebar, no auth required)
   if (currentPage === 'landing') {
     return <LandingPage />
   }
 
-  // Auth pages (no sidebar)
-  if (!isAuthenticated || currentPage === 'login') {
-    return <LoginPage />
-  }
-
+  // Auth pages (no sidebar) — avant la garde login générique
   if (currentPage === 'register') {
     return <RegisterPage />
   }
 
   if (currentPage === 'forgot-password') {
     return <ForgotPasswordPage />
+  }
+
+  if (!isAuthenticated || currentPage === 'login') {
+    return <LoginPage />
   }
 
   if (currentPage === 'onboarding') {

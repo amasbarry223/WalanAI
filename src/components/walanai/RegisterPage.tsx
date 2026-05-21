@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Mail,
@@ -17,6 +18,8 @@ import {
   ArrowLeft,
 } from 'lucide-react'
 import { useAppStore } from '@/lib/store'
+import { authenticateUser, registerAccount } from '@/lib/local-auth'
+import { useAuthNavigation } from '@/hooks/use-auth-navigation'
 import { useToast } from '@/hooks/use-toast'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -82,7 +85,9 @@ function ValidationCheck({ valid, label }: { valid: boolean; label: string }) {
 // ─── Main Component ───────────────────────────────────────────
 
 export default function RegisterPage() {
-  const { login, setCurrentPage } = useAppStore()
+  const router = useRouter()
+  const { login } = useAppStore()
+  const { goTo } = useAuthNavigation()
   const { toast } = useToast()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -137,18 +142,30 @@ export default function RegisterPage() {
 
     setIsLoading(true)
 
-    // Simulate network delay for UX
-    await new Promise((r) => setTimeout(r, 1000))
+    await new Promise((r) => setTimeout(r, 600))
 
-    // Frontend-only: simulate registration with form data
-    login({
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      plan: 'gratuit',
-      role: 'etudiant',
-    })
+    const registered = registerAccount({ name, email, password })
+    if (!registered.ok) {
+      setError(registered.error)
+      setIsLoading(false)
+      return
+    }
 
+    const auth = authenticateUser(email, password)
+    if (!auth.ok) {
+      setError(auth.error)
+      setIsLoading(false)
+      return
+    }
+
+    login(auth.user, { onboardingCompleted: false })
+    toast({ title: 'Compte créé', description: 'Bienvenue sur WalanAI !' })
+    router.replace('/')
     setIsLoading(false)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') handleSubmit()
   }
 
   return (
@@ -171,7 +188,7 @@ export default function RegisterPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
-        onClick={() => setCurrentPage('landing')}
+        onClick={() => goTo('landing')}
         className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 transition-colors mb-4 cursor-pointer"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
@@ -313,6 +330,7 @@ export default function RegisterPage() {
                     placeholder="Retapez votre mot de passe"
                     value={confirmPassword}
                     onChange={(e) => { setConfirmPassword(e.target.value); setFieldErrors((p) => ({ ...p, confirmPassword: '' })) }}
+                    onKeyDown={handleKeyDown}
                     className={`pl-10 pr-10 h-11 bg-gray-50/50 ${
                       fieldErrors.confirmPassword ? 'border-red-300 focus-visible:border-red-500 focus-visible:ring-red-500/20' : 'border-gray-200 focus-visible:border-emerald-500 focus-visible:ring-emerald-500/20'
                     }`}
@@ -405,7 +423,7 @@ export default function RegisterPage() {
               Déjà un compte ?{' '}
               <button
                 type="button"
-                onClick={() => setCurrentPage('login')}
+                onClick={() => goTo('login')}
                 className="font-semibold text-emerald-500 hover:text-emerald-600 transition-colors"
               >
                 Se connecter

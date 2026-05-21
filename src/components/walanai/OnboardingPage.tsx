@@ -723,7 +723,7 @@ function ReadyStep({
 // ── Main Component ───────────────────────────────────────────────────────────
 
 export default function OnboardingPage() {
-  const { setCurrentPage, user } = useAppStore()
+  const { user, completeOnboarding } = useAppStore()
 
   const [currentStep, setCurrentStep] = useState<Step>(1)
   const [selectedSubjects, setSelectedSubjects] = useState<Set<string>>(new Set())
@@ -780,11 +780,11 @@ export default function OnboardingPage() {
   }
 
   const handleSkip = () => {
-    setCurrentPage('dashboard')
+    completeOnboarding()
   }
 
   const handleFinish = () => {
-    setCurrentPage('dashboard')
+    completeOnboarding()
   }
 
   // ── Confetti cleanup ──

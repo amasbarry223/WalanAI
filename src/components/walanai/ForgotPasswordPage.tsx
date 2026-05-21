@@ -16,7 +16,13 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react'
-import { useAppStore } from '@/lib/store'
+import {
+  accountExists,
+  issuePasswordResetCode,
+  resetAccountPassword,
+  verifyPasswordResetCode,
+} from '@/lib/local-auth'
+import { useAuthNavigation } from '@/hooks/use-auth-navigation'
 import { useToast } from '@/hooks/use-toast'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -24,11 +30,8 @@ import { Card, CardContent } from '@/components/ui/card'
 
 type Step = 'email' | 'code' | 'password' | 'success'
 
-// ─── Simulated verification code ──────────────────────────────
-const SIMULATED_CODE = '847291'
-
 export default function ForgotPasswordPage() {
-  const { setCurrentPage } = useAppStore()
+  const { goTo } = useAuthNavigation()
   const { toast } = useToast()
 
   // Step management
@@ -53,6 +56,7 @@ export default function ForgotPasswordPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [passwordErrors, setPasswordErrors] = useState<Record<string, string>>({})
   const [isResetting, setIsResetting] = useState(false)
+  const [demoResetCode, setDemoResetCode] = useState<string | null>(null)
 
   // Resend cooldown timer
   useEffect(() => {
@@ -80,15 +84,23 @@ export default function ForgotPasswordPage() {
     if (!validateEmail()) return
 
     setIsSendingEmail(true)
-    await new Promise((r) => setTimeout(r, 1200))
+    await new Promise((r) => setTimeout(r, 600))
 
+    const issued = issuePasswordResetCode(email)
+    if (!issued.ok) {
+      setEmailError(issued.error)
+      setIsSendingEmail(false)
+      return
+    }
+
+    setDemoResetCode(issued.code)
     setStep('code')
     setIsSendingEmail(false)
     setResendCooldown(30)
 
     toast({
-      title: 'Code envoyé',
-      description: `Un code de vérification a été envoyé à ${email}`,
+      title: 'Code généré (mode démo)',
+      description: `Code affiché à l'écran — en production il serait envoyé par email.`,
     })
   }
 
@@ -137,8 +149,8 @@ export default function ForgotPasswordPage() {
     setIsVerifyingCode(true)
     await new Promise((r) => setTimeout(r, 1000))
 
-    if (fullCode !== SIMULATED_CODE) {
-      setCodeError('Code incorrect. Veuillez réessayer.')
+    if (!verifyPasswordResetCode(email, fullCode)) {
+      setCodeError('Code incorrect ou expiré. Veuillez réessayer.')
       setIsVerifyingCode(false)
       return
     }
@@ -149,13 +161,15 @@ export default function ForgotPasswordPage() {
 
   const handleResendCode = async () => {
     if (resendCooldown > 0) return
+    const issued = issuePasswordResetCode(email)
+    if (issued.ok) setDemoResetCode(issued.code)
     setResendCooldown(30)
     setCode(['', '', '', '', '', ''])
     setCodeError('')
 
     toast({
-      title: 'Code renvoyé',
-      description: 'Un nouveau code de vérification a été envoyé.',
+      title: 'Nouveau code généré',
+      description: 'Le code de démo a été régénéré.',
     })
   }
 
@@ -188,7 +202,14 @@ export default function ForgotPasswordPage() {
     if (!validatePassword()) return
 
     setIsResetting(true)
-    await new Promise((r) => setTimeout(r, 1200))
+    await new Promise((r) => setTimeout(r, 600))
+
+    const reset = resetAccountPassword(email, newPassword)
+    if (!reset.ok) {
+      setPasswordErrors({ newPassword: reset.error })
+      setIsResetting(false)
+      return
+    }
 
     setStep('success')
     setIsResetting(false)
@@ -250,7 +271,7 @@ export default function ForgotPasswordPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
-        onClick={() => setCurrentPage('login')}
+        onClick={() => goTo('login')}
         className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 transition-colors mb-4 cursor-pointer"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
@@ -297,7 +318,7 @@ export default function ForgotPasswordPage() {
                   </div>
 
                   <Button
-                    onClick={() => setCurrentPage('login')}
+                    onClick={() => goTo('login')}
                     className="w-full h-11 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold text-sm shadow-lg shadow-emerald-200/50 cursor-pointer"
                   >
                     Se connecter
@@ -392,7 +413,20 @@ export default function ForgotPasswordPage() {
                               autoFocus
                             />
                           </div>
-                          {emailError && <p className="text-xs text-red-500">{emailError}</p>}
+                          {emailError && (
+                            <div className="space-y-2">
+                              <p className="text-xs text-red-500">{emailError}</p>
+                              {emailError.includes('Aucun compte') && (
+                                <button
+                                  type="button"
+                                  onClick={() => goTo('register')}
+                                  className="text-xs font-semibold text-emerald-600 hover:text-emerald-700"
+                                >
+                                  Créer un compte →
+                                </button>
+                              )}
+                            </div>
+                          )}
                         </div>
 
                         {/* Submit */}
@@ -414,12 +448,16 @@ export default function ForgotPasswordPage() {
                           )}
                         </Button>
 
-                        {/* Info box */}
-                        <div className="rounded-lg bg-blue-50 border border-blue-200 p-3">
-                          <p className="text-xs text-blue-700 leading-relaxed">
-                            <strong>Démo :</strong> Le code de vérification est <code className="font-mono bg-blue-100 px-1 py-0.5 rounded text-blue-800 font-bold">{SIMULATED_CODE}</code>
-                          </p>
-                        </div>
+                        <p className="text-center text-sm text-gray-500">
+                          Pas encore de compte ?{' '}
+                          <button
+                            type="button"
+                            onClick={() => goTo('register')}
+                            className="font-semibold text-emerald-500 hover:text-emerald-600"
+                          >
+                            Créer un compte
+                          </button>
+                        </p>
                       </motion.div>
                     )}
 
@@ -443,9 +481,18 @@ export default function ForgotPasswordPage() {
                         <div className="text-center space-y-1.5">
                           <h1 className="text-2xl font-bold text-gray-900">Vérification</h1>
                           <p className="text-sm text-gray-500">
-                            Entrez le code à 6 chiffres envoyé à <span className="font-semibold text-gray-700">{email}</span>
+                            Entrez le code à 6 chiffres (mode démo : affiché ci-dessous)
                           </p>
                         </div>
+
+                        {demoResetCode && (
+                          <div className="rounded-lg bg-blue-50 border border-blue-200 p-3 text-center">
+                            <p className="text-xs text-blue-700">
+                              <strong>Votre code :</strong>{' '}
+                              <code className="font-mono font-bold text-blue-900">{demoResetCode}</code>
+                            </p>
+                          </div>
+                        )}
 
                         {/* Code inputs */}
                         <div className="flex justify-center gap-2">

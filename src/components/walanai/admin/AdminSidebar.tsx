@@ -74,7 +74,7 @@ const adminNavItems: AdminNavItem[] = [
     icon: <Headphones className="h-4 w-4" />,
   },
   {
-    label: 'Configuration',
+    label: 'Paramètres',
     page: 'admin-settings',
     icon: <Settings className="h-4 w-4" />,
     section: 'SYSTÈME',

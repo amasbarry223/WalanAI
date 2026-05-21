@@ -18,9 +18,6 @@ export const metadata: Metadata = {
   description: "Transformez vos documents de cours en outils de révision personnalisés grâce à l'IA. Résumés, flashcards, quiz et assistant conversationnel.",
   keywords: ["WalanAI", "révision", "IA", "flashcards", "quiz", "étudiants", "apprentissage"],
   authors: [{ name: "WalanAI Team" }],
-  icons: {
-    icon: "/favicon.ico",
-  },
 };
 
 export default function RootLayout({

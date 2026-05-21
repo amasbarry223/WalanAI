@@ -15,6 +15,8 @@ import {
   Shield,
 } from 'lucide-react'
 import { useAppStore } from '@/lib/store'
+import { authenticateUser } from '@/lib/local-auth'
+import { SUPER_ADMIN_EMAIL, SUPER_ADMIN_PASSWORD } from '@/lib/auth'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -57,32 +59,20 @@ export default function AdminLoginPage() {
     // Simulate network delay
     await new Promise((r) => setTimeout(r, 800))
 
-    const lowerEmail = email.trim().toLowerCase()
-
-    // Only allow admin emails
-    const isAdmin = lowerEmail.includes('admin') || lowerEmail === 'admin@walanai.fr'
-
-    if (!isAdmin) {
-      setError('Accès réservé aux administrateurs. Utilisez un compte admin.')
+    const result = authenticateUser(email, password)
+    if (!result.ok) {
+      setError(result.error)
       setIsLoading(false)
       return
     }
 
-    const isSuperAdmin = lowerEmail === 'admin@walanai.fr'
-
-    // Validate specific admin credentials
-    if (isSuperAdmin && password !== 'admin2024') {
-      setError('Identifiants invalides. Vérifiez votre email et mot de passe.')
+    if (result.user.role !== 'admin' && result.user.role !== 'super-admin') {
+      setError(`Accès réservé aux administrateurs. Utilisez ${SUPER_ADMIN_EMAIL}.`)
       setIsLoading(false)
       return
     }
 
-    login({
-      name: isSuperAdmin ? 'Admin WalanAI' : 'Admin',
-      email: lowerEmail,
-      plan: 'pro',
-      role: isSuperAdmin ? 'super-admin' : 'admin',
-    })
+    login(result.user, { onboardingCompleted: true })
 
     // Auto-enter admin mode after login
     setTimeout(() => {
@@ -166,7 +156,7 @@ export default function AdminLoginPage() {
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                   <Input
                     type="email"
-                    placeholder="admin@walanai.fr"
+                    placeholder="barry@walanai.com"
                     value={email}
                     onChange={(e) => { setEmail(e.target.value); setFieldErrors((p) => ({ ...p, email: '' })) }}
                     onKeyDown={handleKeyDown}
@@ -227,10 +217,13 @@ export default function AdminLoginPage() {
             </div>
 
             {/* Hint */}
-            <div className="p-3 rounded-lg bg-slate-700/30 border border-slate-600/30">
+            <div className="p-3 rounded-lg bg-slate-700/30 border border-slate-600/30 space-y-1">
               <p className="text-xs text-slate-400 text-center">
                 <Shield className="h-3 w-3 inline mr-1 text-amber-400" />
                 Accès réservé aux administrateurs de la plateforme
+              </p>
+              <p className="text-[11px] text-slate-500 text-center font-mono">
+                {SUPER_ADMIN_EMAIL} · mot de passe : {SUPER_ADMIN_PASSWORD}
               </p>
             </div>
           </CardContent>

@@ -1,19 +1,10 @@
 'use client'
 
-import { useEffect, useSyncExternalStore } from 'react'
+import { useEffect } from 'react'
 import { useAppStore } from '@/lib/store'
+import { useHydrated } from '@/hooks/use-hydrated'
 import AdminLayout from '@/components/walanai/admin/AdminLayout'
 import AdminLoginPage from '@/components/walanai/admin/AdminLoginPage'
-
-const emptySubscribe = () => () => {}
-
-function useHydrated() {
-  return useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false
-  )
-}
 
 export default function AdminPage() {
   const { isAuthenticated, isAdminMode, enterAdminMode, user } = useAppStore()
@@ -35,7 +26,7 @@ export default function AdminPage() {
 
   if (!mounted) {
     return (
-      <div className="flex h-screen items-center justify-center bg-slate-900">
+      <div className="flex min-h-screen items-center justify-center bg-slate-900">
         <div className="flex flex-col items-center gap-3">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
           <p className="text-sm text-slate-400">Chargement du back-office...</p>

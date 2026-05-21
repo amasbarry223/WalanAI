@@ -1,6 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import {
+  getAdminSettings,
+  getAuditLog,
+  updateAdminSettings,
+} from '@/lib/admin-store'
+import { downloadCsv } from '@/lib/download'
 import { motion } from 'framer-motion'
 import {
   Settings,
@@ -69,7 +75,7 @@ const itemVariants = {
 // ─── Audit Types & Data ─────────────────────────────────────────────────────
 
 type ActionType = 'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT'
-type EntityType = 'Utilisateur' | 'Document' | 'Abonnement' | 'Configuration'
+type EntityType = 'Utilisateur' | 'Document' | 'Abonnement' | 'Paramètres'
 
 interface AuditEntry {
   id: string
@@ -84,24 +90,24 @@ interface AuditEntry {
 }
 
 const mockAuditLog: AuditEntry[] = [
-  { id: '1', timestamp: '04 Mar 2026 14:32', userName: 'Admin Principal', userInitials: 'AP', action: 'LOGIN', entity: 'Configuration', entityId: 'CFG-001', details: 'Connexion administrateur', ip: '192.168.1.10' },
+  { id: '1', timestamp: '04 Mar 2026 14:32', userName: 'Admin Principal', userInitials: 'AP', action: 'LOGIN', entity: 'Paramètres', entityId: 'CFG-001', details: 'Connexion administrateur', ip: '192.168.1.10' },
   { id: '2', timestamp: '04 Mar 2026 14:35', userName: 'Admin Principal', userInitials: 'AP', action: 'CREATE', entity: 'Utilisateur', entityId: 'USR-247', details: "Création d'un nouveau compte utilisateur", ip: '192.168.1.10' },
   { id: '3', timestamp: '04 Mar 2026 13:18', userName: 'Marie Laurent', userInitials: 'ML', action: 'UPDATE', entity: 'Abonnement', entityId: 'SUB-089', details: "Modification du plan de l'utilisateur Lucas Martin vers Pro", ip: '192.168.1.42' },
   { id: '4', timestamp: '04 Mar 2026 12:55', userName: 'Admin Principal', userInitials: 'AP', action: 'DELETE', entity: 'Document', entityId: 'DOC-512', details: "Suppression d'un document", ip: '192.168.1.10' },
-  { id: '5', timestamp: '04 Mar 2026 11:40', userName: 'Marie Laurent', userInitials: 'ML', action: 'UPDATE', entity: 'Configuration', entityId: 'CFG-003', details: 'Modification de la configuration plateforme', ip: '192.168.1.42' },
+  { id: '5', timestamp: '04 Mar 2026 11:40', userName: 'Marie Laurent', userInitials: 'ML', action: 'UPDATE', entity: 'Paramètres', entityId: 'CFG-003', details: 'Modification de la configuration plateforme', ip: '192.168.1.42' },
   { id: '6', timestamp: '04 Mar 2026 10:22', userName: 'Admin Principal', userInitials: 'AP', action: 'UPDATE', entity: 'Abonnement', entityId: 'SUB-001', details: 'Mise à jour des limites du plan Gratuit', ip: '192.168.1.10' },
-  { id: '7', timestamp: '04 Mar 2026 09:15', userName: 'Marie Laurent', userInitials: 'ML', action: 'LOGIN', entity: 'Configuration', entityId: 'CFG-001', details: 'Connexion administrateur', ip: '192.168.1.42' },
-  { id: '8', timestamp: '03 Mar 2026 18:45', userName: 'Admin Principal', userInitials: 'AP', action: 'LOGOUT', entity: 'Configuration', entityId: 'CFG-001', details: 'Déconnexion administrateur', ip: '192.168.1.10' },
+  { id: '7', timestamp: '04 Mar 2026 09:15', userName: 'Marie Laurent', userInitials: 'ML', action: 'LOGIN', entity: 'Paramètres', entityId: 'CFG-001', details: 'Connexion administrateur', ip: '192.168.1.42' },
+  { id: '8', timestamp: '03 Mar 2026 18:45', userName: 'Admin Principal', userInitials: 'AP', action: 'LOGOUT', entity: 'Paramètres', entityId: 'CFG-001', details: 'Déconnexion administrateur', ip: '192.168.1.10' },
   { id: '9', timestamp: '03 Mar 2026 17:30', userName: 'Marie Laurent', userInitials: 'ML', action: 'CREATE', entity: 'Document', entityId: 'DOC-534', details: "Création d'un document de modèle de quiz", ip: '192.168.1.42' },
   { id: '10', timestamp: '03 Mar 2026 16:12', userName: 'Admin Principal', userInitials: 'AP', action: 'UPDATE', entity: 'Utilisateur', entityId: 'USR-198', details: "Modification du rôle de l'utilisateur Sarah Klein", ip: '192.168.1.10' },
   { id: '11', timestamp: '03 Mar 2026 15:08', userName: 'Marie Laurent', userInitials: 'ML', action: 'DELETE', entity: 'Document', entityId: 'DOC-498', details: "Suppression d'un document obsolète", ip: '192.168.1.42' },
   { id: '12', timestamp: '03 Mar 2026 14:33', userName: 'Admin Principal', userInitials: 'AP', action: 'CREATE', entity: 'Utilisateur', entityId: 'USR-248', details: "Création d'un nouveau compte administrateur", ip: '192.168.1.10' },
   { id: '13', timestamp: '03 Mar 2026 13:20', userName: 'Marie Laurent', userInitials: 'ML', action: 'UPDATE', entity: 'Abonnement', entityId: 'SUB-045', details: 'Mise à jour du tarif du plan Pro', ip: '192.168.1.42' },
-  { id: '14', timestamp: '03 Mar 2026 11:55', userName: 'Admin Principal', userInitials: 'AP', action: 'LOGIN', entity: 'Configuration', entityId: 'CFG-001', details: 'Connexion administrateur', ip: '192.168.1.10' },
+  { id: '14', timestamp: '03 Mar 2026 11:55', userName: 'Admin Principal', userInitials: 'AP', action: 'LOGIN', entity: 'Paramètres', entityId: 'CFG-001', details: 'Connexion administrateur', ip: '192.168.1.10' },
   { id: '15', timestamp: '02 Mar 2026 17:40', userName: 'Admin Principal', userInitials: 'AP', action: 'DELETE', entity: 'Utilisateur', entityId: 'USR-112', details: "Suppression du compte utilisateur inactif Pierre Vidal", ip: '192.168.1.10' },
-  { id: '16', timestamp: '02 Mar 2026 16:22', userName: 'Marie Laurent', userInitials: 'ML', action: 'UPDATE', entity: 'Configuration', entityId: 'CFG-007', details: 'Modification des paramètres de notification par email', ip: '192.168.1.42' },
+  { id: '16', timestamp: '02 Mar 2026 16:22', userName: 'Marie Laurent', userInitials: 'ML', action: 'UPDATE', entity: 'Paramètres', entityId: 'CFG-007', details: 'Modification des paramètres de notification par email', ip: '192.168.1.42' },
   { id: '17', timestamp: '02 Mar 2026 14:10', userName: 'Admin Principal', userInitials: 'AP', action: 'CREATE', entity: 'Abonnement', entityId: 'SUB-090', details: "Création d'un code promotionnel pour le plan Pro", ip: '192.168.1.10' },
-  { id: '18', timestamp: '02 Mar 2026 10:05', userName: 'Marie Laurent', userInitials: 'ML', action: 'LOGOUT', entity: 'Configuration', entityId: 'CFG-001', details: 'Déconnexion administrateur', ip: '192.168.1.42' },
+  { id: '18', timestamp: '02 Mar 2026 10:05', userName: 'Marie Laurent', userInitials: 'ML', action: 'LOGOUT', entity: 'Paramètres', entityId: 'CFG-001', details: 'Déconnexion administrateur', ip: '192.168.1.42' },
 ]
 
 const actionBadgeMap: Record<ActionType, { label: string; className: string }> = {
@@ -116,7 +122,7 @@ const entityBadgeMap: Record<EntityType, string> = {
   Utilisateur: 'bg-sky-100 text-sky-700 border-0',
   Document: 'bg-amber-100 text-amber-700 border-0',
   Abonnement: 'bg-fuchsia-100 text-fuchsia-700 border-0',
-  Configuration: 'bg-slate-100 text-slate-600 border-0',
+  Paramètres: 'bg-slate-100 text-slate-600 border-0',
 }
 
 // ─── Security Session Mock ───────────────────────────────────────────────────
@@ -192,6 +198,29 @@ export default function AdminSettingsPage() {
   const [maintenanceConfirmOpen, setMaintenanceConfirmOpen] = useState(false)
   const [pendingMaintenance, setPendingMaintenance] = useState(false)
 
+  useEffect(() => {
+    const s = getAdminSettings()
+    setPlatformName(s.platformName)
+    setMaintenanceMode(s.maintenanceMode)
+    setMaintenanceMessage(s.maintenanceMessage)
+  }, [])
+
+  const auditEntries = useMemo(() => {
+    const logs = getAuditLog()
+    const mapped = logs.map((e) => ({
+      id: e.id,
+      timestamp: new Date(e.timestamp).toLocaleString('fr-FR'),
+      userName: e.actorEmail,
+      userInitials: e.actorEmail.slice(0, 2).toUpperCase(),
+      action: e.action.toUpperCase() as ActionType,
+      entity: (e.entity.charAt(0).toUpperCase() + e.entity.slice(1)) as EntityType,
+      entityId: e.id,
+      details: e.details,
+      ip: 'local',
+    }))
+    return mapped.length > 0 ? mapped : mockAuditLog
+  }, [maintenanceMode])
+
   // ── Audit ──
   const [searchQuery, setSearchQuery] = useState('')
   const [actionFilter, setActionFilter] = useState<string>('all')
@@ -208,7 +237,14 @@ export default function AdminSettingsPage() {
   }
 
   const handleSave = () => {
-    toast({ title: 'Configuration enregistrée', description: 'Les paramètres de la plateforme ont été mis à jour avec succès.' })
+    updateAdminSettings({
+      platformName: platformName.trim() || 'WalanAI',
+      maintenanceMessage: maintenanceMessage.trim() || getAdminSettings().maintenanceMessage,
+    })
+    toast({
+      title: 'Paramètres enregistrés',
+      description: 'Configuration sauvegardée localement (walanai-admin).',
+    })
   }
 
   const handleMaintenanceToggle = (checked: boolean) => {
@@ -217,6 +253,8 @@ export default function AdminSettingsPage() {
       setMaintenanceConfirmOpen(true)
     } else {
       setMaintenanceMode(false)
+      updateAdminSettings({ maintenanceMode: false })
+      toast({ title: 'Maintenance désactivée', description: 'L\'app étudiant est à nouveau accessible.' })
     }
   }
 
@@ -224,7 +262,16 @@ export default function AdminSettingsPage() {
     setMaintenanceMode(true)
     setMaintenanceConfirmOpen(false)
     setPendingMaintenance(false)
-    toast({ title: 'Mode maintenance activé', description: 'La plateforme est désormais inaccessible pour les utilisateurs.' })
+    updateAdminSettings({
+      maintenanceMode: true,
+      maintenanceMessage:
+        maintenanceMessage.trim() ||
+        'Nous effectuons une maintenance programmée. Merci de réessayer dans quelques minutes.',
+    })
+    toast({
+      title: 'Mode maintenance activé',
+      description: 'L\'app sur / est bloquée. Le back-office /admin reste accessible.',
+    })
   }
 
   const cancelMaintenance = () => {
@@ -240,7 +287,7 @@ export default function AdminSettingsPage() {
   }
 
   // ── Audit filtering ──
-  let filtered = mockAuditLog.filter((entry) => {
+  let filtered = auditEntries.filter((entry) => {
     const matchSearch =
       entry.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       entry.details.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -259,9 +306,14 @@ export default function AdminSettingsPage() {
 
   const handleExport = () => {
     setExportConfirmOpen(false)
+    downloadCsv(
+      'walanai-audit.csv',
+      ['Date', 'Acteur', 'Action', 'Entité', 'Détails'],
+      filtered.map((e) => [e.timestamp, e.userName, e.action, e.entity, e.details])
+    )
     toast({
-      title: 'Export réussi',
-      description: `Le journal d'audit a été exporté (${filtered.length} entrée(s)).`,
+      title: 'Export CSV téléchargé',
+      description: `${filtered.length} entrée(s) exportée(s).`,
     })
   }
 
@@ -293,7 +345,7 @@ export default function AdminSettingsPage() {
               <div>
                 <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
                   <Settings className="h-6 w-6 text-emerald-400" />
-                  Configuration
+                  Paramètres
                 </h1>
                 <p className="text-slate-400 text-sm mt-1">Paramètres globaux de la plateforme</p>
               </div>
@@ -885,7 +937,7 @@ export default function AdminSettingsPage() {
                         <SelectItem value="Utilisateur">Utilisateur</SelectItem>
                         <SelectItem value="Document">Document</SelectItem>
                         <SelectItem value="Abonnement">Abonnement</SelectItem>
-                        <SelectItem value="Configuration">Configuration</SelectItem>
+                        <SelectItem value="Paramètres">Paramètres</SelectItem>
                       </SelectContent>
                     </Select>
                     <Select value={dateRange} onValueChange={handleFilterChange(setDateRange)}>

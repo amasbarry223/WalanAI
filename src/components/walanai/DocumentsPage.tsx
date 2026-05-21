@@ -24,20 +24,11 @@ import {
   File,
   FileType2,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
 
 type FilterType = 'tous' | 'favoris' | 'archives'
 type ViewMode = 'grid' | 'list'
-
-const mockDocuments = [
-  { id: 1, title: 'Introduction au Droit Civil', subject: 'Droit', date: '15 Mai 2026', flashcards: 24, type: 'PDF', favorite: true, archived: false, color: 'bg-red-500' },
-  { id: 2, title: 'Microéconomie - Chapitre 3', subject: 'Économie', date: '12 Mai 2026', flashcards: 18, type: 'DOC', favorite: false, archived: false, color: 'bg-blue-500' },
-  { id: 3, title: 'Algorithmes et Structures de Données', subject: 'Informatique', date: '10 Mai 2026', flashcards: 32, type: 'PDF', favorite: true, archived: false, color: 'bg-red-500' },
-  { id: 4, title: 'Histoire de la Révolution Française', subject: 'Histoire', date: '8 Mai 2026', flashcards: 15, type: 'PPT', favorite: false, archived: false, color: 'bg-orange-500' },
-  { id: 5, title: 'Statistiques Descriptives', subject: 'Mathématiques', date: '5 Mai 2026', flashcards: 20, type: 'PDF', favorite: false, archived: true, color: 'bg-red-500' },
-  { id: 6, title: 'Comptabilité Générale', subject: 'Gestion', date: '1 Mai 2026', flashcards: 12, type: 'XLS', favorite: true, archived: false, color: 'bg-green-600' },
-]
 
 const subjectColors: Record<string, string> = {
   Droit: 'bg-blue-100 text-blue-700',
@@ -58,14 +49,50 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.35 } },
 }
 
+const typeColors: Record<string, string> = {
+  PDF: 'bg-red-500',
+  DOC: 'bg-blue-500',
+  DOCX: 'bg-blue-500',
+  PPT: 'bg-orange-500',
+  PPTX: 'bg-orange-500',
+  XLS: 'bg-green-600',
+  XLSX: 'bg-green-600',
+  TXT: 'bg-gray-500',
+}
+
 export default function DocumentsPage() {
-  const { setCurrentPage } = useAppStore()
+  const { setCurrentPage, documents, addDocument, toggleDocumentFavorite } = useAppStore()
   const { toast } = useToast()
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [activeFilter, setActiveFilter] = useState<FilterType>('tous')
   const [searchQuery, setSearchQuery] = useState('')
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
 
-  const filteredDocs = mockDocuments.filter((doc) => {
+  const handleImportFiles = (files: FileList | null) => {
+    if (!files?.length) return
+    Array.from(files).forEach((file) => {
+      const ext = file.name.split('.').pop()?.toUpperCase() || 'PDF'
+      const title = file.name.replace(/\.[^.]+$/, '')
+      addDocument({
+        title,
+        subject: 'Importé',
+        date: new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }),
+        flashcards: 0,
+        type: ext.slice(0, 4),
+        favorite: false,
+        archived: false,
+        color: typeColors[ext] || 'bg-emerald-500',
+        fileName: file.name,
+        sizeLabel: `${(file.size / 1024).toFixed(0)} Ko`,
+      })
+    })
+    toast({
+      title: `${files.length} document(s) importé(s)`,
+      description: 'Fichiers enregistrés localement dans votre navigateur.',
+    })
+  }
+
+  const filteredDocs = documents.filter((doc) => {
     if (activeFilter === 'favoris' && !doc.favorite) return false
     if (activeFilter === 'archives' && !doc.archived) return false
     if (activeFilter === 'tous' && doc.archived) return false
@@ -95,9 +122,20 @@ export default function DocumentsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Mes Documents</h1>
         </div>
         <div className="flex items-center gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            className="hidden"
+            multiple
+            accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt"
+            onChange={(e) => {
+              handleImportFiles(e.target.files)
+              e.target.value = ''
+            }}
+          />
           <Button
             className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2"
-            onClick={() => toast({ title: 'L\'import de documents sera bientôt disponible' })}
+            onClick={() => fileInputRef.current?.click()}
           >
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">Importer</span>

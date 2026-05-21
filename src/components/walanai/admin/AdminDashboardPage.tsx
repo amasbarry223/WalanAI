@@ -1,5 +1,7 @@
 'use client'
 
+import { useMemo } from 'react'
+import { listAdminUsers } from '@/lib/admin-users'
 import { useAppStore } from '@/lib/store'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -84,35 +86,82 @@ const monthlyRevenue = [
   { month: 'Déc', revenue: 8100 },
 ]
 
-const planDistribution = [
-  { name: 'Gratuit', value: 1248, color: '#94A3B8' },
-  { name: 'Pro', value: 342, color: '#10B981' },
-  { name: 'Enterprise', value: 28, color: '#F59E0B' },
-]
-
-const recentUsers = [
-  { id: '1', name: 'Lucas Martin', email: 'lucas.m@univ.fr', plan: 'pro', date: 'Il y a 2h', active: true },
-  { id: '2', name: 'Emma Dubois', email: 'emma.d@univ.fr', plan: 'gratuit', date: 'Il y a 5h', active: true },
-  { id: '3', name: 'Hugo Richard', email: 'hugo.r@univ.fr', plan: 'pro', date: 'Il y a 8h', active: true },
-  { id: '4', name: 'Léa Petit', email: 'lea.p@univ.fr', plan: 'gratuit', date: 'Hier', active: false },
-  { id: '5', name: 'Nathan Bernard', email: 'nathan.b@univ.fr', plan: 'pro', date: 'Hier', active: true },
-]
-
-const alerts = [
-  { id: 1, type: 'warning' as const, title: 'Abonnements expirants', desc: '23 abonnements Pro expirent cette semaine', icon: AlertTriangle, targetPage: 'admin-subscriptions' as AdminPageName },
-  { id: 2, type: 'info' as const, title: 'Tickets support ouverts', desc: '8 tickets en attente de traitement', icon: Clock, targetPage: 'admin-support' as AdminPageName },
-  { id: 3, type: 'success' as const, title: 'Objectif mensuel atteint', desc: 'Revenue mensuel dépassé de 12%', icon: CheckCircle2, targetPage: 'admin-analytics' as AdminPageName },
-]
+const PRO_PRICE_EUR = 9.99
 
 export default function AdminDashboardPage() {
   const { setCurrentAdminPage } = useAppStore()
   const { toast } = useToast()
 
+  const users = useMemo(() => listAdminUsers(), [])
+  const total = users.length
+  const activeCount = users.filter((u) => u.active).length
+  const proCount = users.filter((u) => u.plan === 'pro').length
+  const conversion =
+    total > 0 ? ((proCount / total) * 100).toFixed(1) : '0'
+  const mrr = Math.round(proCount * PRO_PRICE_EUR)
+
+  const planDistribution = useMemo(
+    () => [
+      { name: 'Gratuit', value: users.filter((u) => u.plan === 'gratuit').length, color: '#94A3B8' },
+      { name: 'Pro', value: proCount, color: '#10B981' },
+    ].filter((p) => p.value > 0),
+    [users, proCount]
+  )
+
+  const recentUsers = useMemo(
+    () =>
+      [...users]
+        .filter((u) => !u.isSystemAccount)
+        .slice(0, 5)
+        .map((u) => ({
+          id: u.id,
+          name: u.name,
+          email: u.email,
+          plan: u.plan,
+          date: u.lastActive,
+          active: u.active,
+        })),
+    [users]
+  )
+
+  const suspendedCount = users.filter((u) => !u.active && !u.isSystemAccount).length
+
+  const alerts = [
+    ...(suspendedCount > 0
+      ? [
+          {
+            id: 1,
+            type: 'warning' as const,
+            title: 'Comptes suspendus',
+            desc: `${suspendedCount} compte(s) inactif(s) — voir Utilisateurs`,
+            icon: AlertTriangle,
+            targetPage: 'admin-users' as AdminPageName,
+          },
+        ]
+      : []),
+    {
+      id: 2,
+      type: 'info' as const,
+      title: 'Données locales',
+      desc: `${total} compte(s) enregistré(s) sur cet appareil`,
+      icon: Clock,
+      targetPage: 'admin-users' as AdminPageName,
+    },
+    {
+      id: 3,
+      type: 'success' as const,
+      title: 'Abonnés Pro',
+      desc: `${proCount} utilisateur(s) Pro — MRR estimé ${mrr} €`,
+      icon: CheckCircle2,
+      targetPage: 'admin-subscriptions' as AdminPageName,
+    },
+  ]
+
   const kpis = [
     {
       title: 'Utilisateurs totaux',
-      value: '1,618',
-      change: '+12.5%',
+      value: String(total),
+      change: 'données réelles',
       trend: 'up' as const,
       icon: Users,
       color: 'text-blue-600',
@@ -121,9 +170,9 @@ export default function AdminDashboardPage() {
       targetPage: 'admin-users' as AdminPageName,
     },
     {
-      title: 'Revenu mensuel',
-      value: '8 100 €',
-      change: '+18.2%',
+      title: 'Revenu mensuel (estim.)',
+      value: `${mrr} €`,
+      change: `${proCount} × Pro`,
       trend: 'up' as const,
       icon: CreditCard,
       color: 'text-emerald-600',
@@ -133,8 +182,8 @@ export default function AdminDashboardPage() {
     },
     {
       title: 'Taux de conversion',
-      value: '24.8%',
-      change: '+3.1%',
+      value: `${conversion}%`,
+      change: 'Pro / total',
       trend: 'up' as const,
       icon: TrendingUp,
       color: 'text-violet-600',
@@ -144,9 +193,9 @@ export default function AdminDashboardPage() {
     },
     {
       title: 'Utilisateurs actifs',
-      value: '892',
-      change: '-2.4%',
-      trend: 'down' as const,
+      value: String(activeCount),
+      change: `${total - activeCount} inactif(s)`,
+      trend: activeCount >= total / 2 ? ('up' as const) : ('down' as const),
       icon: Activity,
       color: 'text-amber-600',
       bg: 'bg-amber-50',
@@ -155,10 +204,13 @@ export default function AdminDashboardPage() {
     },
   ]
 
+  const totalDocs = users.reduce((s, u) => s + u.documents, 0)
+  const totalQuizzes = users.reduce((s, u) => s + u.quizzes, 0)
+
   const realtimeStats = [
-    { label: 'Sessions en cours', value: 47, icon: Eye, color: 'text-emerald-500' },
-    { label: 'Quiz en cours', value: 12, icon: Zap, color: 'text-amber-500' },
-    { label: 'Documents uploadés', value: 28, icon: FileText, color: 'text-blue-500' },
+    { label: 'Comptes actifs', value: activeCount, icon: Eye, color: 'text-emerald-500' },
+    { label: 'Quiz enregistrés', value: totalQuizzes, icon: Zap, color: 'text-amber-500' },
+    { label: 'Documents (usage)', value: totalDocs, icon: FileText, color: 'text-blue-500' },
   ]
 
   return (

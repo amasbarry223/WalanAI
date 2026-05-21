@@ -40,7 +40,8 @@ import {
   Moon,
   Sun,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { deleteAccount } from '@/lib/local-auth'
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -53,19 +54,35 @@ const itemVariants = {
 }
 
 export default function SettingsPage() {
-  const { user, setCurrentPage, logout } = useAppStore()
+  const { user, setCurrentPage, logout, userSettings, updateUserSettings, updateProfile } = useAppStore()
   const { toast } = useToast()
-  const [notifications, setNotifications] = useState(true)
-  const [emailNotif, setEmailNotif] = useState(true)
-  const [darkMode, setDarkMode] = useState(false)
-  const [language, setLanguage] = useState('fr')
+  const [name, setName] = useState(user?.name ?? '')
+  const [notifications, setNotifications] = useState(userSettings.notifications)
+  const [emailNotif, setEmailNotif] = useState(userSettings.emailNotif)
+  const [darkMode, setDarkMode] = useState(userSettings.darkMode)
+  const [language, setLanguage] = useState(userSettings.language)
+
+  useEffect(() => {
+    setName(user?.name ?? '')
+  }, [user?.name])
 
   const initials = user?.name
     ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
     : 'U'
 
+  const handleSaveProfile = () => {
+    if (!name.trim()) {
+      toast({ title: 'Le nom est requis', variant: 'destructive' })
+      return
+    }
+    updateProfile(name.trim())
+    updateUserSettings({ notifications, emailNotif, darkMode, language })
+    toast({ title: 'Profil enregistré', description: 'Données sauvegardées dans votre navigateur.' })
+  }
+
   const handleDeleteAccount = () => {
-    toast({ title: 'Fonctionnalité à venir' })
+    if (user?.email) deleteAccount(user.email)
+    toast({ title: 'Compte supprimé localement' })
     logout()
   }
 
@@ -127,17 +144,17 @@ export default function SettingsPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="name" className="text-sm text-gray-600">Nom complet</Label>
-                <Input id="name" defaultValue={user?.name || ''} className="mt-1.5" />
+                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="mt-1.5" />
               </div>
               <div>
                 <Label htmlFor="email" className="text-sm text-gray-600">Email</Label>
-                <Input id="email" defaultValue={user?.email || ''} className="mt-1.5" />
+                <Input id="email" value={user?.email || ''} readOnly className="mt-1.5 bg-gray-50" />
               </div>
             </div>
 
             <Button
               className="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white"
-              onClick={() => toast({ title: 'Profil mis à jour avec succès' })}
+              onClick={handleSaveProfile}
             >
               Enregistrer les modifications
             </Button>

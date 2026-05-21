@@ -333,7 +333,7 @@ function CircularProgress({
 // ─── Main Component ──────────────────────────────────────────────────
 
 export default function QuizGeneratorPage() {
-  const { setCurrentPage } = useAppStore()
+  const { setCurrentPage, addQuizResult } = useAppStore()
 
   // Quiz state
   const [phase, setPhase] = useState<QuizPhase>('config')
@@ -455,6 +455,21 @@ export default function QuizGeneratorPage() {
 
   const finishQuiz = () => {
     setIsTimerRunning(false)
+    const correct = questions.filter((q, i) => answers[i] === q.correctIndex).length
+    const score = questions.length > 0 ? Math.round((correct / questions.length) * 100) : 0
+    const mins = Math.floor(timeElapsed / 60)
+    const secs = timeElapsed % 60
+
+    addQuizResult({
+      title: `Quiz - ${config.subject}`,
+      subject: config.subject,
+      score,
+      totalQuestions: questions.length,
+      correctAnswers: correct,
+      duration: `${mins} min ${secs}s`,
+      type: config.quizType === 'vrai-faux' ? 'vrai-faux' : config.quizType === 'ouvert' ? 'ouvert' : 'qcm',
+    })
+
     setPhase('results')
   }
 

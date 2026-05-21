@@ -1,6 +1,7 @@
 'use client'
 
 import { useAppStore } from '@/lib/store'
+import { useAuthNavigation } from '@/hooks/use-auth-navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
@@ -92,7 +93,7 @@ function AnimatedSection({ children, className = '', id }: { children: React.Rea
 // ─── Navbar ───────────────────────────────────────────────────
 
 function Navbar() {
-  const { setCurrentPage } = useAppStore()
+  const { goTo } = useAuthNavigation()
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -148,13 +149,13 @@ function Navbar() {
           <Button
             variant="ghost"
             className="hidden sm:flex text-zinc-600 hover:text-zinc-900 font-medium"
-            onClick={() => setCurrentPage('login')}
+            onClick={() => goTo('login')}
           >
             Connexion
           </Button>
           <Button
             className="rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-4"
-            onClick={() => setCurrentPage('register')}
+            onClick={() => goTo('register')}
           >
             Commencer
           </Button>
@@ -188,12 +189,12 @@ function Navbar() {
               </a>
             ))}
             <div className="flex flex-col gap-2 pt-3 border-t border-zinc-100">
-              <Button variant="outline" onClick={() => { setCurrentPage('login'); setMobileOpen(false) }}>
+              <Button variant="outline" onClick={() => { goTo('login'); setMobileOpen(false) }}>
                 Connexion
               </Button>
               <Button
                 className="bg-emerald-500 hover:bg-emerald-600 text-white"
-                onClick={() => { setCurrentPage('register'); setMobileOpen(false) }}
+                onClick={() => { goTo('register'); setMobileOpen(false) }}
               >
                 Commencer
               </Button>
@@ -208,7 +209,7 @@ function Navbar() {
 // ─── Hero Section ─────────────────────────────────────────────
 
 function HeroSection() {
-  const { setCurrentPage } = useAppStore()
+  const { goTo } = useAuthNavigation()
   const heroRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -249,7 +250,7 @@ function HeroSection() {
           <div className="gsap-hero flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button
               className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 px-6 py-3 font-medium text-white transition-colors sm:w-auto"
-              onClick={() => setCurrentPage('register')}
+              onClick={() => goTo('register')}
             >
               Essayer gratuitement
               <ArrowRight className="h-4 w-4" />
@@ -311,7 +312,7 @@ function ProductShowcase() {
     })
   }, [])
 
-  const showcaseRow1 = [
+  const showcaseSlides = [
     { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard WalanAI' },
     { src: '/images/showcase/quiz-1.png', alt: 'Quiz Generator' },
     { src: '/images/showcase/flashcards-1.png', alt: 'Flashcards' },
@@ -320,41 +321,12 @@ function ProductShowcase() {
     { src: '/images/showcase/groups-1.png', alt: 'Groupes' },
     { src: '/images/showcase/pomodoro-1.png', alt: 'Pomodoro' },
     { src: '/images/showcase/documents-1.png', alt: 'Documents' },
-    { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard WalanAI' },
-    { src: '/images/showcase/quiz-1.png', alt: 'Quiz Generator' },
-    { src: '/images/showcase/flashcards-1.png', alt: 'Flashcards' },
-    { src: '/images/showcase/coach-1.png', alt: 'Coach IA' },
-    { src: '/images/showcase/progress-1.png', alt: 'Progrès' },
-    { src: '/images/showcase/groups-1.png', alt: 'Groupes' },
-    { src: '/images/showcase/pomodoro-1.png', alt: 'Pomodoro' },
-    { src: '/images/showcase/documents-1.png', alt: 'Documents' },
-    { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard WalanAI' },
-    { src: '/images/showcase/quiz-1.png', alt: 'Quiz Generator' },
-    { src: '/images/showcase/flashcards-1.png', alt: 'Flashcards' },
-    { src: '/images/showcase/coach-1.png', alt: 'Coach IA' },
-  ]
+  ] as const
 
+  const showcaseRow1 = showcaseSlides
   const showcaseRow2 = [
-    { src: '/images/showcase/progress-1.png', alt: 'Progrès' },
-    { src: '/images/showcase/groups-1.png', alt: 'Groupes' },
-    { src: '/images/showcase/pomodoro-1.png', alt: 'Pomodoro' },
-    { src: '/images/showcase/documents-1.png', alt: 'Documents' },
-    { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard WalanAI' },
-    { src: '/images/showcase/quiz-1.png', alt: 'Quiz Generator' },
-    { src: '/images/showcase/flashcards-1.png', alt: 'Flashcards' },
-    { src: '/images/showcase/coach-1.png', alt: 'Coach IA' },
-    { src: '/images/showcase/progress-1.png', alt: 'Progrès' },
-    { src: '/images/showcase/groups-1.png', alt: 'Groupes' },
-    { src: '/images/showcase/pomodoro-1.png', alt: 'Pomodoro' },
-    { src: '/images/showcase/documents-1.png', alt: 'Documents' },
-    { src: '/images/showcase/dashboard-1.png', alt: 'Dashboard WalanAI' },
-    { src: '/images/showcase/quiz-1.png', alt: 'Quiz Generator' },
-    { src: '/images/showcase/flashcards-1.png', alt: 'Flashcards' },
-    { src: '/images/showcase/coach-1.png', alt: 'Coach IA' },
-    { src: '/images/showcase/progress-1.png', alt: 'Progrès' },
-    { src: '/images/showcase/groups-1.png', alt: 'Groupes' },
-    { src: '/images/showcase/pomodoro-1.png', alt: 'Pomodoro' },
-    { src: '/images/showcase/documents-1.png', alt: 'Documents' },
+    ...showcaseSlides.slice(4),
+    ...showcaseSlides.slice(0, 4),
   ]
 
   return (
@@ -1243,7 +1215,7 @@ const plans = [
 ]
 
 function PricingSection() {
-  const { setCurrentPage } = useAppStore()
+  const { goTo } = useAuthNavigation()
 
   return (
     <AnimatedSection id="pricing" className="py-24 sm:py-32 bg-zinc-50">
@@ -1312,7 +1284,7 @@ function PricingSection() {
                         ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
                         : 'bg-zinc-900 hover:bg-zinc-800 text-white'
                     }`}
-                    onClick={() => setCurrentPage('register')}
+                    onClick={() => goTo('register')}
                   >
                     {plan.cta}
                     <ChevronRight className="h-4 w-4 ml-1" />
@@ -1330,7 +1302,7 @@ function PricingSection() {
 // ─── CTA Section ──────────────────────────────────────────────
 
 function CTASection() {
-  const { setCurrentPage } = useAppStore()
+  const { goTo } = useAuthNavigation()
 
   return (
     <AnimatedSection className="py-24 sm:py-32 bg-white">
@@ -1359,7 +1331,7 @@ function CTASection() {
                 <Button
                   size="lg"
                   className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-xl h-12 px-8 text-base font-semibold group"
-                  onClick={() => setCurrentPage('register')}
+                  onClick={() => goTo('register')}
                 >
                   Commencer gratuitement
                   <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -1379,7 +1351,7 @@ function CTASection() {
 // ─── Footer ───────────────────────────────────────────────────
 
 function Footer() {
-  const { setCurrentPage } = useAppStore()
+  const { goTo } = useAuthNavigation()
 
   const footerLinks = [
     {
@@ -1388,7 +1360,7 @@ function Footer() {
         { label: 'Fonctionnalités', href: '#features' },
         { label: 'Tarifs', href: '#pricing' },
         { label: 'FAQ', href: '#faq' },
-        { label: 'Commencer', onClick: () => setCurrentPage('register') },
+        { label: 'Commencer', onClick: () => goTo('register') },
       ],
     },
     {

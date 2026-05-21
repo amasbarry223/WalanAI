@@ -1,7 +1,7 @@
 'use client'
 
 import { useAppStore, type AdminPageName } from '@/lib/store'
-import { useState, useSyncExternalStore } from 'react'
+import { useState } from 'react'
 import AdminSidebar, { AdminSidebarContent } from './AdminSidebar'
 import AdminDashboardPage from './AdminDashboardPage'
 import AdminUsersPage from './AdminUsersPage'
@@ -22,16 +22,6 @@ import {
   SheetDescription,
 } from '@/components/ui/sheet'
 
-const emptySubscribe = () => () => {}
-
-function useHydrated() {
-  return useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false
-  )
-}
-
 const adminPageTitles: Record<AdminPageName, string> = {
   'admin-dashboard': 'Tableau de bord',
   'admin-users': 'Gestion des Utilisateurs',
@@ -40,7 +30,7 @@ const adminPageTitles: Record<AdminPageName, string> = {
   'admin-subscriptions': 'Abonnements & Revenus',
   'admin-analytics': 'Analytique',
   'admin-support': 'Support',
-  'admin-settings': 'Configuration',
+  'admin-settings': 'Paramètres',
 }
 
 function MobileAdminHeader({ onMenuClick }: { onMenuClick: () => void }) {
@@ -94,19 +84,7 @@ function MobileAdminSidebar({ open, onClose }: { open: boolean; onClose: () => v
 
 export default function AdminLayout() {
   const { currentAdminPage } = useAppStore()
-  const mounted = useHydrated()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
-  if (!mounted) {
-    return (
-      <div className="flex h-full items-center justify-center bg-slate-900">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent" />
-          <p className="text-sm text-slate-400">Chargement...</p>
-        </div>
-      </div>
-    )
-  }
 
   const renderPage = () => {
     switch (currentAdminPage) {
