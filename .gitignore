@@ -40,7 +40,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-local-*
+# Fichiers locaux à la racine uniquement (ne pas ignorer src/lib/local-auth.ts)
+/local-*
 .claude
 .z-ai-config
 *.log
